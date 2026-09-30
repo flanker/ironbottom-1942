@@ -4,7 +4,7 @@
 <script>
   // Loads the real page with the debug handle (window.__ibs) switched on, plus the balance bot.
   fetch('../index.html').then(r => r.text()).then(html => {
-    html = html.replace('<head>', '<head><script>window.__IBS_DEBUG = true<\/script>')
+    html = html.replace('<head>', '<head><script>window.__IBS_DEBUG = true; window.__IBS_BASE = "../"<\/script>')
                .replace('</body>', '<script src="balance-bot.js"><\/script></body>');
     document.open(); document.write(html); document.close();
   });
