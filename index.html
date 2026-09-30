@@ -993,7 +993,8 @@ class Wake {
 // ---------------------------------------------------------------- audio
 // Recorded clips in sfx/ (CC0, see README) carry the gun and shell sounds; the synthesised versions below stay as the
 // fallback until they load, or if they cannot. Loudness (LUFS) is measured per clip so they can be levelled at runtime.
-const SFX_CLIPS = { gun_s: -21, gun_m: -20, gun_l: -19, gun_xl: -18.6, distant: -15.5, incoming_a: -16.9, incoming_b: -16, incoming_c: -14.6, whistle: -11.3, flyby: -12.9, outgoing: -11.1 };
+const SFX_CLIPS = { gun_s: -21, gun_m: -20, gun_l: -19, gun_xl: -18.6, distant: -15.5, incoming_a: -16.9, incoming_b: -16, incoming_c: -14.6, whistle: -11.3, flyby: -12.9, outgoing: -11.1,
+  hit_a: -17.2, hit_b: -15.4, hit_c: -15.9, boom_a: -12.3, boom_b: -12.7 };
 // which recording each calibre fires, and the playback rate that makes the reference calibre sound right
 const GUN_CLIP = [[135, 'gun_s', 127, 1.4], [180, 'gun_m', 152, 1], [300, 'gun_l', 203, 1], [1e9, 'gun_xl', 406, 1]];
 // Every positional sound goes through a voice: air absorption (distant guns lose their crack), stereo pan relative to the
@@ -1027,6 +1028,7 @@ const Sfx = {
     // soft saturation curve shared by the low thumps, so they still read on laptop speakers
     const cv = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; cv[i] = Math.tanh(x * 2.6) / Math.tanh(2.6); }
     this.curve = cv;
+    this.water = this.makeWater(c);
     // ambience: sea wash, wind, engine
     const src = c.createBufferSource(); src.buffer = b; src.loop = true;
     const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 340;
@@ -1056,7 +1058,8 @@ const Sfx = {
   },
   voice(x, z, wet = 0.3, now = false) {
     if (!this.ok()) return null;
-    const c = this.ctx, d = distToCam(x, z), air = c.createBiquadFilter();
+    // hear from the player's ship as much as from the camera hanging 300 m behind it, so near misses land close
+    const P = G.player, c = this.ctx, d = P && G.mode !== 'menu' ? Math.min(distToCam(x, z), Math.hypot(x - P.x, z - P.z) + 40) : distToCam(x, z), air = c.createBiquadFilter();
     air.type = 'lowpass'; air.frequency.value = clamp(19000 / (1 + d / 320), 500, 19000); air.Q.value = 0.4;
     let tail = air;
     if (c.createStereoPanner) { const p = c.createStereoPanner(); p.pan.value = this.panOf(x, z); air.connect(p); tail = p; }
@@ -1102,7 +1105,7 @@ const Sfx = {
   },
   // ears ring after a heavy salvo of your own, and you hear the shells tearing away toward the target
   gunOwn(k, n, t0, tx, tz, cal) {
-    if (k > 0.3) { const now = this.ctx.currentTime; this.ear.frequency.cancelScheduledValues(now); this.ear.frequency.setValueAtTime(lerp(3500, 700, k), now); this.ear.frequency.setTargetAtTime(20000, now + 0.05, 0.25 + k * 0.5); }
+    if (k > 0.3) this.dull(lerp(3500, 700, k), 0.25 + k * 0.5);
     const c = this.ctx, g = c.createGain(); let dest = g;
     if (c.createStereoPanner) { const p = c.createStereoPanner(); p.pan.setValueAtTime(0, t0); p.pan.linearRampToValueAtTime(this.panOf(tx, tz), t0 + 1.6); g.connect(p); p.connect(this.out); } else g.connect(this.out);
     if (!this.clip('outgoing', dest, t0 + 0.08, (0.22 + 0.2 * k) * Math.min(3, n) / 2, Math.pow(203 / cal, 0.35) * rand(0.95, 1.05)))
@@ -1161,23 +1164,87 @@ const Sfx = {
     const g = c.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.4 + 0.2 * k, tp); g.gain.exponentialRampToValueAtTime(0.0001, tp + 0.7);
     s.connect(f); f.connect(g); g.connect(dest); s.start(t0, rand(0, 1)); s.stop(tp + 0.8);
   },
+  // Water crash: a noise body plus thousands of droplet blips (short rising chirps, like bubbles popping) whose density
+  // swells and thins as the column falls back. Built once; each splash plays it pitched to the calibre.
+  makeWater(c) {
+    const sr = c.sampleRate, len = Math.floor(sr * 3.6), b = c.createBuffer(1, len, sr), d = b.getChannelData(0);
+    let l1 = 0, l2 = 0, pk = 0;
+    for (let i = 0; i < len; i++) { const t = i / sr, e = Math.min(1, t / 0.1) * Math.exp(-t * 1.25); l1 += (Math.random() * 2 - 1 - l1) * 0.45; l2 += (l1 - l2) * 0.12; d[i] = (l1 - l2) * e * 0.55; }
+    for (let k = 0; k < 3200; k++) {
+      const t = Math.min(3.4, 0.02 + -Math.log(1 - Math.random() * 0.985) / 1.15), f0 = 500 + Math.random() * Math.random() * 3600, f1 = f0 * (1.4 + Math.random());
+      const n = Math.floor((0.004 + Math.random() * 0.02) * sr), i0 = Math.floor(t * sr), amp = (0.02 + Math.random() * 0.1) * Math.exp(-t * 0.6) * Math.min(1, t / 0.08);
+      let ph = 0;
+      for (let j = 0; j < n && i0 + j < len; j++) { const u = j / n; ph += TAU * (f0 + (f1 - f0) * u) / sr; d[i0 + j] += Math.sin(ph) * amp * Math.exp(-u * 4) * Math.min(1, u * 20); }
+    }
+    for (let i = 0; i < len; i++) pk = Math.max(pk, Math.abs(d[i]));
+    for (let i = 0; i < len; i++) d[i] *= 0.9 / pk;
+    return b;
+  },
+  waterFx(dest, t0, vol, rate, type = 'lowpass', freq = 9000) {
+    const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.water; s.playbackRate.value = rate; f.type = type; f.frequency.value = freq; f.Q.value = 0.5; g.gain.value = vol;
+    s.connect(f); f.connect(g); g.connect(dest); s.start(t0);
+  },
+  // struck steel: inharmonic plate modes, each decaying on its own clock
+  ring(dest, t0, f0, dur, vol, modes = [1, 2.76, 5.4, 8.93]) {
+    const c = this.ctx;
+    modes.forEach((m, i) => {
+      const o = c.createOscillator(), g = c.createGain(), f = f0 * m * rand(0.985, 1.015), d = dur / (1 + i * 0.6);
+      o.frequency.setValueAtTime(f, t0); o.frequency.exponentialRampToValueAtTime(f * 0.97, t0 + d);
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol / Math.pow(i + 1, 0.8), t0 + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+      o.connect(g); g.connect(dest); o.start(t0); o.stop(t0 + d + 0.05);
+    });
+  },
+  // fragments and loose fittings rattling down after a hit
+  debris(dest, t0, n, span, vol) { for (let i = 0; i < n; i++) { const t = t0 + 0.08 + Math.pow(Math.random(), 1.6) * span; this.hiss(dest, t, 0.02 + Math.random() * 0.05, rand(1500, 5500), null, vol * rand(0.3, 1) * Math.exp(-(t - t0) * 1.5), 'bandpass', 4, 0.002, 1.3); } },
+  // near miss: fuze whump under the surface, crack of the water, then the column roaring up and raining back down;
+  // close aboard you also hear it falling across the deck
   splash(cal, x, z) {
     const v = this.voice(x, z, 0.25); if (!v) return; const { t0, a, dest } = v, k = cal / 406;
-    this.thump(dest, t0, 0.3 + k * 0.5, lerp(90, 55, k), 30, (0.12 + 0.3 * k) * a, 0.3);
-    this.hiss(dest, t0, 0.5 + k * 0.9, 1100, 180, (0.16 + 0.28 * k) * a, 'lowpass', 0.8, 0.02);
-    this.hiss(dest, t0 + 0.12, 0.9 + k * 1.4, 3500, 1500, (0.05 + 0.08 * k) * a, 'highpass', 0.6, 0.15);
+    const P = G.player, close = P && P.alive ? clamp(1 - Math.hypot(x - P.x, z - P.z) / 180, 0, 1) : 0;
+    this.thump(dest, t0, 0.35 + k * 0.7, lerp(95, 48, k), 24, (0.18 + 0.5 * k) * a * (1 + close), 0.6 + k);
+    this.hiss(dest, t0, 0.05 + k * 0.05, 3500, 900, (0.2 + 0.3 * k) * a, 'highpass', 0.5, 0.002, 1.2);
+    this.waterFx(dest, t0 + 0.03, (0.35 + 0.65 * k) * a * (1 + 0.6 * close), lerp(1.35, 0.72, k) * rand(0.94, 1.06), 'lowpass', lerp(7000, 2600, k));
+    if (close > 0.05) this.waterFx(dest, t0 + 0.6 + k * 0.6, (0.25 + 0.3 * k) * close, rand(1.0, 1.25), 'highpass', 1400);
   },
+  // shell striking a ship: steel clang, the burst itself, fragments; a heavy hit on your own ship rings the hull and
+  // dulls your ears. Ground hits skip the steel.
+  // hits you land are lifted a little over distance so they read as confirmation
+  hit(x, z, cal = 150, own = false, crit = false, ground = false, mine = false) {
+    const v = this.voice(x, z, 0.3); if (!v) return; const { t0, dest } = v, a = mine ? Math.min(1, v.a * 2.2) : v.a, k = cal / 406, name = ['hit_a', 'hit_b', 'hit_c'][(Math.random() * 3) | 0];
+    const vol = (0.55 + 0.6 * k) * a * (own ? 1.25 : 1), rate = lerp(1.3, 0.78, k) * rand(0.94, 1.06);
+    if (!ground) this.ring(dest, t0, lerp(950, 260, k) * rand(0.9, 1.1), 0.18 + 0.5 * k + (own ? 0.4 : 0), (0.14 + 0.1 * k) * a * (own ? 1.6 : 1));
+    this.hiss(dest, t0, 0.04, 5000, 2000, (0.35 + 0.3 * k) * a, 'highpass', 0.5, 0.001, 1.4);
+    if (!this.clip(name, ground ? this.lowpassTo(dest, 1400) : dest, t0 + 0.005, vol, rate)) this.hiss(dest, t0, 0.35 + k * 0.6, 3200, 300, vol * 0.6, 'lowpass', 0.9, 0.003);
+    this.thump(dest, t0, 0.25 + 0.6 * k, lerp(150, 70, k), 32, (0.25 + 0.5 * k) * a * (own ? 1.4 : 1), 0.8);
+    this.debris(dest, t0, own ? 10 : 5, 0.6 + k, (0.12 + 0.1 * k) * a * (own ? 1.5 : 1));
+    if (crit) this.clip(Math.random() < 0.5 ? 'boom_a' : 'boom_b', dest, t0 + rand(0.12, 0.25), (0.7 + 0.4 * k) * a, rand(0.95, 1.1));
+    if (own) {
+      if (k > 0.3 || crit) this.dull(lerp(2500, 600, k), 0.3 + k * 0.6);
+      this.ring(dest, t0 + 0.02, rand(95, 130), 1.2 + k, 0.1 + 0.1 * k, [1, 1.47, 2.09, 2.76]);
+    }
+  },
+  // torpedo: a deep blow under the keel, the muffled detonation, then tons of water coming back down; on your own
+  // ship the hull groans
+  torpHit(x, z, own = false, mine = false) {
+    const v = this.voice(x, z, 0.4); if (!v) return; const { t0, dest } = v, a = mine ? Math.min(1, v.a * 2.2) : v.a, g = own ? 1.3 : 1;
+    this.thump(dest, t0, 1.4, 55, 16, Math.min(1, 0.9 * a * g), 1.2);
+    if (!this.clip(Math.random() < 0.5 ? 'boom_a' : 'boom_b', this.lowpassTo(dest, 700), t0 + 0.02, 1.1 * a * g, rand(0.82, 0.95))) this.hiss(dest, t0, 2, 700, 60, 0.6 * a * g, 'lowpass', 0.8, 0.02);
+    this.waterFx(dest, t0 + 0.35, 0.9 * a * g, 0.62, 'lowpass', 3000);
+    this.waterFx(dest, t0 + 1.4, 0.45 * a * g, 0.8, 'lowpass', 5000);
+    if (own) { this.dull(500, 1.2); this.ring(dest, t0 + 0.1, rand(62, 78), 2.6, 0.16, [1, 1.47, 2.09, 2.76, 3.9]); this.debris(dest, t0 + 0.2, 14, 1.6, 0.2); }
+  },
+  lowpassTo(dest, f) { const q = this.ctx.createBiquadFilter(); q.type = 'lowpass'; q.frequency.value = f; q.connect(dest); return q; },
+  dull(f, tau) { const now = this.ctx.currentTime, e = this.ear.frequency; e.cancelScheduledValues(now); e.setValueAtTime(f, now); e.setTargetAtTime(20000, now + 0.05, tau); },
+  // a ship blowing up: detonation, the deep boom rolling out, burning debris
   boom(s, x, z) {
     const v = this.voice(x, z, 0.45); if (!v) return; const { t0, a, dest } = v;
     this.thump(dest, t0, 0.9 + s * 0.8, 70, 20, Math.min(1, 0.5 * s) * a, 1);
     this.hiss(dest, t0, 0.08, 4000, 1500, Math.min(1, 0.4 * s) * a, 'highpass', 0.5, 0.002, 1.5);
-    this.hiss(dest, t0, 1.2 + s, 900, 70, Math.min(1, 0.45 * s) * a, 'lowpass', 0.8, 0.01);
+    if (!this.clip(Math.random() < 0.5 ? 'boom_a' : 'boom_b', dest, t0 + 0.01, Math.min(1.4, 0.6 * s) * a, rand(0.78, 0.9))) this.hiss(dest, t0, 1.2 + s, 900, 70, Math.min(1, 0.45 * s) * a, 'lowpass', 0.8, 0.01);
+    this.clip(['hit_a', 'hit_b', 'hit_c'][(Math.random() * 3) | 0], dest, t0, Math.min(1, 0.4 * s) * a, 0.75);
     this.hiss(dest, t0 + 0.1, 2 + s, 300, 50, Math.min(1, 0.2 * s) * a, 'lowpass', 0.6, 0.3, 0.6);
-  },
-  hit(x, z) {
-    const v = this.voice(x, z, 0.3); if (!v) return; const { t0, a, dest } = v;
-    this.hiss(dest, t0, 0.35, 3200, 700, 0.35 * a, 'bandpass', 1.2, 0.003); this.thump(dest, t0, 0.3, 160, 50, 0.25 * a, 0.6);
-    this.hiss(dest, t0 + 0.03, 0.5, 5000, 2500, 0.08 * a, 'bandpass', 3, 0.01);
+    this.debris(dest, t0 + 0.3, 12, 2.5, 0.12 * a);
   },
   alarm() { if (!this.ctx || this.muted) return; const c = this.ctx, t0 = c.currentTime; for (let i = 0; i < 3; i++) { const o = c.createOscillator(); o.type = 'square'; o.frequency.value = 880; const g = c.createGain(); g.gain.setValueAtTime(0.0001, t0 + i * 0.18); g.gain.exponentialRampToValueAtTime(0.05, t0 + i * 0.18 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.18 + 0.12); o.connect(g); g.connect(this.out); o.start(t0 + i * 0.18); o.stop(t0 + i * 0.18 + 0.14); } },
   launch(x, z) { const v = this.voice(x, z, 0.2); if (!v) return; const { t0, a, dest } = v; this.hiss(dest, t0, 0.5, 700, 200, 0.25 * a); this.thump(dest, t0 + 0.2, 0.4, 120, 60, 0.2 * a); },
@@ -1834,7 +1901,7 @@ function updateShells(dt) {
       const hx = lerp(s.px, s.x, ht), hy = lerp(s.py, s.y, ht), hz = lerp(s.pz, s.z, ht);
       s.alive = false; shellHit(hit, s, hx, hy, hz); continue;
     }
-    if (s.y < 1100) { const th = terrainH(s.x, s.z); if (s.y < th && th > 0) { s.alive = false; FX.hit(s.x, th, s.z, s.gun.cal * 0.8); Sfx.hit(s.x, s.z); continue; } }
+    if (s.y < 1100) { const th = terrainH(s.x, s.z); if (s.y < th && th > 0) { s.alive = false; FX.hit(s.x, th, s.z, s.gun.cal * 0.8); Sfx.hit(s.x, s.z, s.gun.cal, false, false, true); continue; } }
     if (s.y <= 0 && s.t > 0.05) {
       s.alive = false; FX.splash(s.x, s.z, s.gun.cal); Sfx.splash(s.gun.cal, s.x, s.z);
       if (P && P.alive && s.team !== P.team) { const dd = Math.hypot(s.x - P.x, s.z - P.z); if (dd < 120) G.shake = Math.max(G.shake, 0.4 * (1 - dd / 120) * s.gun.cal / 200); }
@@ -1853,7 +1920,7 @@ function shellHit(ship, sh, x, y, z) {
   if (ship.team === 'US' && sh.team === 'JP') dmg *= DIFF[G.diff].dmgTaken;
   if (Math.random() < gun.fire) fire = ship.startFire(lz, sh.owner);
   const dealt = ship.damage(dmg, sh.owner, 'shell');
-  FX.hit(x, y, z, gun.cal); Sfx.hit(x, z);
+  FX.hit(x, y, z, gun.cal); Sfx.hit(x, z, gun.cal, ship.isPlayer, crit, false, sh.owner.isPlayer);
   if (sh.owner.isPlayer && G.stats) { G.stats.hits++; ribbon(crit ? '重创' : '命中', dealt); if (fire) ribbon('引发火灾', 0); }
   if (ship.isPlayer) { G.shake = Math.max(G.shake, gun.cal / 406 * 1.4); if (crit) hint('我舰要害中弹！'); }
 }
@@ -1896,7 +1963,7 @@ function updateTorps(dt) {
         let dmg = t.spec.dmg * rand(0.9, 1.1) * (sh.spec.cls === 'BB' ? 0.75 : 1);
         if (sh.team === 'US' && t.team === 'JP') dmg *= DIFF[G.diff].dmgTaken;
         const dealt = sh.damage(dmg, t.owner, 'torp');
-        FX.column(t.x, t.z, 1.2); FX.hit(t.x, 3, t.z, 300); Sfx.boom(1.3, t.x, t.z);
+        FX.column(t.x, t.z, 1.2); FX.hit(t.x, 3, t.z, 300); Sfx.torpHit(t.x, t.z, sh.isPlayer, t.owner.isPlayer);
         if (t.owner.isPlayer && G.stats) { G.stats.torpHits++; ribbon('鱼雷命中', dealt); }
         if (sh.isPlayer) { G.shake = Math.max(G.shake, 1.6); hint('我舰中雷！'); }
         break;
