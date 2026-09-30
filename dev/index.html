@@ -1,0 +1,11 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>铁底湾 1942 · 平衡测试</title>
+<script>
+  // Loads the real page with the debug handle (window.__ibs) switched on, plus the balance bot.
+  fetch('../index.html').then(r => r.text()).then(html => {
+    html = html.replace('<head>', '<head><script>window.__IBS_DEBUG = true<\/script>')
+               .replace('</body>', '<script src="balance-bot.js"><\/script></body>');
+    document.open(); document.write(html); document.close();
+  });
+</script>
