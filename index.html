@@ -400,67 +400,159 @@ const TORPS = {
   mk15: { label: 'Mk15', speed: 62, range: 4600, dmg: 6500, reload: 38, salvo: 5, spread: 3.0, visR: 1e9 },
   t93: { label: '九三式', speed: 66, range: 7800, dmg: 6200, reload: 75, salvo: 4, spread: 3.4, visR: 2300 },
 };
+// turret houses: cf front-corner chamfer, fs/rs front/rear slope, ss side slope, rr rounded rear, hood sight hoods, ears rangefinder
 const TS = {
-  us5s: { len: 5.4, h: 2.8, w: 4.0, bl: 6.2, br: .17, n: 1 },
-  us5d: { len: 4.6, h: 2.3, w: 3.8, bl: 5.6, br: .15, n: 2 },
-  us6t: { len: 9.5, h: 3.2, w: 7.4, bl: 9.5, br: .26, n: 3 },
-  us16t: { len: 15, h: 4.8, w: 12.4, bl: 17, br: .55, n: 3 },
-  jp5d: { len: 5.6, h: 2.7, w: 4.4, bl: 6.0, br: .16, n: 2 },
-  jp5s: { len: 4.4, h: 2.5, w: 3.2, bl: 6.0, br: .16, n: 1 },
-  jp55: { len: 4.6, h: 2.4, w: 3.2, bl: 7.0, br: .18, n: 1 },
-  jp8d: { len: 8.2, h: 3.3, w: 7.0, bl: 10, br: .3, n: 2 },
-  jp14d: { len: 13, h: 4.4, w: 10.5, bl: 15, br: .5, n: 2 },
-  jp6c: { len: 2.6, h: 1.6, w: 2.2, bl: 5, br: .16, n: 1 },
+  us5s: { len: 5.4, h: 2.8, w: 4.0, bl: 6.2, br: .17, n: 1, cf: .12, fs: .3, ss: .1, rs: .04, hood: 1 },
+  us5d: { len: 4.6, h: 2.3, w: 3.8, bl: 5.6, br: .15, n: 2, cf: .12, fs: .28, ss: .1, rs: .04, hood: 1 },
+  us6t: { len: 9.5, h: 3.2, w: 7.4, bl: 9.5, br: .26, n: 3, cf: .16, fs: .2, ss: .08, rs: .02, ears: 1 },
+  us16t: { len: 15, h: 4.8, w: 12.4, bl: 17, br: .55, n: 3, cf: .2, fs: .24, ss: .12, rs: .02, ears: 1 },
+  jp5d: { len: 5.6, h: 2.7, w: 4.4, bl: 6.0, br: .16, n: 2, cf: .35, fs: .24, ss: .12, rs: .1 },
+  jp5s: { len: 4.4, h: 2.5, w: 3.2, bl: 6.0, br: .16, n: 1, cf: .35, fs: .24, ss: .12, rs: .1 },
+  jp55: { len: 4.6, h: 2.4, w: 3.2, bl: 7.0, br: .18, n: 1, cf: .45, fs: .22, ss: .16, rs: .05 },
+  jp8d: { len: 8.2, h: 3.3, w: 7.0, bl: 10, br: .3, n: 2, cf: .45, fs: .22, ss: .16, rs: .06 },
+  jp14d: { len: 13, h: 4.4, w: 10.5, bl: 15, br: .5, n: 2, cf: .3, fs: .2, ss: .1, rr: .35, ears: 1 },
+  jp6c: { len: 2.6, h: 1.6, w: 2.2, bl: 5, br: .16, n: 1, cf: .3, fs: .2, ss: .1 },
 };
-const Bx = (z, y, len, h, w, x = 0, m = 's') => ({ k: 'b', z, y, len, h, w, x, m });
-const Cy = (z, y, r, h, rake = 0, x = 0) => ({ k: 'c', z, y, r, h, rake: rake * DEG, x });
-const Ms = (z, y, h, r) => ({ k: 'm', z, y, h, r, x: 0 });
+// Ship parts, in hull-local metres (z toward the bow, y above the deck at z).
+// Bx block (rf/rr rounded front/rear, fs front slope, ta top inset, win window band), Cy funnel, Ms mast (tri tripod legs),
+// Pl platform, Tt torpedo mount, Aa light gun (o Oerlikon, b2/b4 Bofors, j2/j3 25 mm, ha/ha2 HA mounts), Sl searchlight,
+// Rf rangefinder, Dr director, Bt boat, Cp catapult (+ floatplane), Cr crane, Gm fixed gun mount, Dc depth-charge rack.
+const Bx = (z, y, len, h, w, x = 0, m = 's', o = {}) => ({ k: 'b', z, y, len, h, w, x, m, ...o });
+const Cy = (z, y, r, h, rake = 0, x = 0, o = {}) => ({ k: 'c', z, y, r, h, rake: rake * DEG, x, ...o });
+const Ms = (z, y, h, r, o = {}) => ({ k: 'm', z, y, h, r, x: 0, ...o, rake: (o.rake || 0) * DEG });
+const Pl = (z, y, len, w, x = 0) => ({ k: 'pl', z, y, len, w, x });
+const Tt = (z, y, n, x = 0, len = 7.5, sh = 0) => ({ k: 'tt', z, y, n, x, len, sh });
+const Aa = (z, y, x, kind) => ({ k: 'aa', z, y, x, kind });
+const Sl = (z, y, x) => ({ k: 'sl', z, y, x });
+const Rf = (z, y, len, x = 0) => ({ k: 'rf', z, y, len, x });
+const Dr = (z, y, kind) => ({ k: 'dr', z, y, kind, x: 0 });
+const Bt = (z, y, x, len) => ({ k: 'bt', z, y, x, len });
+const Cp = (z, y, x, len, face, plane) => ({ k: 'cp', z, y, x, len, face: face * DEG, plane });
+const Cr = (z, y, x, h, boom) => ({ k: 'cr', z, y, x, h, boom });
+const Gm = (z, y, x, face, kind) => ({ k: 'gm', z, y, x, face: face * DEG, kind });
+const Dc = (z, x) => ({ k: 'dc', z, y: 0, x });
 const Tu = (z, y, face, kind, x = 0, sec = false) => ({ z, y, face: face * DEG, kind, x, sec });
 
+const SENDAI_BASE = [
+  Bx(40.5, 0, 11, 4.6, 8.6, 0, 's', { rf: .4 }), Bx(41, 4.6, 7.5, 3, 7.4, 0, 's', { rf: .6, win: .7 }), Bx(41.3, 7.6, 5, 2, 5.6, 0, 's', { rf: .8, win: .8 }),
+  Rf(41, 9.6, 4.5), Ms(36.5, 4.6, 20, .4, { tri: 3, yards: [[.66, 7]], top: [.5, 2] }), Aa(37, 4.6, 3.6, 'j2'), Aa(37, 4.6, -3.6, 'j2'),
+  Bx(9, 0, 30, 2.2, 5.6, 0, 's', { rf: .3, rr: .3 }),
+  Tt(9, 0, 2, 4.4, 7), Tt(9, 0, 2, -4.4, 7), Tt(-13, 0, 2, 4.4, 7), Tt(-13, 0, 2, -4.4, 7),
+  Bt(17.5, 1.4, 5.4, 8), Bt(17.5, 1.4, -5.4, 8),
+  Bx(-22, 0, 16, 3, 7, 0, 's', { rr: .3, rf: .2 }), Rf(-22, 3, 3.5), Ms(-28.5, 3, 13, .3, { tri: 2, yards: [[.75, 5]] }),
+];
 const SPECS = {
   fletcher: { cls: 'DD', nation: 'US', type: '弗莱彻级驱逐舰', L: 114, B: 12, F: 5.2, D: 4, sheer: [[0, .9], [.5, .95], [1, 1.4]], top: 12,
     kn: 36.5, turn: 6.2, rudderT: 1.5, accelT: 9, hp: 16000, tons: 2050, gun: 'us127', torp: 'mk15', torpMounts: 2, prefRange: 3800, aiErr: 70, cam: [300, 88], dc: 3,
-    parts: [Bx(0, 0, 26, 2.4, 7), Bx(22, 0, 13, 4.2, 9), Bx(23.5, 4.2, 8, 3, 7.5), Bx(22.5, 7.2, 3.6, 2, 3.2, 0, 'd'), Ms(17, 4, 17, .35), Cy(6, 2.4, 1.7, 8.5, 5), Cy(-7, 2.4, 1.7, 8, 5), Bx(1, 2.4, 7, 1.1, 2.2, 0, 'd'), Bx(-15, 0, 7, 1.1, 2.2, 0, 'd'), Bx(-28, 0, 12, 2.8, 7)],
+    parts: [
+      Bx(22, 0, 14, 2.6, 8.6, 0, 's', { rf: .35 }), Bx(22.5, 2.6, 8.5, 2.4, 7.6, 0, 's', { rf: .7, win: .7, fs: .4 }), Bx(23, 5.0, 5.6, 1.9, 6.4, 0, 's', { rf: .8, win: .6 }),
+      Pl(22.5, 6.9, 7.6, 8.4), Dr(20.6, 6.9, 'us37'), Aa(20.5, 5, 3.5, 'o'), Aa(20.5, 5, -3.5, 'o'),
+      Ms(17, 2.6, 19, .35, { yards: [[.64, 7.5], [.8, 4]], radar: 'sc', rake: 4 }),
+      Bx(1, 0, 27, 2.4, 6.4, 0, 's', { rf: .25, rr: .25 }),
+      Cy(8, 2.4, 1.75, 8.2, 5, 0, { cap: 'us' }), Cy(-6, 2.4, 1.75, 7.6, 5, 0, { cap: 'us' }),
+      Tt(1, 2.4, 5), Bx(-17.5, 0, 6, 0.9, 4.6), Tt(-17.5, 0.9, 5),
+      Pl(-9.8, 6.6, 2.6, 3.4), Sl(-9.8, 6.6, 0), Bt(-3, 1.4, -4.6, 7.5), Aa(-11, 0, 4.1, 'o'), Aa(-11, 0, -4.1, 'o'),
+      Bx(-27, 0, 11, 2.8, 7, 0, 's', { rr: .2 }), Aa(-23, 2.8, 0, 'b2'),
+      Dc(-54.5, 2.2), Dc(-54.5, -2.2)],
     tur: [Tu(40, 0, 0, 'us5s'), Tu(31, 2.6, 0, 'us5s'), Tu(-28, 2.8, 180, 'us5s'), Tu(-38, 1.2, 180, 'us5s'), Tu(-47, 0, 180, 'us5s')] },
   brooklyn: { cls: 'CL', nation: 'US', type: '布鲁克林级轻巡洋舰', L: 185, B: 18.6, F: 6.4, D: 6.9, sheer: [[0, .85], [.45, .95], [1, 1.35]], top: 22,
     kn: 32.5, turn: 4.2, rudderT: 2.4, accelT: 14, hp: 34000, tons: 9767, gun: 'us152', torp: null, prefRange: 5600, aiErr: 80, cam: [400, 115], dc: 3,
-    parts: [Bx(26, 0, 22, 6, 13), Bx(29, 6, 12, 4, 10), Bx(30, 10, 6, 3, 7), Bx(30, 13, 3.5, 2.5, 3.5, 0, 'd'), Ms(24, 6, 22, .5), Bx(-2, 0, 30, 3, 12), Cy(6, 3, 2.6, 10), Cy(-8, 3, 2.6, 10), Bx(-28, 0, 14, 5, 11), Bx(-28, 5, 4, 2.5, 4, 0, 'd'), Ms(-20, 5, 16, .4), Bx(-80, 0, 14, .6, 1.2, 4, 'd'), Bx(-80, 0, 14, .6, 1.2, -4, 'd')],
+    parts: [
+      Bx(27, 0, 22, 5.5, 13.5, 0, 's', { rf: .25 }), Bx(29, 5.5, 13, 3.2, 11, 0, 's', { rf: .55, win: .8 }), Bx(30, 8.7, 8, 2.6, 8.4, 0, 's', { rf: .7, win: .7 }),
+      Pl(30, 11.3, 9, 10.5), Dr(29.5, 11.3, 'us37'), Aa(20, 5.5, 5, 'b4'), Aa(20, 5.5, -5, 'b4'),
+      Ms(23.5, 5.5, 23, .5, { yards: [[.62, 11], [.78, 6]], top: [.45, 2.6], radar: 'sc' }),
+      Bx(-1, 0, 32, 3, 12.5, 0, 's', { rf: .2, rr: .2 }),
+      Gm(12, 3, 5.2, 90, 'us5d'), Gm(12, 3, -5.2, -90, 'us5d'), Gm(-13, 3, 5.2, 90, 'us5d'), Gm(-13, 3, -5.2, -90, 'us5d'),
+      Cy(5, 3, 2.6, 11, 0, 0, { cap: 'us' }), Cy(-7, 3, 2.6, 10.5, 0, 0, { cap: 'us' }),
+      Pl(-1, 9, 4.5, 9), Sl(-1, 9, 3.2), Sl(-1, 9, -3.2), Bt(-1, 3.2, 4.3, 8), Bt(-1, 3.2, -4.3, 8),
+      Bx(-27, 0, 13, 5, 11.5, 0, 's', { rr: .3 }), Bx(-26.5, 5, 7, 2.4, 7, 0, 's', { win: .5, rf: .4 }), Dr(-27.5, 7.4, 'us37'),
+      Ms(-20, 5, 18, .4, { yards: [[.72, 8]] }), Aa(-36, 0, 5.2, 'b4'), Aa(-36, 0, -5.2, 'b4'),
+      Bx(-72, 0, 11, 0.12, 9, 0, 'd'), Cp(-79, 0.6, 4.6, 15, 25, 1), Cp(-79, 0.6, -4.6, 15, -25, 1), Cr(-88.5, 0, 0, 6.5, 11)],
     tur: [Tu(63, 0, 0, 'us6t'), Tu(52, 2.9, 0, 'us6t'), Tu(42, 4.2, 0, 'us6t'), Tu(-44, 2.9, 180, 'us6t'), Tu(-55, 0, 180, 'us6t')] },
   nc: { cls: 'BB', nation: 'US', type: '北卡罗来纳级战列舰', L: 222, B: 33, F: 8.5, D: 10, sheer: [[0, .9], [.5, .95], [1, 1.3]], top: 30,
     kn: 28, turn: 2.6, rudderT: 4, accelT: 22, hp: 72000, tons: 36600, gun: 'us406', sec: 'sec127', torp: null, prefRange: 7600, aiErr: 100, cam: [480, 140], dc: 4,
-    parts: [Bx(32, 0, 26, 8, 20), Bx(33, 8, 16, 7, 14), Bx(34, 15, 10, 7, 9), Bx(35, 22, 6, 4, 6), Bx(35, 26, 4, 3, 4, 0, 'd'), Ms(30, 22, 14, .6), Bx(2, 0, 40, 6, 22), Cy(12, 6, 4, 13, 4), Cy(-6, 6, 4, 12, 4), Bx(-26, 0, 18, 8, 16), Bx(-27, 8, 5, 3, 5, 0, 'd'), Ms(-18, 8, 20, .5)],
+    parts: [
+      Bx(3, 0, 64, 6, 25, 0, 's', { rf: .3, rr: .3 }), Bx(38.5, 0, 6.5, 10, 6.5, 0, 's', { rf: 1, rr: 1 }),
+      Bx(31, 6, 11, 4, 13, 0, 's', { rf: .6, win: .6 }), Bx(31.5, 10, 9, 4.5, 10.5, 0, 's', { rf: .7, win: .7 }),
+      Bx(32, 14.5, 7, 4, 8.5, 0, 's', { rf: .75, win: .7 }), Bx(32, 18.5, 5.5, 3.5, 6.5, 0, 's', { rf: .8, win: .6 }),
+      Pl(32, 22, 7.5, 9), Dr(32.5, 22, 'us38'), Ms(29.5, 22, 13, .45, { yards: [[.55, 9]], radar: 'sc' }), Dr(25.5, 6, 'us37'),
+      Cy(12, 6, 4.2, 14, 4, 0, { cap: 'us' }), Cy(-5, 6, 4.2, 13, 4, 0, { cap: 'us' }),
+      Pl(3.5, 12.5, 5, 11), Sl(3.5, 12.5, 3.8), Sl(3.5, 12.5, -3.8), Bt(3.5, 6.3, 6.8, 10), Bt(3.5, 6.3, -6.8, 10),
+      Ms(-15, 6, 22, .55, { yards: [[.75, 10]], tri: 3, top: [.55, 2.4] }),
+      Bx(-22, 6, 10, 3, 12, 0, 's', { rr: .5, win: .5 }), Dr(-22.5, 9, 'us37'), Dr(-26.5, 6, 'us38'),
+      Aa(33, 6, 9.5, 'b4'), Aa(33, 6, -9.5, 'b4'), Aa(-26, 6, 9.5, 'b4'), Aa(-26, 6, -9.5, 'b4'),
+      Aa(45, 0, 12, 'o'), Aa(45, 0, -12, 'o'), Aa(-40, 0, 12, 'o'), Aa(-40, 0, -12, 'o'),
+      Cp(-96, 0.6, 7, 16, 25, 1), Cp(-96, 0.6, -7, 16, -25, 1), Cr(-106, 0, 0, 8, 14)],
     tur: [Tu(72, 0, 0, 'us16t'), Tu(57, 4, 0, 'us16t'), Tu(-52, 3, 180, 'us16t'),
       Tu(20, 6, 90, 'us5d', 10.5, true), Tu(10, 6, 90, 'us5d', 10.5, true), Tu(0, 6, 90, 'us5d', 10.5, true), Tu(-10, 6, 90, 'us5d', 10.5, true), Tu(-20, 6, 90, 'us5d', 10.5, true),
       Tu(20, 6, -90, 'us5d', -10.5, true), Tu(10, 6, -90, 'us5d', -10.5, true), Tu(0, 6, -90, 'us5d', -10.5, true), Tu(-10, 6, -90, 'us5d', -10.5, true), Tu(-20, 6, -90, 'us5d', -10.5, true)] },
-  shiratsuyu: { cls: 'DD', nation: 'JP', type: '白露型驱逐舰', L: 111, B: 9.9, F: 4.4, D: 3.5, sheer: [[0, .85], [.6, .85], [.64, 1.45], [1, 1.65]], top: 12,
+  shiratsuyu: { cls: 'DD', nation: 'JP', type: '白露型驱逐舰', L: 111, B: 9.9, F: 4.4, D: 3.5, sheer: [[0, .85], [.618, .85], [.622, 1.45], [1, 1.65]], top: 12, stem: 'clipper',
     kn: 34, turn: 6.5, rudderT: 1.6, accelT: 9, hp: 10000, tons: 1685, gun: 'jp127', torp: 't93', torpMounts: 2, prefRange: 3600, aiErr: 80, dc: 1,
-    parts: [Bx(24, 0, 8, 4, 6.5), Bx(24.5, 4, 5, 2.5, 5), Ms(19.5, 3, 14, .3), Cy(8, 0, 1.5, 7, 12), Cy(-4, 0, 1.3, 6, 12), Bx(2, 0, 6.5, 1.3, 2.4, 0, 'd'), Bx(-12, 0, 6.5, 1.3, 2.4, 0, 'd'), Bx(-24, 0, 8, 2.2, 5), Ms(-18, 0, 10, .25)],
+    parts: [
+      Bx(23.5, 0, 9, 2.6, 7, 0, 's', { rf: .5 }), Bx(24, 2.6, 6.5, 1.9, 6, 0, 's', { rf: .75, win: .6 }), Bx(24.3, 4.5, 4.4, 1.7, 5, 0, 's', { rf: .85, win: .8 }),
+      Rf(24.3, 6.2, 3), Ms(19.5, 2.6, 13, .3, { tri: 2.2, yards: [[.7, 5]], top: [.52, 1.4] }),
+      Cy(7.5, 0, 1.6, 7.4, 12, 0, { cap: 'jp', pipe: 1 }), Cy(-4, 0, 1.35, 6.4, 12, 0, { cap: 'jp', pipe: 1 }),
+      Tt(1.5, 0.6, 4, 0, 8, 1), Tt(-12, 0.6, 4, 0, 8, 1), Bx(-7.8, 0, 2.8, 1.2, 2.8), Aa(-7.8, 1.2, 0, 'j2'),
+      Bt(6, 1.4, 3.6, 6), Bt(6, 1.4, -3.6, 6),
+      Bx(-24.5, 0, 8, 2.2, 5.2, 0, 's', { rr: .3 }), Ms(-18.5, 0, 10, .25, { yards: [[.8, 3]] }), Dc(-52, 1.6), Dc(-52, -1.6)],
     tur: [Tu(34, 0, 0, 'jp5d'), Tu(-30, 2.2, 180, 'jp5d'), Tu(-40, 0, 180, 'jp5s')] },
-  fubuki: { cls: 'DD', nation: 'JP', type: '吹雪型驱逐舰', L: 118, B: 10.4, F: 4.6, D: 3.2, sheer: [[0, .85], [.6, .85], [.64, 1.45], [1, 1.65]], top: 12,
+  fubuki: { cls: 'DD', nation: 'JP', type: '吹雪型驱逐舰', L: 118, B: 10.4, F: 4.6, D: 3.2, sheer: [[0, .85], [.618, .85], [.622, 1.45], [1, 1.65]], top: 12, stem: 'clipper',
     kn: 38, turn: 6.3, rudderT: 1.6, accelT: 9, hp: 10500, tons: 1750, gun: 'jp127', torp: 't93', torpMounts: 3, torpSalvo: 3, prefRange: 3600, aiErr: 80, dc: 1,
-    parts: [Bx(27, 0, 8.5, 4.2, 7), Bx(27.5, 4.2, 5.5, 2.6, 5.5), Ms(22, 3, 14, .3), Cy(9, 0, 1.9, 7.5, 10), Cy(-3, 0, 1.5, 6.5, 10), Bx(3, 0, 5.5, 1.3, 2.4, 0, 'd'), Bx(-10, 0, 5.5, 1.3, 2.4, 0, 'd'), Bx(-18, 0, 5.5, 1.3, 2.4, 0, 'd'), Bx(-27, 0, 8, 2.2, 5), Ms(-22, 0, 10, .25)],
+    parts: [
+      Bx(26.5, 0, 9.5, 2.8, 7.4, 0, 's', { rf: .5 }), Bx(27, 2.8, 7, 2.0, 6.4, 0, 's', { rf: .75, win: .6 }), Bx(27.3, 4.8, 4.6, 1.7, 5.2, 0, 's', { rf: .85, win: .8 }),
+      Rf(27.3, 6.5, 3), Ms(22, 2.8, 13.5, .3, { tri: 2.2, yards: [[.7, 5]], top: [.52, 1.4] }),
+      Cy(9, 0, 1.95, 7.8, 10, 0, { cap: 'jp', pipe: 1, ov: .62 }), Cy(-3, 0, 1.55, 6.8, 10, 0, { cap: 'jp', pipe: 1 }),
+      Tt(3.5, 0.6, 3, 0, 8, 1), Tt(-10, 0.6, 3, 0, 8, 1), Tt(-18.5, 0.6, 3, 0, 8, 1),
+      Bt(8, 1.4, 3.8, 6), Bt(8, 1.4, -3.8, 6),
+      Bx(-27, 0, 7.5, 2.2, 5, 0, 's', { rr: .3 }), Ms(-24, 2.2, 9, .25, { yards: [[.8, 3]] }), Dc(-56, 1.6), Dc(-56, -1.6)],
     tur: [Tu(39, 0, 0, 'jp5d'), Tu(-33, 2.2, 180, 'jp5d'), Tu(-44, 0, 180, 'jp5d')] },
-  sendai: { cls: 'CL', nation: 'JP', type: '川内型轻巡洋舰', L: 162, B: 14.2, F: 5.4, D: 4.8, sheer: [[0, .85], [.66, .85], [.7, 1.4], [1, 1.55]], top: 20,
+  sendai: { cls: 'CL', nation: 'JP', type: '川内型轻巡洋舰', L: 162, B: 14.2, F: 5.4, D: 4.8, sheer: [[0, .85], [.678, .85], [.682, 1.4], [1, 1.55]], top: 20, stem: 'clipper',
     kn: 35, turn: 4.8, rudderT: 2.2, accelT: 12, hp: 17000, tons: 5195, gun: 'jp140', torp: 't93', torpMounts: 2, prefRange: 4300, aiErr: 85, dc: 2,
-    parts: [Bx(40, 0, 10, 5, 8), Bx(40.5, 5, 6, 4, 6), Bx(41, 9, 3.5, 2, 3.5, 0, 'd'), Ms(36, 6, 20, .4), Cy(22, 0, 1.8, 8, 6), Cy(13, 0, 1.8, 8.5, 6), Cy(4, 0, 1.8, 8.5, 6), Cy(-5, 0, 1.8, 8, 6), Bx(-22, 0, 16, 3, 7), Ms(-32, 0, 15, .3), Bx(9, 0, 5, 1.2, 2.2, 4, 'd'), Bx(9, 0, 5, 1.2, 2.2, -4, 'd')],
+    parts: [...SENDAI_BASE, ...[22, 13, 4, -5].map((z, i) => Cy(z, 0, 1.8, i === 0 || i === 3 ? 8.5 : 9, 6, 0, { cap: 'jp', ov: .8, pipe: 1 }))],
     tur: [Tu(62, 0, 0, 'jp55'), Tu(53, 2, 0, 'jp55'), Tu(30, 0, 90, 'jp55', 5), Tu(30, 0, -90, 'jp55', -5), Tu(-34, 3, 180, 'jp55'), Tu(-46, 0, 180, 'jp55'), Tu(-58, 0, 180, 'jp55')] },
-  aoba: { cls: 'CA', nation: 'JP', type: '青叶型重巡洋舰', L: 185, B: 17.6, F: 5.8, D: 5.7, sheer: [[0, .8], [.42, .8], [.46, 1.25], [1, 1.45]], top: 24,
+  aoba: { cls: 'CA', nation: 'JP', type: '青叶型重巡洋舰', L: 185, B: 17.6, F: 5.8, D: 5.7, sheer: [[0, .8], [.438, .8], [.442, 1.25], [1, 1.45]], top: 24, stem: 'clipper',
     kn: 33, turn: 4.4, rudderT: 2.4, accelT: 13, hp: 22000, tons: 8700, gun: 'jp203', torp: 't93', torpMounts: 2, prefRange: 4800, aiErr: 90, dc: 2,
-    parts: [Bx(32, 0, 14, 7, 11), Bx(33, 7, 10, 5, 9), Bx(34, 12, 6, 4, 6), Bx(34, 16, 3.5, 2, 3.5, 0, 'd'), Ms(28, 10, 18, .45), Cy(12, 0, 3, 11, 8), Cy(-2, 0, 2.2, 9, 8), Bx(-22, 0, 14, 3, 9), Ms(-30, 3, 16, .4), Bx(-12, 0, 12, .6, 1.2, 0, 'd')],
+    parts: [
+      Bx(33, 0, 15, 6.5, 11, 0, 's', { rf: .4 }), Bx(33.5, 6.5, 10.5, 4.3, 9, 0, 's', { rf: .55, win: .8 }), Bx(34, 10.8, 7, 3.4, 7, 0, 's', { rf: .7, win: .8 }),
+      Pl(34, 14.2, 8.5, 9.5), Dr(33.5, 14.2, 'jp'), Ms(27.5, 6.5, 21, .45, { tri: 4, yards: [[.62, 9]], top: [.45, 2.6] }),
+      Bx(5, 0, 28, 2.6, 8.4, 0, 's', { rf: .3, rr: .3 }),
+      Cy(12, 0, 3, 12, 8, 0, { cap: 'jp', ov: .62, pipe: 2 }), Cy(-1, 0, 2.2, 10, 8, 0, { cap: 'jp', pipe: 1 }),
+      Aa(18, 0, 5.6, 'ha'), Aa(18, 0, -5.6, 'ha'), Bt(4, 1.6, 5.9, 9), Bt(4, 1.6, -5.9, 9),
+      Tt(-5, 0, 4, 5.8, 7), Tt(-5, 0, 4, -5.8, 7), Cp(-17, 3, 0, 15, 0, 1),
+      Bx(-27, 0, 11, 3, 8.4, 0, 's', { rr: .3 }), Rf(-25, 3, 4), Ms(-31, 3, 16, .4, { tri: 3, yards: [[.75, 6]] }), Cr(-30.5, 3, 0, 8, 12)],
     tur: [Tu(58, 0, 0, 'jp8d'), Tu(47, 2.8, 0, 'jp8d'), Tu(-50, 0, 180, 'jp8d')] },
-  takao: { cls: 'CA', nation: 'JP', type: '高雄型重巡洋舰', L: 193, B: 19, F: 5.8, D: 6.1, sheer: [[0, .8], [.42, .8], [.46, 1.25], [1, 1.45]], top: 28,
+  takao: { cls: 'CA', nation: 'JP', type: '高雄型重巡洋舰', L: 193, B: 19, F: 5.8, D: 6.1, sheer: [[0, .8], [.438, .8], [.442, 1.25], [1, 1.45]], top: 28, stem: 'clipper',
     kn: 35, turn: 4.2, rudderT: 2.4, accelT: 13, hp: 24000, tons: 9850, gun: 'jp203', torp: 't93', torpMounts: 2, prefRange: 5000, aiErr: 90, dc: 2,
-    parts: [Bx(30, 0, 22, 8, 13), Bx(30, 8, 17, 6, 11), Bx(31, 14, 11, 6, 9), Bx(31, 20, 6, 4, 6), Bx(31, 24, 4, 2.4, 4, 0, 'd'), Ms(22, 14, 18, .5), Cy(8, 0, 3.6, 12, 14), Cy(-5, 0, 2.4, 10, 14), Bx(-24, 0, 16, 3, 9), Ms(-32, 3, 20, .45), Bx(-14, 0, 12, .6, 1.2, 0, 'd')],
+    parts: [
+      Bx(30, 0, 22, 8, 13.5, 0, 's', { rf: .3 }), Bx(30.5, 8, 17, 6, 12, 0, 's', { rf: .45, win: .9 }), Pl(31, 14, 14, 16),
+      Bx(31, 14, 12, 5, 9.5, 0, 's', { rf: .6, win: .9 }), Bx(31.5, 19, 7, 4, 7, 0, 's', { rf: .75, win: .8 }),
+      Pl(31.5, 23, 8.5, 10), Dr(32, 23, 'jp'), Rf(29, 23, 6), Ms(21, 8, 25, .5, { tri: 3.5, yards: [[.66, 10]], top: [.52, 2.4] }),
+      Bx(2, 0, 18, 2.8, 8.4, 0, 's', { rf: .3, rr: .3 }),
+      Cy(8, 0, 3.8, 12.5, 14, 0, { cap: 'jp', ov: .6, pipe: 2 }), Cy(-5, 0, 2.5, 11.5, 14, 0, { cap: 'jp', pipe: 1 }),
+      Aa(1, 2.8, 3, 'ha'), Aa(1, 2.8, -3, 'ha'), Bt(14, 1.4, 6.3, 9), Bt(14, 1.4, -6.3, 9),
+      Tt(-8, 0, 4, 6.8, 8), Tt(-8, 0, 4, -6.8, 8),
+      Bx(-18, 0, 13, 3.4, 12, 0, 's', { rr: .2 }), Cp(-16, 3.4, 4.2, 17, 12, 1), Cp(-16, 3.4, -4.2, 17, -12, 1),
+      Bx(-29, 0, 8, 3, 8.4, 0, 's', { rr: .3 }), Rf(-26.5, 3, 4), Ms(-30, 3, 19, .45, { tri: 3, yards: [[.72, 7]] }), Cr(-29.5, 3, 0, 7, 14)],
     tur: [Tu(72, 0, 0, 'jp8d'), Tu(61, 2.8, 0, 'jp8d'), Tu(50, 4.8, 0, 'jp8d'), Tu(-46, 2.8, 180, 'jp8d'), Tu(-57, 0, 180, 'jp8d')] },
   kongo: { cls: 'BB', nation: 'JP', type: '金刚型战列舰', L: 222, B: 31, F: 8, D: 9.7, sheer: [[0, .85], [.5, .9], [1, 1.35]], top: 40,
-    kn: 30, turn: 2.9, rudderT: 3.6, accelT: 20, hp: 48000, tons: 32156, gun: 'jp356', sec: 'sec152', torp: null, prefRange: 6000, aiErr: 95, dc: 3, deck: 0x7a6a50,
-    parts: [Bx(40, 0, 14, 8, 14), Bx(40, 8, 11, 8, 11), Bx(40.5, 16, 9, 8, 9), Bx(41, 24, 7, 7, 8), Bx(41, 31, 6, 5, 7), Bx(41, 36, 4, 3, 5, 0, 'd'), Ms(38.5, 36, 10, .5), Cy(16, 0, 3.8, 13, 6), Cy(0, 0, 3.6, 12, 6), Bx(-18, 0, 16, 6, 16), Ms(-26, 6, 22, .5)],
+    kn: 30, turn: 2.9, rudderT: 3.6, accelT: 20, hp: 48000, tons: 32156, gun: 'jp356', sec: 'sec152', torp: null, prefRange: 6000, aiErr: 95, dc: 3, deck: 'wood',
+    parts: [
+      Bx(40, 0, 16, 8, 14.5, 0, 's', { rf: .5 }), Bx(40, 8, 12, 5, 11, 0, 's', { rf: .5, win: .6 }), Pl(40, 13, 14, 15),
+      Bx(40.5, 13, 9.5, 5, 9, 0, 's', { rf: .6, win: .6 }), Pl(40.5, 18, 12, 13), Bx(41, 18, 7.5, 5, 7.5, 0, 's', { rf: .6, win: .7 }), Pl(41, 23, 10, 11),
+      Bx(41, 23, 6, 4.5, 6.5, 0, 's', { rf: .7, win: .8 }), Pl(41, 27.5, 8, 9), Bx(41, 27.5, 5, 4, 5.5, 0, 's', { rf: .8, win: .7 }),
+      Bx(41, 31.5, 3.5, 2.5, 4.5, 0, 's', { rf: .5 }), Rf(41, 34, 9), Ms(38.5, 34, 10, .45, { yards: [[.5, 7]] }), Ms(37, 8, 26, .7, { tri: 4.5 }),
+      Bx(8, 0, 36, 3.6, 16, 0, 's', { rf: .3, rr: .3 }),
+      Cy(16, 0, 3.9, 14, 6, 0, { cap: 'jp', ov: .78, pipe: 2 }), Cy(0, 0, 3.7, 13, 6, 0, { cap: 'jp', ov: .78, pipe: 1 }),
+      Pl(8, 11, 5, 13), Sl(8, 11, 4.5), Sl(8, 11, -4.5),
+      Aa(24, 3.6, 6.4, 'ha2'), Aa(24, 3.6, -6.4, 'ha2'), Aa(-7, 3.6, 6.4, 'ha2'), Aa(-7, 3.6, -6.4, 'ha2'), Aa(8, 3.6, 6.2, 'j3'), Aa(8, 3.6, -6.2, 'j3'),
+      Bx(-19, 0, 16, 6, 14, 0, 's', { rr: .4 }), Rf(-19, 6, 6), Ms(-25, 6, 22, .55, { tri: 4, yards: [[.7, 10]], top: [.5, 3] }), Cr(-24.5, 6, 0, 8, 15),
+      Aa(-14, 6, 5, 'j3'), Aa(-14, 6, -5, 'j3')],
     tur: [Tu(74, 0, 0, 'jp14d'), Tu(60, 3.6, 0, 'jp14d'), Tu(-42, 3.6, 180, 'jp14d'), Tu(-58, 0, 180, 'jp14d'),
       Tu(30, -3.5, 90, 'jp6c', 15.2, true), Tu(20, -3.5, 90, 'jp6c', 15.3, true), Tu(10, -3.5, 90, 'jp6c', 15.4, true), Tu(-10, -3.5, 90, 'jp6c', 15.3, true),
       Tu(30, -3.5, -90, 'jp6c', -15.2, true), Tu(20, -3.5, -90, 'jp6c', -15.3, true), Tu(10, -3.5, -90, 'jp6c', -15.4, true), Tu(-10, -3.5, -90, 'jp6c', -15.3, true)] },
 };
 SPECS.nagara = Object.assign({}, SPECS.sendai, { type: '长良型轻巡洋舰', kn: 36, tons: 5170,
-  parts: [Bx(40, 0, 10, 5, 8), Bx(40.5, 5, 6, 4, 6), Bx(41, 9, 3.5, 2, 3.5, 0, 'd'), Ms(36, 6, 20, .4), Cy(20, 0, 1.9, 8.5, 6), Cy(10, 0, 1.9, 8.5, 6), Cy(0, 0, 1.9, 8, 6), Bx(-22, 0, 16, 3, 7), Ms(-32, 0, 15, .3), Bx(10, 0, 5, 1.2, 2.2, 4, 'd'), Bx(10, 0, 5, 1.2, 2.2, -4, 'd')] });
+  parts: [...SENDAI_BASE, ...[20, 10, 0].map(z => Cy(z, 0, 1.9, 8.8, 6, 0, { cap: 'jp', ov: .8, pipe: 1 }))] });
 for (const k in SPECS) SPECS[k].key = k;
 
 const PLAYABLE = [
@@ -958,91 +1050,423 @@ const Sfx = {
 };
 
 // ---------------------------------------------------------------- ship models
+const sstep = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
 function interpSheer(pts, s) {
   if (s <= pts[0][0]) return pts[0][1];
   for (let i = 0; i < pts.length - 1; i++) if (s <= pts[i + 1][0]) { const t = (s - pts[i][0]) / (pts[i + 1][0] - pts[i][0]); return lerp(pts[i][1], pts[i + 1][1], t); }
   return pts[pts.length - 1][1];
 }
 const deckY = (spec, z) => spec.F * interpSheer(spec.sheer, clamp(z / spec.L + 0.5, 0, 1));
+// waterline plan (also the hit-test outline)
 function halfW(s) {
   if (s < 0.12) return 0.74 + 0.26 * Math.sin((s / 0.12) * Math.PI / 2);
   if (s < 0.58) return 1;
   const u = clamp((s - 0.58) / 0.42, 0, 1); return Math.max(0.018, Math.pow(Math.max(0, Math.cos(u * Math.PI / 2)), 0.8));
 }
-function bowRake(spec, s, frac) { return s > 0.9 ? frac * ((s - 0.9) / 0.1) * spec.L * 0.035 : 0; }
+// visual plans: finer stern at the waterline, flared bow at the deck
+function halfWL(s) { return s < 0.14 ? 0.42 + 0.58 * Math.sin((s / 0.14) * Math.PI / 2) : halfW(s); }
+function halfWDeck(s) {
+  if (s < 0.12) return 0.8 + 0.2 * Math.sin((s / 0.12) * Math.PI / 2);
+  if (s < 0.56) return 1;
+  const u = clamp((s - 0.56) / 0.44, 0, 1); return Math.max(0.012, Math.pow(Math.max(0, Math.cos(u * Math.PI / 2)), 0.62));
+}
+function bowRake(spec, s, frac) {
+  if (s <= 0.9) return 0;
+  const k = (s - 0.9) / 0.1;
+  return spec.stem === 'clipper' ? k * Math.pow(frac, 1.7) * spec.L * 0.05 : k * frac * spec.L * 0.035;
+}
+const keelD = (spec, s) => spec.D * (s > 0.86 ? lerp(1, 0.15, sstep((s - 0.86) / 0.14)) : s < 0.1 ? lerp(0.3, 1, sstep(s / 0.1)) : 1);
+const hullTopY = spec => spec.F * Math.max(...spec.sheer.map(p => p[1])) + 0.6;
+function hullStations(spec) {
+  const N = Math.round(clamp(spec.L / 1.8, 56, 110)), br = spec.sheer.map(p => p[0]).filter(s => s > 0 && s < 1), ss = [];
+  for (let i = 0; i <= N; i++) { const s = i / N; if (!br.some(b => Math.abs(b - s) < 0.003)) ss.push(s); }
+  return ss.concat(br).sort((a, b) => a - b);
+}
+// starboard half-section from the deck edge down to the keel: flared topsides, then a super-ellipse bilge (V-shaped forward)
+function hullSection(spec, s, top) {
+  const B2 = spec.B / 2, hw = B2 * halfWL(s), hd = Math.max(hw, B2 * halfWDeck(s)), kd = keelD(spec, s);
+  const p = lerp(lerp(3.4, 1.15, sstep((s - 0.7) / 0.27)), 2.2, sstep((0.14 - s) / 0.14));
+  const pts = [];
+  for (let k = 0; k <= 4; k++) { const f = 1 - k / 4; pts.push([hw + (hd - hw) * Math.pow(f, 1.6), top * f]); }
+  for (let k = 1; k <= 7; k++) { const t = k / 7; pts.push([hw * Math.pow(Math.max(0, 1 - Math.pow(t, p)), 1 / p), -kd * t]); }
+  return { pts, kd };
+}
 function buildHull(spec) {
-  const { L, B, D } = spec, N = 40, RING = 9;
-  const pos = [], idx = [], dpos = [], didx = [];
-  for (let i = 0; i <= N; i++) {
-    const s = i / N, z = (s - 0.5) * L, hw = B / 2 * halfW(s), top = deckY(spec, z);
-    const kd = D * (s > 0.88 ? lerp(1, 0.2, (s - 0.88) / 0.12) : s < 0.05 ? lerp(0.55, 1, s / 0.05) : 1);
-    const pts = [[hw, top], [hw, top * 0.35], [hw * 0.96, -kd * 0.35], [hw * 0.66, -kd * 0.9], [0, -kd], [-hw * 0.66, -kd * 0.9], [-hw * 0.96, -kd * 0.35], [-hw, top * 0.35], [-hw, top]];
-    for (const [x, y] of pts) pos.push(x, y, z + bowRake(spec, s, (y + kd) / (top + kd)));
-    dpos.push(hw, top, z + bowRake(spec, s, 1), -hw, top, z + bowRake(spec, s, 1));
-    if (i < N) {
-      for (let j = 0; j < RING - 1; j++) { const a = i * RING + j, b = (i + 1) * RING + j; idx.push(a, b, b + 1, a, b + 1, a + 1); }
-      const a = i * 2, b = (i + 1) * 2; didx.push(a, b, b + 1, a, b + 1, a + 1);
+  const L = spec.L, yMin = -spec.D, yMax = hullTopY(spec), RING = 12;
+  const rings = hullStations(spec).map(s => { const z = (s - 0.5) * L, top = deckY(spec, z), h = hullSection(spec, s, top); return { s, z, top, pts: h.pts, kd: h.kd }; });
+  const pos = [], uv = [], idx = [];
+  for (const side of [1, -1]) {
+    const base = pos.length / 3;
+    for (const r of rings) for (const [x, y] of r.pts) {
+      pos.push(x * side, y, r.z + bowRake(spec, r.s, (y + r.kd) / (r.top + r.kd)));
+      uv.push(side < 0 ? r.s * 0.5 : 0.5 + (1 - r.s) * 0.5, (y - yMin) / (yMax - yMin));
+    }
+    for (let i = 0; i < rings.length - 1; i++) for (let j = 0; j < RING - 1; j++) {
+      const a = base + i * RING + j, b = a + RING;
+      if (side > 0) idx.push(a, b, b + 1, a, b + 1, a + 1); else idx.push(a, b + 1, b, a, a + 1, b + 1);
     }
   }
-  const c0 = pos.length / 3; const top0 = deckY(spec, -L / 2); pos.push(0, (top0 - D * 0.55) / 2, -L / 2);
-  for (let j = 0; j < RING - 1; j++) idx.push(c0, j, j + 1);
-  const hull = new THREE.BufferGeometry(); hull.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); hull.setIndex(idx); hull.computeVertexNormals();
-  const deck = new THREE.BufferGeometry(); deck.setAttribute('position', new THREE.Float32BufferAttribute(dpos, 3)); deck.setIndex(didx); deck.computeVertexNormals();
-  return { hull, deck };
+  // transom
+  const r0 = rings[0], ring = r0.pts.map(([x, y]) => [x, y]).concat(r0.pts.slice().reverse().map(([x, y]) => [-x, y]));
+  const c0 = pos.length / 3, cy = ring.reduce((a, p) => a + p[1], 0) / ring.length;
+  pos.push(0, cy, r0.z); uv.push(0.001, (cy - yMin) / (yMax - yMin));
+  for (const [x, y] of ring) { pos.push(x, y, r0.z); uv.push(0.001, (y - yMin) / (yMax - yMin)); }
+  for (let k = 0; k < ring.length; k++) idx.push(c0, c0 + 1 + (k + 1) % ring.length, c0 + 1 + k);
+  const hull = new THREE.BufferGeometry();
+  hull.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); hull.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  hull.setIndex(idx); hull.computeVertexNormals();
+  // deck; the forecastle-break bulkhead goes to the superstructure
+  const dp = [], duv = [], step = [];
+  for (let i = 0; i < rings.length - 1; i++) {
+    const a = rings[i], b = rings[i + 1], x0 = a.pts[0][0], x1 = b.pts[0][0], z0 = a.z + bowRake(spec, a.s, 1), z1 = b.z + bowRake(spec, b.s, 1);
+    const A = [-x0, a.top, z0], Bq = [x0, a.top, z0], C = [x1, b.top, z1], D = [-x1, b.top, z1], tris = [A, C, Bq, A, D, C];
+    if (Math.abs(b.top - a.top) > 0.4 && z1 - z0 < 1) step.push(...tris.flat());
+    else for (const q of tris) { dp.push(...q); duv.push(q[0] / 8, q[2] / 8); }
+  }
+  const deck = new THREE.BufferGeometry();
+  deck.setAttribute('position', new THREE.Float32BufferAttribute(dp, 3)); deck.setAttribute('uv', new THREE.Float32BufferAttribute(duv, 2)); deck.computeVertexNormals();
+  let stepGeo = null;
+  if (step.length) { stepGeo = new THREE.BufferGeometry(); stepGeo.setAttribute('position', new THREE.Float32BufferAttribute(step, 3)); stepGeo.computeVertexNormals(); }
+  return { hull, deck, step: stepGeo, rings };
 }
 function mergeGeos(geos) {
   if (!geos.length) return new THREE.BufferGeometry();
   const parts = geos.map(g => g.index ? g.toNonIndexed() : g);
   let total = 0; for (const g of parts) total += g.attributes.position.count;
-  const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3); let o = 0;
-  for (const g of parts) { pos.set(g.attributes.position.array, o * 3); nor.set(g.attributes.normal.array, o * 3); o += g.attributes.position.count; }
-  const out = new THREE.BufferGeometry(); out.setAttribute('position', new THREE.BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); return out;
+  const pos = new Float32Array(total * 3), nor = new Float32Array(total * 3), col = new Float32Array(total * 3).fill(1); let o = 0;
+  for (const g of parts) {
+    if (!g.attributes.normal) g.computeVertexNormals();
+    pos.set(g.attributes.position.array, o * 3); nor.set(g.attributes.normal.array, o * 3);
+    if (g.attributes.color) col.set(g.attributes.color.array, o * 3);
+    o += g.attributes.position.count;
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); out.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  return out;
 }
-function funnelGeo(p, r, h) {
-  const g = new THREE.CylinderGeometry(r * 0.94, r, h, 14, 1); g.translate(0, h / 2, 0); g.scale(0.72, 1, 1);
-  const a = g.attributes.position, tr = Math.tan(p.rake);
-  for (let i = 0; i < a.count; i++) a.setZ(i, a.getZ(i) - a.getY(i) * tr);
-  return g;
+// darken each piece toward its footing: cheap contact shadow
+function aoTint(g, y0, span = 2.4, lo = 0.6) {
+  const a = g.attributes.position, c = new Float32Array(a.count * 3);
+  for (let i = 0; i < a.count; i++) c[i * 3] = c[i * 3 + 1] = c[i * 3 + 2] = lo + (1 - lo) * sstep((a.getY(i) - y0) / span);
+  g.setAttribute('color', new THREE.BufferAttribute(c, 3)); return g;
 }
+// plan outline (x, z) with an elliptical front / rear
+function planPoly(len, w, rf = 0, rr = 0, seg = 6) {
+  const hw = w / 2, hl = len / 2, df = Math.min(hl, rf * hw), dr = Math.min(hl, rr * hw), pts = [];
+  if (df > 0.01) for (let k = 0; k <= seg; k++) { const a = k / seg * Math.PI; pts.push([hw * Math.cos(a), hl - df + df * Math.sin(a)]); }
+  else pts.push([hw, hl], [-hw, hl]);
+  if (dr > 0.01) for (let k = 0; k <= seg; k++) { const a = Math.PI + k / seg * Math.PI; pts.push([hw * Math.cos(a), -hl + dr + dr * Math.sin(a)]); }
+  else pts.push([-hw, -hl], [hw, -hl]);
+  return pts;
+}
+// solid between two matching convex outlines; flat-shaded
+function loftGeo(bot, top, y0, y1, capTop = true, capBot = false, sides = true) {
+  let area = 0; for (let i = 0; i < bot.length; i++) { const [x1, z1] = bot[i], [x2, z2] = bot[(i + 1) % bot.length]; area += x1 * z2 - x2 * z1; }
+  if (area > 0) { bot = bot.slice().reverse(); top = top.slice().reverse(); }
+  const P = [], n = bot.length, V = (q, y) => [q[0], y, q[1]], T = (a, b, c) => P.push(...a, ...b, ...c);
+  if (sides) for (let i = 0; i < n; i++) { const j = (i + 1) % n, b0 = V(bot[i], y0), b1 = V(bot[j], y0), t0 = V(top[i], y1), t1 = V(top[j], y1); T(b0, b1, t1); T(b0, t1, t0); }
+  if (capTop) for (let i = 1; i < n - 1; i++) T(V(top[0], y1), V(top[i], y1), V(top[i + 1], y1));
+  if (capBot) for (let i = 1; i < n - 1; i++) T(V(bot[0], y0), V(bot[i + 1], y0), V(bot[i], y0));
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.computeVertexNormals(); return g;
+}
+const V3 = THREE.Vector3, UPV = new V3(0, 1, 0);
+function cylG(rt, rb, h, seg = 10, open = false) { const g = new THREE.CylinderGeometry(rt, rb, h, seg, 1, open); g.translate(0, h / 2, 0); return g; }
+function boxG(w, h, len) { const g = new THREE.BoxGeometry(w, h, len); g.translate(0, h / 2, 0); return g; }
+function rodG(a, b, r, seg = 6) {
+  const d = new V3().subVectors(b, a), L = d.length(), g = new THREE.CylinderGeometry(r, r, L, seg, 1, true);
+  g.translate(0, L / 2, 0); g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(UPV, d.normalize())); g.translate(a.x, a.y, a.z); return g;
+}
+function barrelG(len, r, elev) { const g = new THREE.CylinderGeometry(r * 0.8, r, len, 6); g.translate(0, len / 2, 0); g.rotateX(Math.PI / 2 - elev); return g; }
+const at = (g, x, y, z, ry = 0) => { if (ry) g.rotateY(ry); g.translate(x, y, z); return g; };
+const seg2 = (L, a, b) => L.push(a.x, a.y, a.z, b.x, b.y, b.z);
+function railAround(L, poly, x, y, z, h = 1.0) {
+  for (let i = 0; i < poly.length; i++) {
+    const [ax, az] = poly[i], [bx, bz] = poly[(i + 1) % poly.length];
+    seg2(L, new V3(x + ax, y + h, z + az), new V3(x + bx, y + h, z + bz));
+    seg2(L, new V3(x + ax, y, z + az), new V3(x + ax, y + h, z + az));
+  }
+}
+
+// part builders: B.s(geo, footY) superstructure grey, B.d(geo) dark metal, B.L line segments, B.masts rigging anchors
+const PART = {
+  b(p, dy, B) {
+    const y0 = dy + p.y, plan = planPoly(p.len, p.w, p.rf || 0, p.rr || 0), ta = p.ta || 0, fs = p.fs || 0;
+    const top = plan.map(([x, z]) => [x * (1 - 2 * ta / p.w), z * (1 - 2 * ta / p.len) - (z > 0 ? fs * z / (p.len / 2) : 0)]);
+    const g = loftGeo(plan, top, 0, p.h); g.translate(p.x, y0, p.z);
+    if (p.m === 'd') B.d(g); else B.s(g, y0);
+    if (p.win) {
+      const f0 = (p.h - p.win - 0.35) / p.h, f1 = (p.h - 0.35) / p.h, ring = f => plan.map((q, i) => [lerp(q[0], top[i][0], f) * (1 + 0.1 / p.w), lerp(q[1], top[i][1], f) * (1 + 0.1 / p.len)]);
+      const w = loftGeo(ring(f0), ring(f1), p.h * f0, p.h * f1, false); w.translate(p.x, y0, p.z); B.d(w);
+    }
+  },
+  c(p, dy, B) {
+    const y0 = dy + p.y, ov = p.ov || 0.72, tr = Math.tan(p.rake), r = p.r, h = p.h, out = [], dk = [];
+    out.push(cylG(r * 0.95, r, h, 20, true), cylG(r * 1.18, r * 1.3, 0.9, 20));
+    dk.push(at(new THREE.CircleGeometry(r * 0.93, 20).rotateX(-Math.PI / 2), 0, h - 0.7, 0));
+    if (p.cap === 'jp') { dk.push(cylG(r * 0.97, r * 0.97, 0.9, 20, true).translate(0, h - 0.9, 0), cylG(r * 1.12, r * 1.12, 0.22, 20).translate(0, h + 0.45, 0)); }
+    else { dk.push(cylG(r * 0.97, r * 0.975, 1.0, 20, true).translate(0, h - 1.0, 0)); out.push(cylG(r * 1.03, r * 1.03, 0.25, 20).translate(0, h - 0.25, 0)); }
+    const pipes = [];
+    for (let k = 0; k < (p.pipe || 0); k++) pipes.push(cylG(0.16, 0.16, h + 1.3, 6).translate((k - ((p.pipe || 1) - 1) / 2) * 0.7, 0, -r - 0.25));
+    const fin = g => { g.scale(ov, 1, 1); const a = g.attributes.position; for (let i = 0; i < a.count; i++) a.setZ(i, a.getZ(i) - a.getY(i) * tr); g.translate(p.x, y0, p.z); return g; };
+    for (const g of out) B.s(fin(g), y0, 3);
+    for (const g of pipes) { const a = g.attributes.position; for (let i = 0; i < a.count; i++) a.setZ(i, a.getZ(i) - a.getY(i) * tr); g.translate(p.x, y0, p.z); B.s(g, y0, 3); }
+    for (const g of dk) B.d(fin(g));
+  },
+  m(p, dy, B) {
+    const y0 = dy + p.y, H = p.h, r = p.r, tr = Math.tan(p.rake), gs = [cylG(r * 0.35, r, H, 8)], dk = [];
+    if (p.tri) for (const sx of [-1, 1]) gs.push(rodG(new V3(sx * p.tri * 0.55, 0, -p.tri), new V3(0, H * 0.55, 0), r * 0.75));
+    for (const [f, len] of p.yards || []) { const g = new THREE.CylinderGeometry(r * 0.28, r * 0.28, len, 5); g.rotateZ(Math.PI / 2); g.translate(0, H * f, 0); gs.push(g); }
+    if (p.top) { const [f, sz] = p.top; gs.push(boxG(sz, 0.3, sz).translate(0, H * f, 0)); }
+    if (p.radar === 'sc') dk.push(new THREE.BoxGeometry(2.6, 1.6, 0.12).translate(0, H * 0.9, 0.35));
+    const fin = g => { const a = g.attributes.position; for (let i = 0; i < a.count; i++) a.setZ(i, a.getZ(i) - a.getY(i) * tr); g.translate(p.x, y0, p.z); return g; };
+    for (const g of gs) B.s(fin(g), y0, 1.2); for (const g of dk) B.d(fin(g));
+    const yard = (p.yards || [])[0];
+    B.masts.push({ top: new V3(p.x, y0 + H, p.z - H * tr), yard: yard ? { y: y0 + H * yard[0], z: p.z - H * yard[0] * tr, w: yard[1] / 2 } : null });
+  },
+  pl(p, dy, B) { const y0 = dy + p.y; B.s(boxG(p.w, 0.25, p.len).translate(p.x, y0 - 0.25, p.z), y0 - 2); railAround(B.L, planPoly(p.len, p.w), p.x, y0, p.z); },
+  tt(p, dy, B) {
+    const y0 = dy + p.y, sp = 0.62, w = p.n * sp + 0.5;
+    B.s(cylG(w * 0.5 + 0.3, w * 0.5 + 0.4, 0.5, 14).translate(p.x, y0, p.z), y0, 0.5);
+    for (let k = 0; k < p.n; k++) { const g = new THREE.CylinderGeometry(0.3, 0.3, p.len, 8); g.rotateX(Math.PI / 2); B.s(g.translate(p.x + (k - (p.n - 1) / 2) * sp, y0 + 0.95, p.z + 0.6), y0, 1); }
+    B.s(boxG(1.1, 1.3, 1.2).translate(p.x, y0 + 0.4, p.z - p.len * 0.42), y0, 1);
+    if (p.sh) B.s(loftGeo(planPoly(p.len * 0.5, w + 0.5, 0.7), planPoly(p.len * 0.45, w + 0.2, 0.7), 0, 1.7).translate(p.x, y0 + 0.35, p.z + p.len * 0.2), y0, 1);
+  },
+  aa(p, dy, B) {
+    const y0 = dy + p.y, x = p.x, z = p.z, sgn = Math.sign(x) || 1, face = x ? sgn * Math.PI / 2 * 0.6 : 0;
+    const bar = (len, r, el, bx, by, bz) => B.d(at(barrelG(len, r, el).translate(bx, by, bz), 0, 0, 0, face).translate(x, y0, z));
+    const s = g => B.s(at(g, 0, 0, 0, face).translate(x, y0, z), y0, 1);
+    switch (p.kind) {
+      case 'o': s(cylG(0.07, 0.1, 1.1, 6)); s(new THREE.BoxGeometry(0.95, 0.8, 0.06).translate(0, 1.0, 0.25)); bar(2.2, 0.05, 0.5, 0, 1.15, 0); break;
+      case 'b2': case 'b4': {
+        const n = p.kind === 'b2' ? 2 : 4, R = n === 2 ? 1.9 : 2.5;
+        s(cylG(R, R, 1.0, 16, true)); s(boxG(n * 0.6 + 0.4, 0.9, 1.3).translate(0, 0.2, 0));
+        for (let k = 0; k < n; k++) bar(3.4, 0.08, 0.35, (k - (n - 1) / 2) * 0.55, 1.0, 0.3); break;
+      }
+      case 'j2': case 'j3': { const n = p.kind === 'j2' ? 2 : 3; s(boxG(1.3, 0.8, 1.1)); for (let k = 0; k < n; k++) bar(2.4, 0.06, 0.3, (k - (n - 1) / 2) * 0.3, 0.75, 0.3); break; }
+      case 'ha': s(cylG(0.35, 0.45, 0.8, 8)); s(loftGeo(planPoly(1.8, 1.9, 0.8), planPoly(1.4, 1.6, 0.8), 0, 1.7).translate(0, 0.3, 0.3)); bar(4.2, 0.1, 0.4, 0, 1.2, 0.3); break;
+      case 'ha2': s(cylG(0.8, 0.9, 0.6, 10)); s(loftGeo(planPoly(2.6, 3.0, 0.7), planPoly(2.0, 2.6, 0.7), 0, 2.0).translate(0, 0.4, 0.4)); bar(5, 0.12, 0.5, -0.5, 1.4, 0.5); bar(5, 0.12, 0.5, 0.5, 1.4, 0.5); break;
+    }
+  },
+  sl(p, dy, B) {
+    const y0 = dy + p.y; B.s(cylG(0.12, 0.12, 0.6, 6).translate(p.x, y0, p.z), y0, 0.6);
+    const g = new THREE.CylinderGeometry(0.55, 0.55, 1.0, 12); g.rotateX(Math.PI / 2); B.s(g.translate(p.x, y0 + 1.1, p.z), y0, 1);
+    B.d(new THREE.CircleGeometry(0.5, 12).translate(p.x, y0 + 1.1, p.z + 0.51));
+  },
+  rf(p, dy, B) {
+    const y0 = dy + p.y; B.s(cylG(0.5, 0.6, 0.8, 10).translate(p.x, y0, p.z), y0, 0.8);
+    const g = new THREE.CylinderGeometry(0.32, 0.32, p.len, 8); g.rotateZ(Math.PI / 2); B.s(g.translate(p.x, y0 + 1.1, p.z), y0, 1);
+    for (const sx of [-1, 1]) B.d(new THREE.BoxGeometry(0.5, 0.75, 0.75).translate(p.x + sx * p.len / 2, y0 + 1.1, p.z));
+  },
+  dr(p, dy, B) {
+    const y0 = dy + p.y, k = p.kind === 'us38' ? 1.25 : 1;
+    if (p.kind === 'jp') {
+      B.s(cylG(1.4, 1.5, 2.1, 12).translate(p.x, y0, p.z), y0, 1); B.s(boxG(2.2, 0.9, 2.4).translate(p.x, y0 + 2.1, p.z), y0);
+      const g = new THREE.CylinderGeometry(0.28, 0.28, 5, 8); g.rotateZ(Math.PI / 2); B.s(g.translate(p.x, y0 + 1.3, p.z), y0);
+    } else {
+      B.s(loftGeo(planPoly(3.6 * k, 3.4 * k, 0.6), planPoly(3.3 * k, 3.1 * k, 0.6), 0, 2.3 * k).translate(p.x, y0, p.z), y0, 1);
+      const g = new THREE.CylinderGeometry(0.3, 0.3, 5.2 * k, 8); g.rotateZ(Math.PI / 2); B.s(g.translate(p.x, y0 + 1.4 * k, p.z - 0.4), y0);
+      for (const sx of [-1, 1]) B.d(new THREE.BoxGeometry(0.5, 0.7, 0.7).translate(p.x + sx * 2.6 * k, y0 + 1.4 * k, p.z - 0.4));
+      B.d(new THREE.BoxGeometry(3.0 * k, 0.9 * k, 0.12).translate(p.x, y0 + 2.3 * k + 0.7 * k, p.z + 0.4));
+    }
+  },
+  bt(p, dy, B) {
+    const y0 = dy + p.y, w = clamp(p.len * 0.24, 1.4, 2.4), g = new THREE.SphereGeometry(1, 12, 6, 0, TAU, Math.PI / 2, Math.PI / 2);
+    g.scale(w / 2, 0.8, p.len / 2); B.s(g.translate(p.x, y0 + 0.8, p.z), y0 - 0.5, 1.6);
+    B.s(new THREE.BoxGeometry(w * 0.8, 0.12, p.len * 0.82).translate(p.x, y0 + 0.86, p.z), y0);
+    const sg = Math.sign(p.x) || 1;
+    for (const dz of [-0.36, 0.36]) {
+      const a = new V3(p.x + sg * (w / 2 + 0.3), dy, p.z + dz * p.len), b = new V3(a.x, y0 + 2.2, a.z), c = new V3(p.x, y0 + 2.2, a.z);
+      B.d(rodG(a, b, 0.09)); B.d(rodG(b, c, 0.09)); seg2(B.L, c, new V3(p.x, y0 + 0.9, a.z));
+    }
+  },
+  cp(p, dy, B) {
+    const y0 = dy + p.y, ry = p.face, grp = [], dk = [];
+    B.s(cylG(1.0, 1.2, Math.max(0.3, p.y + 0.3), 10).translate(p.x, dy, p.z), dy, 1);
+    grp.push(boxG(0.9, 0.7, p.len).translate(0, 0.3, 0), boxG(1.6, 0.25, p.len * 0.3).translate(0, 0.95, -p.len * 0.1));
+    if (p.plane) {
+      const pz = -p.len * 0.08, py = 2.3, f = new THREE.CylinderGeometry(0.4, 0.62, 8.8, 8); f.rotateX(Math.PI / 2);
+      grp.push(f.translate(0, py, pz), boxG(12, 0.14, 1.8).translate(0, py + 0.35, pz + 1.2), boxG(3.8, 0.1, 1.1).translate(0, py + 0.1, pz - 3.8),
+        boxG(0.12, 1.5, 1.5).translate(0, py + 0.1, pz - 3.9), boxG(0.7, 0.6, 5.6).translate(0, 1.1, pz + 0.4), boxG(0.3, 0.3, 1.4).translate(5.2, py - 0.6, pz + 1.2), boxG(0.3, 0.3, 1.4).translate(-5.2, py - 0.6, pz + 1.2));
+      for (const [ax, az] of [[0.25, 1.5], [-0.25, 1.5], [0.25, -0.8], [-0.25, -0.8]]) grp.push(rodG(new V3(ax, 1.6, pz + az), new V3(ax * 1.6, py, pz + az), 0.06));
+      dk.push(new THREE.CylinderGeometry(0.1, 0.1, 2.6, 4).rotateZ(Math.PI / 2).translate(0, py, pz + 4.5));
+    }
+    for (const g of grp) B.s(at(g, 0, 0, 0, ry).translate(p.x, y0, p.z), y0, 1.2);
+    for (const g of dk) B.d(at(g, 0, 0, 0, ry).translate(p.x, y0, p.z));
+  },
+  cr(p, dy, B) {
+    const y0 = dy + p.y, base = new V3(p.x, y0 + p.h * 0.35, p.z), tip = new V3(p.x, base.y + p.boom * Math.sin(0.6), p.z - p.boom * Math.cos(0.6)), top = new V3(p.x, y0 + p.h, p.z);
+    B.s(cylG(0.45, 0.6, p.h, 8).translate(p.x, y0, p.z), y0, 1.5); B.s(rodG(base, tip, 0.22), y0);
+    seg2(B.L, top, tip); seg2(B.L, tip, new V3(tip.x, tip.y - 3.5, tip.z));
+  },
+  gm(p, dy, B) {
+    const y0 = dy + p.y, tg = turretGeo(p.kind), ts = TS[p.kind];
+    const g = tg.base.clone(); g.rotateY(p.face); g.translate(p.x, y0, p.z); B.s(g, y0, 1);
+    const b = tg.bar.clone(); b.rotateX(-0.12); b.translate(0, ts.h * 0.5, ts.len * 0.18); b.rotateY(p.face); b.translate(p.x, y0, p.z); B.d(b);
+  },
+  dc(p, dy, B) {
+    for (const sx of [-0.55, 0.55]) B.s(boxG(0.15, 1.3, 4).translate(p.x + sx, dy, p.z), dy, 1);
+    for (let k = 0; k < 4; k++) { const g = new THREE.CylinderGeometry(0.34, 0.34, 0.95, 8); g.rotateZ(Math.PI / 2); B.d(g.translate(p.x, dy + 0.75, p.z - 1.4 + k * 0.95)); }
+  },
+};
 const geoCache = {};
 function shipGeometry(spec) {
   if (geoCache[spec.key]) return geoCache[spec.key];
-  const { hull, deck } = buildHull(spec), sup = [], dark = [];
-  for (const p of spec.parts) {
-    const dy = deckY(spec, p.z);
-    if (p.k === 'b') { const g = new THREE.BoxGeometry(p.w, p.h, p.len); g.translate(p.x, dy + p.y + p.h / 2, p.z); (p.m === 'd' ? dark : sup).push(g); }
-    else if (p.k === 'c') {
-      const g = funnelGeo(p, p.r, p.h); g.translate(p.x, dy + p.y, p.z); sup.push(g);
-      const cap = funnelGeo(p, p.r * 1.02, 1.1); cap.translate(p.x, dy + p.y + p.h - 1.1, p.z - (p.h - 1.1) * Math.tan(p.rake)); dark.push(cap);
-    } else if (p.k === 'm') {
-      const g = new THREE.CylinderGeometry(p.r * 0.5, p.r, p.h, 6); g.translate(p.x, dy + p.y + p.h / 2, p.z); dark.push(g);
-      const yard = new THREE.BoxGeometry(p.h * 0.5, 0.25, 0.25); yard.translate(p.x, dy + p.y + p.h * 0.74, p.z); dark.push(yard);
-    }
+  const { hull, deck, step, rings } = buildHull(spec), sup = [], dark = [], L = [], masts = [];
+  const B = { s: (g, y0, span) => sup.push(aoTint(g, y0, span)), d: g => dark.push(g), L, masts };
+  if (step) B.s(step, deckY(spec, 0) - 0.5, 3);
+  for (const p of spec.parts) PART[p.k](p, deckY(spec, p.z), B);
+  // bow and stern fittings: staffs, capstans, anchor cables, breakwater on the big ships
+  const bowZ = spec.L / 2 + bowRake(spec, 1, 1), bowY = deckY(spec, spec.L / 2), sternZ = -spec.L / 2 + 0.6, sternY = deckY(spec, -spec.L / 2);
+  const jack = new V3(0, bowY + 3 + spec.L * 0.012, bowZ - 0.6), ensign = new V3(0, sternY + 4 + spec.L * 0.015, sternZ);
+  B.d(rodG(new V3(0, bowY, bowZ - 0.6), jack, 0.08)); B.d(rodG(new V3(0, sternY, sternZ), ensign, 0.1));
+  const cz = spec.L * 0.42, cY = deckY(spec, cz), hz = spec.L * 0.47, hY = deckY(spec, hz), hx = spec.B / 2 * halfWDeck(0.97) * 0.8;
+  for (const sx of [-1, 1]) {
+    const cx = sx * spec.B * 0.07;
+    B.s(cylG(0.45, 0.55, 0.7, 10).translate(cx, cY, cz), cY, 0.7);
+    const d = new V3(sx * hx - cx, hY - cY, hz - cz), len = d.length(), ch = new THREE.BoxGeometry(0.35, 0.12, len);
+    ch.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new V3(0, 0, 1), d.clone().normalize())); ch.translate((cx + sx * hx) / 2, (cY + hY) / 2 + 0.06, (cz + hz) / 2); B.d(ch);
   }
-  return (geoCache[spec.key] = { hull, deck, sup: mergeGeos(sup), dark: mergeGeos(dark) });
+  if (spec.cls !== 'DD') {
+    const t1 = spec.tur.reduce((a, t) => t.z > a.z ? t : a), bz = t1.z + TS[t1.kind].len / 2 + 2.5, by = deckY(spec, bz), arm = spec.B * 0.3;
+    for (const sx of [-1, 1]) B.s(boxG(0.25, 1.1, arm).translate(0, 0, -arm / 2).rotateY(sx * 0.95).translate(0, by, bz + 1.5), by, 1.1);
+  }
+  // guard rails along the deck edge
+  for (const sx of [-1, 1]) {
+    let prev = null;
+    rings.forEach((r, i) => {
+      if (r.s > 0.985) return;
+      const p = new V3(sx * (r.pts[0][0] - 0.15), r.top, r.z + bowRake(spec, r.s, 1));
+      if (i % 2 === 0) seg2(L, p, new V3(p.x, p.y + 1.05, p.z));
+      if (prev) { seg2(L, new V3(prev.x, prev.y + 1.05, prev.z), new V3(p.x, p.y + 1.05, p.z)); seg2(L, new V3(prev.x, prev.y + 0.55, prev.z), new V3(p.x, p.y + 0.55, p.z)); }
+      prev = p;
+    });
+  }
+  // rigging: stays from bow to stern over the mast heads, aerials between the yards
+  masts.sort((a, b) => b.top.z - a.top.z);
+  if (masts.length) {
+    seg2(L, jack, masts[0].top);
+    for (let i = 0; i < masts.length - 1; i++) seg2(L, masts[i].top, masts[i + 1].top);
+    seg2(L, masts[masts.length - 1].top, ensign);
+    const y0 = masts[0].yard, y1 = masts.length > 1 ? masts[masts.length - 1].yard : null;
+    if (y0) for (const sx of [-1, 1]) seg2(L, new V3(sx * y0.w, y0.y, y0.z), y1 ? new V3(sx * y1.w, y1.y, y1.z) : ensign);
+  }
+  const lines = new THREE.BufferGeometry(); lines.setAttribute('position', new THREE.Float32BufferAttribute(L, 3));
+  return (geoCache[spec.key] = { hull, deck, sup: mergeGeos(sup), dark: mergeGeos(dark), lines });
 }
 const turCache = {};
 function turretGeo(kind) {
   if (turCache[kind]) return turCache[kind];
-  const t = TS[kind];
-  const base = new THREE.BoxGeometry(t.w, t.h, t.len);
-  const a = base.attributes.position;
-  for (let i = 0; i < a.count; i++) if (a.getY(i) > 0 && a.getZ(i) > 0) a.setZ(i, a.getZ(i) - t.len * 0.26);
-  base.translate(0, t.h / 2, 0); base.computeVertexNormals();
-  const bars = [];
-  for (let k = 0; k < t.n; k++) {
-    const g = new THREE.CylinderGeometry(t.br * 0.78, t.br, t.bl, 8); g.rotateX(Math.PI / 2);
-    g.translate((k - (t.n - 1) / 2) * t.w * 0.28, 0, t.bl / 2); bars.push(g);
+  const t = TS[kind], hw = t.w / 2, hl = t.len / 2, c = (t.cf || 0) * hw, ss = t.ss || 0.1, fs = (t.fs != null ? t.fs : 0.26) * t.len, rs = (t.rs || 0) * t.len;
+  const plan = [[-hw, hl - c], [-hw + c, hl], [hw - c, hl], [hw, hl - c]];
+  if (t.rr) { const d = t.rr * hw; for (let k = 0; k <= 6; k++) { const a = k / 6 * Math.PI; plan.push([hw * Math.cos(a), -hl + d - d * Math.sin(a)]); } }
+  else plan.push([hw, -hl], [-hw, -hl]);
+  const top = plan.map(([x, z]) => [x * (1 - ss), z > 0 ? z - fs * z / hl : z + rs * -z / hl]);
+  const faceZ = hl - fs * 0.5, parts = [loftGeo(plan, top, 0, t.h, true, true)];
+  const mw = t.n > 1 ? t.w * 0.28 * (t.n - 1) + t.br * 5 : t.br * 5;
+  parts.push(new THREE.BoxGeometry(mw, t.h * 0.42, 0.5).translate(0, t.h * 0.5, faceZ - 0.1));
+  if (t.hood) for (const sx of [-1, 1]) parts.push(boxG(t.w * 0.14, t.h * 0.18, t.len * 0.22).translate(sx * hw * 0.55, t.h - 0.05, hl - fs - t.len * 0.12));
+  if (t.ears) {
+    const re = t.h * 0.085, g = new THREE.CylinderGeometry(re, re, t.w * 1.3, 8); g.rotateZ(Math.PI / 2); parts.push(g.translate(0, t.h * 0.78, -hl * 0.55));
+    for (const sx of [-1, 1]) parts.push(new THREE.BoxGeometry(re * 2.4, re * 2.8, re * 2.8).translate(sx * t.w * 0.65, t.h * 0.78, -hl * 0.55));
   }
-  const barb = new THREE.CylinderGeometry(t.w * 0.42, t.w * 0.42, 1, 14); barb.translate(0, -0.5, 0);
-  return (turCache[kind] = { base, bar: mergeGeos(bars), barb });
+  // barrels: blast bag at the port, taper, muzzle swell
+  const exitZ = faceZ - t.len * 0.18, br = t.br, bl = t.bl;
+  const prof = [[0.001, 0], [br * 1.7, 0], [br * 1.7, exitZ + br * 2.5], [br * 1.12, exitZ + br * 3.4], [br, exitZ + br * 4.5], [br * 0.8, bl * 0.93], [br * 0.96, bl * 0.945], [br * 0.96, bl], [0.001, bl]].map(([r, y]) => new THREE.Vector2(r, y));
+  const bars = [];
+  for (let k = 0; k < t.n; k++) { const g = new THREE.LatheGeometry(prof, 10); g.rotateX(Math.PI / 2); bars.push(g.translate((k - (t.n - 1) / 2) * t.w * 0.28, 0, 0)); }
+  const barb = new THREE.CylinderGeometry(t.w * 0.42, t.w * 0.44, 1, 20); barb.translate(0, -0.5, 0);
+  return (turCache[kind] = { base: mergeGeos(parts), bar: mergeGeos(bars), barb: mergeGeos([barb]) });
 }
-const std = (c, r = 0.78, m = 0.22, side = THREE.FrontSide) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m, side });
+
+// ---- paint: hull sides and decks are canvas textures
+const MAX_ANISO = renderer.capabilities.getMaxAnisotropy();
+function canvasTex(cv, repeat) {
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, MAX_ANISO);
+  if (repeat) t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  return t;
+}
+const HULL_PAINT = { US: '#39434f', JP: '#5c6166' };
+function hullTexture(spec, no) {
+  const W = 2048, H = 256, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d'), yMin = -spec.D, yMax = hullTopY(spec), pxv = H / (yMax - yMin), pxu = (W / 2) / spec.L;
+  const Y = y => (yMax - y) * pxv, boot = spec.F * 0.09 + 0.25, digits = spec.cls === 'DD' && no ? no.replace(/\D/g, '') : '';
+  let seed = spec.L * 7 + spec.B; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (const side of [0, 1]) {
+    const X0 = side * W / 2, X = s => X0 + (side ? 1 - s : s) * W / 2, deckAt = s => deckY(spec, (s - 0.5) * spec.L);
+    c.save(); c.beginPath(); c.rect(X0, 0, W / 2, H); c.clip();
+    c.fillStyle = HULL_PAINT[spec.nation]; c.fillRect(X0, 0, W / 2, H);
+    // mottled weathering, plating strakes and butts
+    for (let i = 0; i < 260; i++) { c.fillStyle = `rgba(${rnd() < 0.5 ? '0,0,0' : '255,255,255'},${0.02 + rnd() * 0.03})`; c.fillRect(X0 + rnd() * W / 2, rnd() * H, 6 + rnd() * 40, 2 + rnd() * 10); }
+    c.strokeStyle = 'rgba(0,0,0,.16)'; c.lineWidth = 1;
+    for (let y = boot + 1.8; y < yMax; y += 1.9) { c.beginPath(); c.moveTo(X0, Y(y)); c.lineTo(X0 + W / 2, Y(y)); c.stroke(); }
+    c.strokeStyle = 'rgba(0,0,0,.09)';
+    for (let z = 0; z < spec.L; z += 6.5) { c.beginPath(); c.moveTo(X(z / spec.L), Y(boot)); c.lineTo(X(z / spec.L), 0); c.stroke(); }
+    // portholes with rust streaks
+    const rows = [[1.3, 0.2, 0.9]]; if (spec.L > 150) rows.push([3.3, 0.3, 0.8]);
+    for (const [dd, s0, s1] of rows) for (let z = s0 * spec.L; z < s1 * spec.L; z += 2.3) {
+      const s = z / spec.L, y = deckAt(s) - dd; if (y < boot + 1) continue;
+      c.fillStyle = '#0b0d10'; c.beginPath(); c.ellipse(X(s), Y(y), Math.max(1, 0.2 * pxu), Math.max(1, 0.2 * pxv), 0, 0, TAU); c.fill();
+      if (rnd() < 0.3) { const g = c.createLinearGradient(0, Y(y), 0, Y(y - 1.5 - rnd() * 2)); g.addColorStop(0, 'rgba(105,60,36,.35)'); g.addColorStop(1, 'rgba(105,60,36,0)'); c.fillStyle = g; c.fillRect(X(s) - 1, Y(y), 2, (1.5 + rnd() * 2) * pxv); }
+    }
+    for (let i = 0; i < spec.L / 4; i++) { const s = rnd(), y = boot + 0.5 + rnd() * (deckAt(s) - boot - 1), l = (0.8 + rnd() * 2.5) * pxv, g = c.createLinearGradient(0, Y(y), 0, Y(y) + l); g.addColorStop(0, 'rgba(95,55,34,.22)'); g.addColorStop(1, 'rgba(95,55,34,0)'); c.fillStyle = g; c.fillRect(X(s), Y(y), 1 + rnd() * 1.5, l); }
+    // hawse pipe
+    const hs = 0.955, hy = deckAt(hs) - 1.5; c.fillStyle = '#0a0b0d'; c.beginPath(); c.ellipse(X(hs), Y(hy), 0.55 * pxu, 0.5 * pxv, 0, 0, TAU); c.fill();
+    const hg = c.createLinearGradient(0, Y(hy), 0, Y(hy - 3)); hg.addColorStop(0, 'rgba(110,62,36,.5)'); hg.addColorStop(1, 'rgba(110,62,36,0)'); c.fillStyle = hg; c.fillRect(X(hs) - 0.3 * pxu, Y(hy), 0.6 * pxu, 3 * pxv);
+    // salt stain, boot-topping, anti-fouling
+    const sg = c.createLinearGradient(0, Y(boot + 0.9), 0, Y(boot)); sg.addColorStop(0, 'rgba(210,215,215,0)'); sg.addColorStop(1, 'rgba(210,215,215,.1)'); c.fillStyle = sg; c.fillRect(X0, Y(boot + 0.9), W / 2, 0.9 * pxv);
+    c.fillStyle = '#141517'; c.fillRect(X0, Y(boot), W / 2, (boot + 0.3) * pxv);
+    c.fillStyle = '#4c2620'; c.fillRect(X0, Y(-0.3), W / 2, H);
+    if (digits) {
+      const s = 0.84, hM = spec.F * 0.46, y = deckAt(s) - spec.F * 0.42;
+      c.save(); c.translate(X(s), Y(y)); c.scale(pxu / pxv, 1);
+      c.font = `700 ${Math.round(hM * pxv)}px "Big Shoulders Stencil Display","Arial Narrow",sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillStyle = 'rgba(226,229,232,.82)'; c.fillText(digits, 0, 0); c.restore();
+    }
+    c.restore();
+  }
+  return canvasTex(cv);
+}
+// deck styles: painted steel (US DD), painted planking (US CL/BB), linoleum with brass strips (IJN), bare teak (IJN BB)
+const DECK_PAINT = { steel: ['#4d5867', 0], plank: ['#515d6c', 1], lino: ['#74553d', 2], wood: ['#957d58', 1] };
+function deckTexture(style) {
+  const S = 512, cv = document.createElement('canvas'); cv.width = cv.height = S;
+  const c = cv.getContext('2d'), [base, kind] = DECK_PAINT[style], m = S / 8;
+  let seed = S + style.length * 31; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  c.fillStyle = base; c.fillRect(0, 0, S, S);
+  if (kind === 1) {
+    const pw = 0.28 * m;
+    for (let x = 0; x < S; x += pw) {
+      let z = -rnd() * 6 * m;
+      while (z < S) { const l = (4 + rnd() * 3) * m; c.fillStyle = `rgba(${rnd() < 0.5 ? '0,0,0' : '255,240,220'},${rnd() * 0.07})`; c.fillRect(x, z, pw, l); c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(x, z, pw, 1); z += l; }
+      c.fillStyle = style === 'wood' ? 'rgba(30,20,10,.55)' : 'rgba(0,0,0,.3)'; c.fillRect(x, 0, 1, S);
+    }
+  } else {
+    for (let i = 0; i < 90; i++) { c.fillStyle = `rgba(${rnd() < 0.5 ? '0,0,0' : '255,255,255'},${0.02 + rnd() * 0.04})`; c.fillRect(rnd() * S, rnd() * S, 10 + rnd() * 60, 10 + rnd() * 60); }
+    const step = (kind === 2 ? 1.6 : 2) * m;
+    c.fillStyle = kind === 2 ? 'rgba(190,150,80,.45)' : 'rgba(0,0,0,.18)';
+    for (let v = 0; v < S; v += step) { c.fillRect(v, 0, 1.5, S); c.fillRect(0, v, S, 1.5); }
+  }
+  return canvasTex(cv, true);
+}
+const std = (c, r = 0.78, m = 0.22, side = THREE.FrontSide, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m, side, ...o });
 const MATS = {
-  US: { hull: std(0x353f4d, .72, .25, THREE.DoubleSide), sup: std(0x7c858e), deck: std(0x3d4652, .9, .05, THREE.DoubleSide), dark: std(0x1b1f23, .6, .4) },
-  JP: { hull: std(0x5e6368, .72, .25, THREE.DoubleSide), sup: std(0x6b7075), deck: std(0x5a4535, .9, .05, THREE.DoubleSide), dark: std(0x1b1f23, .6, .4) },
+  US: { sup: std(0x7c858e, .78, .22, THREE.FrontSide, { vertexColors: true }), dark: std(0x1b1f23, .6, .4, THREE.FrontSide, { vertexColors: true }) },
+  JP: { sup: std(0x6b7075, .78, .22, THREE.FrontSide, { vertexColors: true }), dark: std(0x1b1f23, .6, .4, THREE.FrontSide, { vertexColors: true }) },
 };
-const deckMats = {};
+const LINE_MAT = new THREE.LineBasicMaterial({ color: 0x15191d, transparent: true, opacity: 0.75 });
+const matCache = {};
+function hullMat(spec, no) {
+  const id = spec.key + '|' + (spec.cls === 'DD' ? no || '' : '');
+  if (matCache[id]) return matCache[id];
+  const m = matCache[id] = std(0xffffff, .72, .22, THREE.DoubleSide, { map: hullTexture(spec, no) });
+  // hull numbers use the stencil webfont; repaint once it has arrived
+  if (spec.cls === 'DD' && no && document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { m.map.dispose(); m.map = hullTexture(spec, no); m.needsUpdate = true; });
+  return m;
+}
+function deckMat(spec) {
+  const style = spec.deck || (spec.nation === 'US' ? (spec.cls === 'DD' ? 'steel' : 'plank') : 'lino');
+  return matCache['deck|' + style] || (matCache['deck|' + style] = std(0xffffff, .9, .05, THREE.DoubleSide, { map: deckTexture(style) }));
+}
 
 // ---------------------------------------------------------------- world state
 let ships = [], shells = [], torps = [];
@@ -1077,8 +1501,8 @@ class Ship {
     this.sinkRoll = rand(0.6, 1.1) * (Math.random() < 0.5 ? -1 : 1); this.sinkPitch = rand(-0.25, 0.25); this.bob = 0;
     const g = this.group = new THREE.Group(); g.rotation.order = 'YXZ';
     const geos = shipGeometry(spec), M = MATS[spec.nation];
-    let deckMat = M.deck; if (spec.deck) { deckMat = deckMats[spec.deck] || (deckMats[spec.deck] = std(spec.deck, .9, .05, THREE.DoubleSide)); }
-    g.add(new THREE.Mesh(geos.hull, M.hull), new THREE.Mesh(geos.deck, deckMat), new THREE.Mesh(geos.sup, M.sup), new THREE.Mesh(geos.dark, M.dark));
+    g.add(new THREE.Mesh(geos.hull, hullMat(spec, o.no)), new THREE.Mesh(geos.deck, deckMat(spec)), new THREE.Mesh(geos.sup, M.sup), new THREE.Mesh(geos.dark, M.dark));
+    this.lines = new THREE.LineSegments(geos.lines, LINE_MAT); g.add(this.lines);
     this.turrets = [];
     for (const t of spec.tur) {
       const ts = TS[t.kind], tg = turretGeo(t.kind), dy = deckY(spec, t.z);
@@ -1175,6 +1599,8 @@ class Ship {
       y -= Math.pow(this.sinkT, 1.7) * (spec.F + spec.D) * 0.028;
     }
     this.bob = y;
+    // rails and rigging only read up close; beyond that they just add shimmer
+    this.lines.visible = Math.hypot(this.x - camera.position.x, this.z - camera.position.z) * camera.fov / 55 < L * 9;
     this.group.position.set(this.x, y, this.z);
     this.group.rotation.set(-pitch, this.heading, roll);
     this.group.updateMatrixWorld(true);
@@ -2004,11 +2430,29 @@ function drawSil(cv, key, fill) {
   c.beginPath(); c.moveTo(X(-spec.L / 2), Y(0));
   for (let i = 0; i <= 40; i++) { const s = i / 40, z = (s - .5) * spec.L; c.lineTo(X(z + bowRake(spec, s, 1)), Y(deckY(spec, z))); }
   c.lineTo(X(spec.L / 2), Y(0)); c.closePath(); c.fill();
+  const rect = (z0, len, y0, h) => c.fillRect(X(z0), Y(y0 + h), len * sc, h * sc + 0.5), line = (z0, y0, z1, y1, w = 1) => { c.lineWidth = w; c.beginPath(); c.moveTo(X(z0), Y(y0)); c.lineTo(X(z1), Y(y1)); c.stroke(); };
   for (const p of spec.parts) {
-    const dy = deckY(spec, p.z);
-    if (p.k === 'b') c.fillRect(X(p.z - p.len / 2), Y(dy + p.y + p.h), p.len * sc, p.h * sc + 0.5);
-    else if (p.k === 'c') { const tr = Math.tan(p.rake) * p.h; c.beginPath(); c.moveTo(X(p.z - p.r), Y(dy + p.y)); c.lineTo(X(p.z + p.r), Y(dy + p.y)); c.lineTo(X(p.z + p.r - tr), Y(dy + p.y + p.h)); c.lineTo(X(p.z - p.r - tr), Y(dy + p.y + p.h)); c.closePath(); c.fill(); }
-    else if (p.k === 'm') { c.lineWidth = Math.max(1, p.r * 2 * sc); c.beginPath(); c.moveTo(X(p.z), Y(dy + p.y)); c.lineTo(X(p.z), Y(dy + p.y + p.h)); c.stroke(); c.lineWidth = 1; c.beginPath(); c.moveTo(X(p.z - p.h * 0.2), Y(dy + p.y + p.h * 0.74)); c.lineTo(X(p.z + p.h * 0.2), Y(dy + p.y + p.h * 0.74)); c.stroke(); }
+    const dy = deckY(spec, p.z), y0 = dy + p.y;
+    switch (p.k) {
+      case 'b': rect(p.z - p.len / 2, p.len, y0, p.h); break;
+      case 'pl': rect(p.z - p.len / 2, p.len, y0 - 0.4, 0.4); break;
+      case 'c': { const tr = Math.tan(p.rake) * p.h; c.beginPath(); c.moveTo(X(p.z - p.r), Y(y0)); c.lineTo(X(p.z + p.r), Y(y0)); c.lineTo(X(p.z + p.r - tr), Y(y0 + p.h)); c.lineTo(X(p.z - p.r - tr), Y(y0 + p.h)); c.closePath(); c.fill(); if (p.cap === 'jp') rect(p.z - tr - p.r * 1.1, p.r * 2.2, y0 + p.h + 0.3, 0.4); break; }
+      case 'm': {
+        const tr = Math.tan(p.rake) * p.h; line(p.z, y0, p.z - tr, y0 + p.h, Math.max(1, p.r * 2 * sc));
+        if (p.tri) line(p.z - p.tri, y0, p.z - tr * 0.55, y0 + p.h * 0.55, Math.max(1, p.r * 1.5 * sc));
+        for (const [f, len] of p.yards || []) line(p.z - tr * f - len * 0.12, y0 + p.h * f, p.z - tr * f + len * 0.12, y0 + p.h * f);
+        if (p.top) rect(p.z - tr * p.top[0] - p.top[1] / 2, p.top[1], y0 + p.h * p.top[0], 0.4);
+        break;
+      }
+      case 'tt': rect(p.z - p.len / 2 + 0.6, p.len, y0, 1.3); break;
+      case 'dr': rect(p.z - 1.8, 3.6, y0, p.kind === 'us38' ? 2.9 : 2.3); break;
+      case 'rf': rect(p.z - 0.5, 1, y0, 1.5); break;
+      case 'bt': rect(p.z - p.len / 2, p.len, y0, 1.1); break;
+      case 'cp': rect(p.z - p.len / 2 * Math.cos(p.face), p.len * Math.cos(p.face), y0, 1); if (p.plane) rect(p.z - 4.4, 8.8, y0 + 1.6, 1.2); break;
+      case 'cr': line(p.z, y0, p.z, y0 + p.h, 1.5); line(p.z, y0 + p.h * 0.35, p.z - p.boom * Math.cos(0.6), y0 + p.h * 0.35 + p.boom * Math.sin(0.6)); break;
+      case 'gm': rect(p.z - TS[p.kind].len / 2, TS[p.kind].len, y0, TS[p.kind].h); break;
+      default: rect(p.z - 1, 2, y0, 1.3);
+    }
   }
   for (const t of spec.tur) {
     if (t.sec && t.y < 0) continue;
@@ -2191,7 +2635,7 @@ function start(data) {
   requestAnimationFrame(t => { lastT = t; frame(t); });
 }
 window.claude?.hot?.snapshot?.(() => ({ ship: G.shipKey, diff: G.diff }));
-if (window.__IBS_DEBUG) window.__ibs = { PERF, renderer, G, advance(sec, fn) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) { if (fn) fn(); if (G.mode !== 'paused') step(1 / 30, true); updateCamera(1 / 30); } }, leadPoint, intercept, angDiff, terrainH, get ships() { return ships; }, get torps() { return torps; }, aim, startGame, SPECS };
+if (window.__IBS_DEBUG) window.__ibs = { PERF, renderer, G, advance(sec, fn) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) { if (fn) fn(); if (G.mode !== 'paused') step(1 / 30, true); updateCamera(1 / 30); } }, leadPoint, intercept, angDiff, terrainH, get ships() { return ships; }, get torps() { return torps; }, aim, startGame, SPECS, camera, scene, Ship, clearWorld, showScreen };
 if (window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data ?? {});
 })();
 </script>
