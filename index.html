@@ -261,6 +261,65 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
   .banner{top:27%}
   .banner .b3{font-size:13px}
 }
+/* ---------- Landscape phones (and the iOS app): thumbs own the bottom corners, the HUD moves to the top and bottom-centre */
+.t-throttle,.t-rudder{display:none}
+@media (pointer:coarse) and (orientation:landscape) and (max-height:540px){
+  #touch #tUp,#touch #tDown,#touch #tLeft,#touch #tRight{display:none}
+  .t-throttle,.t-rudder{display:block;position:absolute;pointer-events:auto;touch-action:none;background:rgba(9,14,18,.55);border:1px solid var(--rule-strong)}
+  .t-throttle{left:calc(env(safe-area-inset-left,0px) + 12px);bottom:12px;width:50px;height:178px}
+  .t-ticks{position:absolute;inset:8px 0;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(100% / 6 - 1px),rgba(240,181,74,.35) calc(100% / 6 - 1px),rgba(240,181,74,.35) calc(100% / 6))}
+  .t-knob{position:absolute;left:4px;right:4px;height:22px;background:var(--lamp);color:var(--ink);font:700 11px var(--f-body);display:grid;place-items:center;transform:translateY(-50%);transition:top .12s}
+  .t-rudder{left:calc(env(safe-area-inset-left,0px) + 72px);bottom:12px;width:150px;height:56px}
+  .t-rudder::before{content:"舵";position:absolute;left:8px;top:4px;font:12px var(--f-body);color:var(--paper-dim)}
+  .t-rudder::after{content:"";position:absolute;left:50%;top:10px;bottom:10px;width:1px;background:var(--paper-dim)}
+  .t-rud-knob{position:absolute;top:12px;bottom:12px;width:34px;margin-left:-17px;left:50%;background:rgba(240,181,74,.8)}
+  #touch #tFire{right:calc(env(safe-area-inset-right,0px) + 16px);bottom:16px;width:84px;height:84px;font-size:16px}
+  #touch #tWpn{right:calc(env(safe-area-inset-right,0px) + 112px);bottom:16px;width:58px;height:40px;font-size:13px}
+  #touch #tZoom{right:calc(env(safe-area-inset-right,0px) + 112px);bottom:64px;width:58px;height:40px;font-size:13px}
+  #touch #tDc{right:calc(env(safe-area-inset-right,0px) + 20px);bottom:110px;width:76px;height:36px;font-size:13px}
+  #touch #tZoom.on,#touch #tFire.on{background:rgba(240,181,74,.4)}
+  #touch #tPause{left:calc(env(safe-area-inset-left,0px) + 8px);top:8px;width:46px;height:30px;font-size:12px}
+  .hud-tl{left:calc(env(safe-area-inset-left,0px) + 62px);top:6px}
+  .wave-no{font-size:18px}.wave-name{font-size:11px}.counts{font-size:11px}
+  .hud-tr{right:calc(env(safe-area-inset-right,0px) + 10px);top:6px}
+  .score{font-size:18px}.clock{font-size:10px}
+  .feed{position:fixed;left:calc(env(safe-area-inset-left,0px) + 62px);top:64px;right:auto;font-size:11px;max-width:240px}
+  .hud-br{top:52px;bottom:auto;right:calc(env(safe-area-inset-right,0px) + 8px);padding:3px}
+  #mini{width:100px;height:100px}
+  .hud-bc{top:6px;bottom:auto;left:50%;right:auto;transform:translateX(-50%);flex-direction:row;gap:4px}
+  .wpn{min-width:0;padding:4px 8px;gap:3px}.wpn .sub{display:none}.wpn-h{font-size:12px}
+  .pip{width:9px;height:11px}
+  .hud-bl{left:50%;right:auto;transform:translateX(-50%);bottom:8px;width:min(270px,calc(100vw - 520px));min-width:210px;padding:5px 9px;gap:3px}
+  .hud-bl .ship-name b{font-size:13px}.hud-bl .ship-name span{font-size:12px}.hud-bl .hp-row{font-size:11px}
+  .hud-bl .ship-type,.hud-bl #tele,.hud-bl .rudder{display:none}
+  .hud-bl .nav{grid-template-columns:1fr}
+  .hud-bl .nav-read{display:flex;gap:18px}
+  .hud-bl .nav-read b{font-size:19px;display:inline;margin-left:4px}
+  .keys-strip,.lock-hint{display:none}
+  .hint{bottom:96px;font-size:12px}
+  .banner{top:14%}.banner .b2{font-size:32px}.banner .b3{font-size:12px}
+  .torp-warn{top:auto;bottom:118px}
+  /* menu: title, ships and launch on the left; the ship on its stage on the right */
+  .menu{background:linear-gradient(90deg,rgba(6,9,12,.94) 0,rgba(6,9,12,.78) 36%,rgba(6,9,12,0) 58%)}
+  .menu-grid{grid-template-columns:minmax(300px,46%) minmax(0,1fr);grid-template-rows:auto auto 1fr;grid-template-areas:"brand stage" "dock stage" ". stage";min-height:100%;height:100%;gap:6px 14px;
+    padding:10px calc(env(safe-area-inset-right,0px) + 10px) 10px calc(env(safe-area-inset-left,0px) + 14px)}
+  .brand,.pick,.oni{background:none;padding:0}
+  .brand .brief,.brand .keys,.brand .touch-note,.oni,.en,.eyebrow{display:none}
+  .title{font-size:32px;margin:0}
+  .stage{min-height:0;padding:0}.stage::before{inset:6% 4% 24%}.stage-blurb{display:none}.stage-name{font-size:28px}.stage-type{font-size:11px;margin-bottom:0}.stage-no{font-size:12px}
+  .sec-title{margin:0 0 6px;font-size:11px}
+  .dock-row{grid-template-columns:minmax(0,1fr);gap:8px}
+  .cards{grid-template-columns:minmax(0,1fr);gap:5px}
+  .card{grid-template-columns:92px minmax(0,1fr);padding:5px 8px;gap:0 10px;align-items:center}
+  .card canvas{grid-column:1;grid-row:1;height:26px}
+  .card dl{display:none}
+  .card-h b{font-size:14px}.card .ty{font-size:11px;margin:0}
+  .launch{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-width:0}
+  .launch .primary{width:auto;flex:1;padding:9px 12px;font-size:15px}
+  .seg button{padding:7px 10px;font-size:12px}
+  .diff-note,.best{display:none}
+}
+html.app,html.app body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 @media (prefers-reduced-motion:reduce){
   .banner.show,.torp-warn{animation:none}
 }
@@ -325,6 +384,8 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
     <button id="tZoom" aria-label="望远镜">望远</button>
     <button id="tDc" aria-label="损管">损管</button>
     <button id="tPause" aria-label="暂停">暂停</button>
+    <div id="tThrottle" class="t-throttle" aria-label="车钟：上下拖动"><div class="t-ticks"></div><div class="t-knob"></div></div>
+    <div id="tRudder" class="t-rudder" aria-label="舵：左右拖动"><div class="t-rud-knob"></div></div>
   </div>
 
   <div id="menu" class="screen menu">
@@ -2007,7 +2068,7 @@ function shellHit(ship, sh, x, y, z) {
   const dealt = ship.damage(dmg, sh.owner, 'shell');
   FX.hit(x, y, z, gun.cal); Sfx.hit(x, z, gun.cal, ship.isPlayer, crit, false, sh.owner.isPlayer);
   if (sh.owner.isPlayer && G.stats) { G.stats.hits++; ribbon(crit ? '重创' : '命中', dealt); if (fire) ribbon('引发火灾', 0); }
-  if (ship.isPlayer) { G.shake = Math.max(G.shake, gun.cal / 406 * 1.4); if (crit) hint('我舰要害中弹！'); }
+  if (ship.isPlayer) { G.shake = Math.max(G.shake, gun.cal / 406 * 1.4); if (crit) hint('我舰要害中弹！'); haptic(crit || gun.cal >= 300 ? 'hitHeavy' : 'hit'); }
 }
 function launchFan(ship, heading) {
   const tp = ship.torp, n = ship.torpSalvo;
@@ -2050,7 +2111,7 @@ function updateTorps(dt) {
         const dealt = sh.damage(dmg, t.owner, 'torp');
         FX.column(t.x, t.z, 1.2); FX.hit(t.x, 3, t.z, 300); Sfx.torpHit(t.x, t.z, sh.isPlayer, t.owner.isPlayer);
         if (t.owner.isPlayer && G.stats) { G.stats.torpHits++; ribbon('鱼雷命中', dealt); }
-        if (sh.isPlayer) { G.shake = Math.max(G.shake, 1.6); hint('我舰中雷！'); }
+        if (sh.isPlayer) { G.shake = Math.max(G.shake, 1.6); hint('我舰中雷！'); haptic('torp'); }
         break;
       }
     }
@@ -2251,7 +2312,7 @@ function startGame() {
     a.ai = new AI(a); a.ai.slot = i; ships.push(a);
   });
   G.mode = 'play'; G.time = 0; G.clock = 0; G.wave = 0; G.nextWaveT = 5; G.waveActive = false; G.endT = -1; G.result = null;
-  G.weapon = 'guns'; G.zoomToggle = false; G.fireReq = false; G.shake = 0; G.keysT = 22;
+  G.weapon = 'guns'; G.zoomToggle = false; G.fireReq = false; G.fireHeld = false; G.lock = null; touchState.rud = 0; G.shake = 0; G.keysT = 22;
   G.stats = { shots: 0, hits: 0, torps: 0, torpHits: 0, dmgDealt: 0, dmgTaken: 0, kills: [], tons: 0, lost: [] };
   aim.yaw = P.heading; aim.range = P.gun.range * 0.55;
   G.camZoom = 1;
@@ -2300,7 +2361,7 @@ function onShipSunk(s, killer) {
   if (s.team === 'JP') {
     const pd = P ? (s.dmgBy.get(P) || 0) : 0, credit = killer === P || pd >= s.maxHp * 0.25;
     if (credit) { G.stats.kills.push({ name: s.name, type: s.typeLabel, tons: s.spec.tons, fate: FATE[s.name] || '' }); G.stats.tons += s.spec.tons; }
-    if (killer === P) ribbon('击沉', 0);
+    if (killer === P) { ribbon('击沉', 0); haptic('success'); }
     feed(`${killer && killer.team === 'US' ? '<b>' + killer.name + '</b> ' : ''}击沉 <b>${s.name}</b>（${s.typeLabel}）`, 'foe');
   } else {
     if (s !== P) { G.stats.lost.push(s.name); feed(`<b>${s.name}</b> 沉没`, 'friend'); }
@@ -2328,7 +2389,21 @@ const clockStr = t => String(Math.floor(t / 60)).padStart(2, '0') + ':' + String
 function updatePlayer(dt) {
   const P = G.player; if (!P || !P.alive) return;
   const l = keys.KeyA || keys.ArrowLeft || touchState.left, r = keys.KeyD || keys.ArrowRight || touchState.right;
-  P.rudderCmd = (l ? 1 : 0) - (r ? 1 : 0);
+  P.rudderCmd = touchState.rud || ((l ? 1 : 0) - (r ? 1 : 0));
+  // a locked target steers the aim: lead for the guns, intercept course for torpedoes
+  if (G.lock && (!G.lock.alive || G.lock.removed)) G.lock = null;
+  if (G.lock) {
+    const T = G.lock;
+    let lx, lz;
+    if (G.weapon === 'torps' && P.torp) { const ic = intercept(P.x, P.z, T.x, T.z, T.vx, T.vz, P.torp.speed); if (ic) { lx = ic.x; lz = ic.z; } }
+    if (lx == null) [lx, lz] = leadPoint(P.x, P.z, T, P.gun);
+    aim.yaw = wrapA(aim.yaw + angDiff(aim.yaw, Math.atan2(lx - P.x, lz - P.z)) * Math.min(1, dt * 6));
+    aim.range += (Math.hypot(lx - P.x, lz - P.z) - aim.range) * Math.min(1, dt * 6);
+  }
+  // fire button held: fire whatever is ready and bearing, without nagging hints
+  if (G.fireHeld) {
+    if (G.weapon === 'guns' ? P.mainTurrets.some(t => t.reload <= 0 && t.onTarget) : (P.torp && P.torpReady.some(v => v <= 0))) G.fireReq = true;
+  }
   P.aimX = P.x + Math.sin(aim.yaw) * aim.range; P.aimZ = P.z + Math.cos(aim.yaw) * aim.range;
   if (P.secGun) secondaryLogic(P);
   for (let i = 0; i < P.torpReady.length; i++) P.torpReady[i] -= dt;
@@ -2341,13 +2416,14 @@ function playerFire() {
     const ready = P.mainTurrets.filter(t => t.reload <= 0), aimed = ready.filter(t => t.onTarget);
     if (!aimed.length) { hint(!ready.length ? '主炮装填中' : P.mainTurrets.some(t => t.inArc) ? '炮塔转向中' : '炮塔无法指向该方位'); return; }
     for (const t of aimed) fireTurret(P, t, P.aimX, P.aimZ, 0);
+    haptic(P.gun.cal >= 300 ? 'heavy' : P.gun.cal >= 150 ? 'medium' : 'light');
     if (aim.range > P.gun.range) hint('超出射程，炮弹落在最大射程处');
   } else {
     const rel = Math.abs(angDiff(P.heading, aim.yaw));
     if (rel < 25 * DEG || rel > 155 * DEG) { hint('鱼雷需向舷侧发射，转向或调整方位'); return; }
     const m = P.torpReady.findIndex(v => v <= 0);
     if (m < 0) { hint('鱼雷装填中'); return; }
-    launchFan(P, aim.yaw); P.torpReady[m] = P.torp.reload;
+    launchFan(P, aim.yaw); P.torpReady[m] = P.torp.reload; haptic('light');
     ribbon('鱼雷出管', 0);
   }
 }
@@ -2361,7 +2437,16 @@ function useDC() { const P = G.player; if (!P) return; if (P.useDC()) { hint('�
 
 // ---------------------------------------------------------------- input
 const coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches && !matchMedia('(pointer: fine)').matches;
-const touchState = { left: false, right: false };
+// iOS app shell (ios/): it injects window.__IBS_APP, takes haptics over a message handler and tells us about backgrounding
+const APP = window.__IBS_APP || null;
+function haptic(kind) { if (APP) try { window.webkit.messageHandlers.haptic.postMessage(kind); } catch (e) {} }
+if (APP) {
+  document.documentElement.classList.add('app');
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+  window.__ibsBackground = () => { if (G.mode === 'play') pause(true); try { Sfx.ctx && Sfx.ctx.suspend(); } catch (e) {} };
+  window.__ibsForeground = () => { try { Sfx.ctx && Sfx.ctx.resume(); } catch (e) {} };
+}
+const touchState = { left: false, right: false, rud: 0 };
 function zoomOn() { return G.zoomToggle || G.shiftHeld || G.rmb || G.touchZoom; }
 function aimDelta(dx, dy) {
   const P = G.player; if (!P) return;
@@ -2413,9 +2498,43 @@ window.addEventListener('mouseup', e => {
 glCanvas.addEventListener('wheel', e => { if (G.mode !== 'play') return; e.preventDefault(); G.camZoom = clamp(G.camZoom * Math.exp(e.deltaY * 0.001), 0.55, 2.4); }, { passive: false });
 // touch aiming
 const touches = new Map();
-glCanvas.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch' || G.mode !== 'play') return; Sfx.init(); touches.set(e.pointerId, { x: e.clientX, y: e.clientY }); glCanvas.setPointerCapture(e.pointerId); });
-glCanvas.addEventListener('pointermove', e => { const t = touches.get(e.pointerId); if (!t) return; aimDelta((e.clientX - t.x) * 1.6, (e.clientY - t.y) * 1.6); t.x = e.clientX; t.y = e.clientY; });
-const endTouch = e => touches.delete(e.pointerId);
+glCanvas.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch' || G.mode !== 'play') return; Sfx.init(); touches.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now(), moved: false }); glCanvas.setPointerCapture(e.pointerId); });
+glCanvas.addEventListener('pointermove', e => {
+  const t = touches.get(e.pointerId); if (!t) return;
+  if (!t.moved && Math.hypot(e.clientX - t.x0, e.clientY - t.y0) > 12) { t.moved = true; if (G.lock) { G.lock = null; hint('手动瞄准'); } }
+  if (t.moved) aimDelta((e.clientX - t.x) * 1.6, (e.clientY - t.y) * 1.6);
+  t.x = e.clientX; t.y = e.clientY;
+});
+const endTouch = e => {
+  const t = touches.get(e.pointerId); touches.delete(e.pointerId);
+  if (t && !t.moved && e.type === 'pointerup' && performance.now() - t.t0 < 400) tapLock(e.clientX, e.clientY);
+};
+// tap near an enemy (its hull or its label) to lock it; tap open sea to let go
+function tapLock(x, y) {
+  const P = G.player; if (!P || !P.alive) return;
+  let best = null, bd = 1e9;
+  for (const s of ships) {
+    if (!s.alive || s.removed || s.team === P.team) continue;
+    for (const [py, slack] of [[s.spec.F + 4, 1], [s.spec.top + 34, 0.8]]) {
+      const sp = toScreen(s.x, py, s.z); if (!sp) continue;
+      const d = Math.hypot(sp[0] - x, sp[1] - y) * slack; if (d < bd) { bd = d; best = s; }
+    }
+  }
+  if (best && bd < 70) { G.lock = best; hint('锁定 ' + best.name + '：提前量自动计算'); haptic('select'); }
+  else if (G.lock) { G.lock = null; hint('解除锁定'); }
+}
+// throttle lever: drag up and down through the seven notches; rudder pad: drag sideways, centres on release
+(() => {
+  const lev = document.getElementById('tThrottle'), pad = document.getElementById('tRudder'), knob = pad.querySelector('.t-rud-knob');
+  const setNotch = e => { const P = G.player; if (!P) return; const r = lev.getBoundingClientRect(), n = Math.round(clamp(1 - (e.clientY - r.top - 8) / (r.height - 16), 0, 1) * 6); if (n !== P.throttle) { P.throttle = n; hint('车钟：' + THROTTLE_CN[n]); haptic('select'); } };
+  lev.addEventListener('pointerdown', e => { e.preventDefault(); Sfx.init(); lev.setPointerCapture(e.pointerId); setNotch(e); });
+  lev.addEventListener('pointermove', e => { if (lev.hasPointerCapture(e.pointerId)) setNotch(e); });
+  const setRud = e => { const r = pad.getBoundingClientRect(), u = clamp((e.clientX - r.left) / r.width * 2 - 1, -1, 1); touchState.rud = Math.abs(u) < 0.12 ? 0 : -u; knob.style.left = ((u + 1) / 2 * 100) + '%'; };
+  const freeRud = () => { touchState.rud = 0; knob.style.left = '50%'; };
+  pad.addEventListener('pointerdown', e => { e.preventDefault(); Sfx.init(); pad.setPointerCapture(e.pointerId); setRud(e); });
+  pad.addEventListener('pointermove', e => { if (pad.hasPointerCapture(e.pointerId)) setRud(e); });
+  pad.addEventListener('pointerup', freeRud); pad.addEventListener('pointercancel', freeRud);
+})();
 glCanvas.addEventListener('pointerup', endTouch); glCanvas.addEventListener('pointercancel', endTouch);
 function bindHold(id, on, off) {
   const el = document.getElementById(id);
@@ -2426,7 +2545,7 @@ function bindHold(id, on, off) {
 bindHold('tUp', () => throttleStep(1)); bindHold('tDown', () => throttleStep(-1));
 bindHold('tLeft', () => { touchState.left = true; }, () => { touchState.left = false; });
 bindHold('tRight', () => { touchState.right = true; }, () => { touchState.right = false; });
-bindHold('tFire', () => { G.fireReq = true; });
+bindHold('tFire', () => { G.fireReq = true; G.fireHeld = true; }, () => { G.fireHeld = false; });
 bindHold('tWpn', () => setWeapon(G.weapon === 'guns' ? 'torps' : 'guns'));
 bindHold('tZoom', () => { G.touchZoom = !G.touchZoom; $('#tZoom').classList.toggle('on', G.touchZoom); });
 bindHold('tDc', () => useDC());
@@ -2520,7 +2639,9 @@ function drawTelegraph(P) {
   c.strokeStyle = '#ebe3cd'; c.lineWidth = 2; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(a) * R * 0.95, cy + Math.sin(a) * R * 0.95); c.stroke();
   c.fillStyle = '#ebe3cd'; c.beginPath(); c.arc(cx, cy, 3.5, 0, TAU); c.fill();
 }
+const THROTTLE_SHORT = ['全退', '半退', '停', '¼', '½', '¾', '全'], tKnob = $('#tThrottle .t-knob');
 function updateHud(dt) {
+  if (coarse && G.player) { const n = G.player.throttle; tKnob.style.top = `calc(8px + (100% - 16px) * ${(1 - n / 6).toFixed(3)})`; if (tKnob.textContent !== THROTTLE_SHORT[n]) tKnob.textContent = THROTTLE_SHORT[n]; }
   const P = G.player; if (!P) return;
   hudT -= dt; if (hudT > 0) return; hudT = 0.1;
   const hpf = P.hp / P.maxHp, bar = $('#hHpBar');
@@ -2569,6 +2690,17 @@ function drawOverlay() {
   if (G.mode !== 'play' && G.mode !== 'paused') return;
   const P = G.player; if (!P) return;
   const cx = VW / 2, cy = VH / 2;
+  // locked target: amber brackets around the hull
+  if (G.lock && G.lock.alive) {
+    const T = G.lock, a = toScreen(T.x, T.spec.F + T.spec.top * 0.5, T.z), half = T.spec.L * 0.5;
+    const e1 = toScreen(T.x + Math.sin(T.heading) * half, T.spec.F, T.z + Math.cos(T.heading) * half), e2 = toScreen(T.x - Math.sin(T.heading) * half, T.spec.F, T.z - Math.cos(T.heading) * half);
+    if (a && e1 && e2) {
+      const w = Math.max(26, Math.abs(e1[0] - e2[0]) / 2 + 12), h = Math.max(18, w * 0.45), k = Math.min(12, w * 0.4), x = a[0], y = a[1];
+      c.strokeStyle = '#f0b54a'; c.lineWidth = 2; c.beginPath();
+      for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { c.moveTo(x + sx * w, y + sy * h - sy * k); c.lineTo(x + sx * w, y + sy * h); c.lineTo(x + sx * w - sx * k, y + sy * h); }
+      c.stroke(); c.font = '700 11px "Noto Sans SC",sans-serif'; c.fillStyle = '#f0b54a'; c.textAlign = 'center'; c.fillText('锁定', x, y + h + 14);
+    }
+  }
   // ship labels & lead markers
   c.textAlign = 'center'; c.textBaseline = 'alphabetic';
   let hover = null, hoverD = 60;

@@ -70,6 +70,16 @@
 主界面背景音乐 `music_hymn` 是美国海军赞美诗《Eternal Father, Strong to Save》，美国海军乐队礼仪乐队演奏，来自 [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Eternal_Father,_Strong_to_Save_(Instrumental).mp3)。美国政府作品，属公共领域。
 - 本地运行：在仓库目录执行 `python3 -m http.server`，然后打开 `http://localhost:8000/`。
 
+## iOS app
+
+`ios/` 是 iPhone 横屏版的 Xcode 工程：一个 SwiftUI + WKWebView 的薄外壳，构建时由 `ios/build-web.sh` 把网站的 `index.html` 和 `sfx/` 拷进 app，换成随包的 three.js 与拉丁字体（中文用系统的苹方、宋体），完全离线运行。外壳负责震动反馈、静音键下照常出声、切到后台自动暂停。
+
+触屏横屏操作（手机网页横屏同样适用）：左手车钟推杆、转舵板；右手开火（按住连射）、望远镜、切换武器、损管；轻点敌舰锁定，提前量自动计算，拖动画面改为手动瞄准。
+
+```sh
+open ios/Ironbottom.xcodeproj   # 选模拟器或真机运行；上传 TestFlight 前在 Signing 里选开发者团队
+```
+
 ## 平衡测试
 
 `dev/` 目录里是调数值用的工具。打开 `dev/index.html` 会开启调试句柄 `window.__ibs`，并加载一个「机器人舰长」。它会算提前量瞄准、躲鱼雷、绕开岛屿、自动损管。在控制台执行：
