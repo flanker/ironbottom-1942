@@ -184,3 +184,56 @@
     return R.anim('making_' + fmt, total, (g, t) => making(g, t, w, h, fmt), w, h);
   };
 })();
+
+// ---- covers: Washington's broadside at the brightest instant of the muzzle flash, framed for each aspect
+(function () {
+  const R = window.__rec, I = window.__ibs, G = I.G, cam = I.camera;
+  const serif = px => `900 ${px}px "Noto Serif SC",serif`, sans = (px, w = 700) => `${w} ${px}px "Noto Sans SC",sans-serif`, sten = px => `900 ${px}px "Big Shoulders Stencil Display",sans-serif`;
+  function say(g, text, x, y, f, fill, align = 'left', glow = 30, stroke = 0.1) {
+    g.save(); g.font = f; g.textAlign = align; const px = parseFloat(f.match(/(\d+)px/)[1]);
+    g.shadowColor = 'rgba(0,0,0,.85)'; g.shadowBlur = glow; g.lineJoin = 'round'; g.lineWidth = px * stroke; g.strokeStyle = 'rgba(6,9,12,.92)'; g.strokeText(text, x, y);
+    g.shadowBlur = 0; g.fillStyle = fill; g.fillText(text, x, y); g.restore();
+  }
+  function width(g, text, f) { g.save(); g.font = f; const w = g.measureText(text).width; g.restore(); return w; }
+  R.cover = async fmt => {
+    const v = fmt === 'v', w = v ? 1080 : 1920, h = v ? 1920 : 1080;
+    await R.setup(w, h);
+    await document.fonts.load(serif(100), '逆天了！铁底湾'); await document.fonts.load(sans(80), 'Claude Code一晚上做出一个「战舰世界」纯网页3D海战游戏·真能玩'); await document.fonts.load(sten(80), 'Claude Code1942');
+    const h2 = R.h2, BX = 2000, BZ = 2400; h2.scene();
+    const nc = h2.ship('nc', 'US', '华盛顿号', BX, BZ, 0.25, 0.35, 3), tx = BX - 9000, tz = BZ + 1800;
+    h2.aimAt(nc, tx, tz); nc.secT = {}; nc.secAimX = BX - 4000; nc.secAimZ = BZ + 900;
+    const S = I.Sfx, keep = {}; for (const k of ['gun', 'splash', 'hit', 'incoming', 'flyby', 'boom']) { keep[k] = S[k]; S[k] = () => {}; }
+    for (let i = 0; i < 240; i++) I.step(1 / 60, true);
+    h2.salvo(nc, tx, tz, 30); h2.salvo(nc, BX - 4000, BZ + 900, 30, true);
+    for (let i = 0; i < 5; i++) I.step(1 / 60, true);
+    Object.assign(S, keep);
+    const side = h2.dirXZ(nc.heading + Math.PI / 2 + 0.55), base = h2.W(nc, 0, 0, 0);
+    if (v) { h2.look(base.clone().add(side.multiplyScalar(250)).add(h2.V(0, 10, 0)), h2.W(nc, 0, 12, 4), 46); cam.setViewOffset(w, h, 0, -h * 0.02, w, h); }
+    else { h2.look(base.clone().add(side.multiplyScalar(165)).add(h2.V(0, 9, 0)), h2.W(nc, 0, 13, 6), 40); cam.setViewOffset(w, h, -w * 0.17, 0, w, h); }
+    I.renderView(); cam.clearViewOffset();
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+    g.drawImage(I.glCanvas, 0, 0, w, h);
+    if (v) {
+      // portrait: title block in the upper band, tagline in the lower band, both inside the 3:4 safe area
+      let gr = g.createLinearGradient(0, 0, 0, h * 0.42); gr.addColorStop(0, 'rgba(6,9,12,.78)'); gr.addColorStop(1, 'rgba(6,9,12,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h * 0.42);
+      gr = g.createLinearGradient(0, h * 0.62, 0, h); gr.addColorStop(0, 'rgba(6,9,12,0)'); gr.addColorStop(1, 'rgba(6,9,12,.85)'); g.fillStyle = gr; g.fillRect(0, h * 0.62, w, h * 0.38);
+      say(g, '逆天了！', w / 2, 520, serif(220), '#f0b54a', 'center', 44);
+      const a = 'Claude Code ', b = '一晚上', fa = sten(110), fb = sans(100), wa = width(g, a, fa), wb = width(g, b, fb);
+      say(g, a, w / 2 - (wa + wb) / 2, 660, fa, '#fff'); say(g, b, w / 2 - (wa + wb) / 2 + wa, 660, fb, '#fff');
+      say(g, '做出一个「战舰世界」', w / 2, 1440, sans(96), '#fff', 'center');
+      say(g, '纯网页 3D 海战 · 真能玩', w / 2, 1540, sans(52, 500), '#f0b54a', 'center', 20);
+      say(g, '铁底湾', w / 2 - 70, 1640, serif(60), '#ebe3cd', 'center', 16); say(g, '1942', w / 2 + 72, 1640, sten(46), '#f0b54a', 'center', 16);
+    } else {
+      // landscape: ship on the right, text block on the left over a soft dark fade
+      const gr = g.createLinearGradient(0, 0, w * 0.62, 0); gr.addColorStop(0, 'rgba(6,9,12,.82)'); gr.addColorStop(0.7, 'rgba(6,9,12,.35)'); gr.addColorStop(1, 'rgba(6,9,12,0)'); g.fillStyle = gr; g.fillRect(0, 0, w * 0.62, h);
+      say(g, '逆天了', 96, 360, serif(250), '#f0b54a', 'left', 48);
+      const a = 'Claude Code ', b = '一晚上', fa = sten(112), fb = sans(100), wa = width(g, a, fa);
+      say(g, a, 100, 540, fa, '#fff'); say(g, b, 100 + wa, 540, fb, '#fff');
+      say(g, '做出一个「战舰世界」', 100, 680, sans(100), '#fff');
+      say(g, '纯网页 3D 海战 · 浏览器打开就能玩', 104, 790, sans(46, 500), '#f0b54a', 'left', 18);
+      say(g, '铁底湾', 104, 900, serif(64), '#ebe3cd', 'left', 16); say(g, '1942', 104 + width(g, '铁底湾', serif(64)) + 10, 900, sten(50), '#f0b54a', 'left', 16);
+    }
+    await R.post(`covers/cover_${fmt}.png`, await new Promise(r => c.toBlob(r, 'image/png'))); await R.flush();
+    return `cover_${fmt} ${w}x${h}`;
+  };
+})();
