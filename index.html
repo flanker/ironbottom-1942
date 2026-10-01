@@ -273,6 +273,12 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
   .t-rudder::before{content:"舵";position:absolute;left:8px;top:4px;font:12px var(--f-body);color:var(--paper-dim)}
   .t-rudder::after{content:"";position:absolute;left:50%;top:10px;bottom:10px;width:1px;background:var(--paper-dim)}
   .t-rud-knob{position:absolute;top:12px;bottom:12px;width:34px;margin-left:-17px;left:50%;background:rgba(240,181,74,.8)}
+  /* the knob is the order; the white marker is what the ship is actually doing, with its value beside it */
+  .t-knob{opacity:.78}
+  .t-act{position:absolute;left:-5px;right:-5px;height:3px;background:#ebe3cd;transform:translateY(-50%);box-shadow:0 0 0 1px rgba(6,9,12,.7);pointer-events:none}
+  .t-act::after{content:attr(data-v);position:absolute;left:calc(100% + 4px);top:50%;transform:translateY(-50%);font:700 12px var(--f-mono);color:#ebe3cd;white-space:nowrap;text-shadow:0 1px 2px #000}
+  .t-rud-act{position:absolute;top:6px;bottom:6px;width:3px;margin-left:-1.5px;left:50%;background:#ebe3cd;box-shadow:0 0 0 1px rgba(6,9,12,.7);pointer-events:none}
+  .t-rud-act::after{content:attr(data-v);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);font:700 12px var(--f-mono);color:#ebe3cd;white-space:nowrap;text-shadow:0 1px 2px #000}
   #touch #tFire{right:calc(env(safe-area-inset-right,0px) + 16px);bottom:16px;width:84px;height:84px;font-size:16px}
   #touch #tWpn{right:calc(env(safe-area-inset-right,0px) + 112px);bottom:16px;width:58px;height:40px;font-size:13px}
   #touch #tZoom{right:calc(env(safe-area-inset-right,0px) + 112px);bottom:64px;width:58px;height:40px;font-size:13px}
@@ -319,7 +325,8 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
   .seg button{padding:7px 10px;font-size:12px}
   .diff-note,.best{display:none}
 }
-html.app,html.app body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+html.app,html.app *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html.app,html.app body{touch-action:manipulation}
 @media (prefers-reduced-motion:reduce){
   .banner.show,.torp-warn{animation:none}
 }
@@ -384,8 +391,8 @@ html.app,html.app body{-webkit-user-select:none;user-select:none;-webkit-touch-c
     <button id="tZoom" aria-label="望远镜">望远</button>
     <button id="tDc" aria-label="损管">损管</button>
     <button id="tPause" aria-label="暂停">暂停</button>
-    <div id="tThrottle" class="t-throttle" aria-label="车钟：上下拖动"><div class="t-ticks"></div><div class="t-knob"></div></div>
-    <div id="tRudder" class="t-rudder" aria-label="舵：左右拖动"><div class="t-rud-knob"></div></div>
+    <div id="tThrottle" class="t-throttle" aria-label="车钟：上下拖动"><div class="t-ticks"></div><div class="t-knob"></div><div class="t-act"></div></div>
+    <div id="tRudder" class="t-rudder" aria-label="舵：左右拖动"><div class="t-rud-knob"></div><div class="t-rud-act"></div></div>
   </div>
 
   <div id="menu" class="screen menu">
@@ -2444,6 +2451,7 @@ if (APP) {
   document.documentElement.classList.add('app');
   try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
   window.__ibsBackground = () => { if (G.mode === 'play') pause(true); try { Sfx.ctx && Sfx.ctx.suspend(); } catch (e) {} };
+  ['selectstart', 'contextmenu'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
   window.__ibsForeground = () => { try { Sfx.ctx && Sfx.ctx.resume(); } catch (e) {} };
 }
 const touchState = { left: false, right: false, rud: 0 };
@@ -2502,7 +2510,7 @@ glCanvas.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch' ||
 glCanvas.addEventListener('pointermove', e => {
   const t = touches.get(e.pointerId); if (!t) return;
   if (!t.moved && Math.hypot(e.clientX - t.x0, e.clientY - t.y0) > 12) { t.moved = true; if (G.lock) { G.lock = null; hint('手动瞄准'); } }
-  if (t.moved) aimDelta((e.clientX - t.x) * 1.6, (e.clientY - t.y) * 1.6);
+  if (t.moved) { const dy = e.clientY - t.y; aimDelta((e.clientX - t.x) * 1.6, dy * 2.4 * (1 + Math.min(Math.abs(dy), 24) / 8)); }
   t.x = e.clientX; t.y = e.clientY;
 });
 const endTouch = e => {
@@ -2639,9 +2647,16 @@ function drawTelegraph(P) {
   c.strokeStyle = '#ebe3cd'; c.lineWidth = 2; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(a) * R * 0.95, cy + Math.sin(a) * R * 0.95); c.stroke();
   c.fillStyle = '#ebe3cd'; c.beginPath(); c.arc(cx, cy, 3.5, 0, TAU); c.fill();
 }
-const THROTTLE_SHORT = ['全退', '半退', '停', '¼', '½', '¾', '全'], tKnob = $('#tThrottle .t-knob');
+const THROTTLE_SHORT = ['全退', '半退', '停', '¼', '½', '¾', '全'], tKnob = $('#tThrottle .t-knob'), tAct = $('#tThrottle .t-act'), tRudAct = $('#tRudder .t-rud-act');
 function updateHud(dt) {
-  if (coarse && G.player) { const n = G.player.throttle; tKnob.style.top = `calc(8px + (100% - 16px) * ${(1 - n / 6).toFixed(3)})`; if (tKnob.textContent !== THROTTLE_SHORT[n]) tKnob.textContent = THROTTLE_SHORT[n]; }
+  if (coarse && G.player) {
+    const P = G.player, n = P.throttle; tKnob.style.top = `calc(8px + (100% - 16px) * ${(1 - n / 6).toFixed(3)})`; if (tKnob.textContent !== THROTTLE_SHORT[n]) tKnob.textContent = THROTTLE_SHORT[n];
+    // actual speed on the same notch scale (-½ to full), actual rudder angle on the pad
+    const idx = clamp((P.speed / P.maxV + 0.5) / 0.25, 0, 6), kn = Math.round(P.speed / KN) + 'kn';
+    tAct.style.top = `calc(8px + (100% - 16px) * ${(1 - idx / 6).toFixed(3)})`; if (tAct.dataset.v !== kn) tAct.dataset.v = kn;
+    const rd = P.rudder, rv = Math.abs(rd) < 0.05 ? '正舵' : (rd > 0 ? '左 ' : '右 ') + Math.round(Math.abs(rd) * 35) + '°';
+    tRudAct.style.left = ((1 - rd) / 2 * 100).toFixed(1) + '%'; if (tRudAct.dataset.v !== rv) tRudAct.dataset.v = rv;
+  }
   const P = G.player; if (!P) return;
   hudT -= dt; if (hudT > 0) return; hudT = 0.1;
   const hpf = P.hp / P.maxHp, bar = $('#hHpBar');
