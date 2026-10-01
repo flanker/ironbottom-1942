@@ -44,6 +44,11 @@
     'h/impact': low('命中！起火！'),
     'h/sink': g => say(g, '击沉！', H.w / 2, 960, serif(150), AMBER, { glow: 36 }),
     'h/torp1': low('驱逐舰鱼雷齐射'),
+    'h/long': low('远距离对轰', '九公里外的战列舰，炮弹要飞六秒'),
+    'h/shellcam': low('跟着一发 16 英寸炮弹飞过去'),
+    'h/melee': low('近距离混战', '巡洋舰、驱逐舰排成战列对射'),
+    'h/melee_close': low('六英寸速射炮，五秒一轮'),
+    'h/evade': low('急转规避鱼雷', '转到与雷迹平行，鱼雷从两舷擦过'),
     'h/torp2': low('中雷！'),
     'h/outro': g => { say(g, 'ironbottom1942.com', H.w / 2, 520, mono(96, 600), AMBER, { glow: 36 }); say(g, '打开浏览器就能玩', H.w / 2, 620, sans(56), '#fff'); say(g, '你想让 AI 做什么游戏？评论区见', H.w / 2, 700, sans(40, 500), PAPER); },
     // portrait: persistent title band on top, captions in the bottom band
@@ -62,10 +67,15 @@
     'v/impact': vlow('命中！起火！'),
     'v/sink': g => say(g, '击沉！', VV.w / 2, 1500, serif(150), AMBER, { glow: 36 }),
     'v/torp2': vlow('鱼雷命中！'),
-    'v/outro': g => { say(g, 'ironbottom1942.com', VV.w / 2, 1440, mono(72, 600), AMBER, { glow: 30 }); say(g, '评论区告诉我你想玩什么', VV.w / 2, 1530, sans(52), '#fff'); },
+    'v/long': vlow('远距离对轰', '炮弹要飞六秒'),
+    'v/shellcam': vlow('跟着炮弹飞过去'),
+    'v/melee': vlow('近距离混战', '巡洋舰、驱逐舰对射'),
+    'v/melee_close': vlow('六英寸速射炮', '五秒一轮'),
+    'v/evade': vlow('急转规避鱼雷', '鱼雷从两舷擦过'),
+    'v/outro': vlow('你想让 AI 做什么游戏？', '评论区告诉我'),
   };
   // every glyph the cards and the making-of use, so the subsetted webfonts are in before drawing
-  const ALL = '逆天了！Claude Code一晚上做出一个「战舰世界」铁底湾1942·瓜达尔卡纳尔萨沃岛海峡纯网页3D海战浏览器打开就能玩三艘美舰可选驱逐轻巡洋列，大小目然每艘船都是代码“画”的桥脚桅鱼雷管水上飞机……没有外部模型文件高雄型重金刚塔式楼伦娜号弹射器与弗莱彻级之前后我只说了句：优化下建更精细些炮弹真实道行要好几秒得自己算提量命中起火击沉齐中ironbottom1942.com你想让AI什么游戏？评论区见告诉HTML我这样跟话不同口径应该一样看网是否有音效可用的方近失声都果首选择时拖动360度检视买配置改好已提交部署第二初版线按膛主界面重做与打光行美国赞美诗背景乐0123456789个段录音CC0公共领域约字年月日时分秒→✓:．.~+';
+  const ALL = '逆天了！Claude Code一晚上做出一个「战舰世界」铁底湾1942·瓜达尔卡纳尔萨沃岛海峡纯网页3D海战浏览器打开就能玩三艘美舰可选驱逐轻巡洋列，大小目然每艘船都是代码“画”的桥脚桅鱼雷管水上飞机……没有外部模型文件高雄型重金刚塔式楼伦娜号弹射器与弗莱彻级之前后我只说了句：优化下建更精细些炮弹真实道行要好几秒得自己算提量命中起火击沉齐中ironbottom1942.com你想让AI什么游戏？评论区见告诉HTML我这样跟话不同口径应该一样看网是否有音效可用的方近失声都果首选择时拖动360度检视买配置改好已提交部署第二初版线按膛主界面重做与打光行美国赞美诗背景乐0123456789个段录音CC0公共领域约字年月日时分秒→✓:．.~+远距离对轰九公里外要飞六秒跟着发英寸近混排成射速一轮急转规避与平行从两舷擦过让';
   async function fonts() {
     const specs = [serif(100), serif(100, 700), sans(60), sans(60, 500), sans(60, 400), sten(80), mono(60), mono(60, 500)];
     await preload(specs.map(f => [f, ALL]));

@@ -67,8 +67,9 @@
   // ---- shot runner: f = { warm, tick(t, dt), cam(t, dt), paint(ctx, t), overlay }
   R.shot = async (name, dur, f = {}) => {
     const dt = 1 / R.fps, n = Math.round(dur * R.fps);
+    log = []; hook(true);   // sounds during the warm-up are swallowed too
     for (let i = 0, m = Math.round((f.warm || 0) * R.fps); i < m; i++) { f.warmTick && f.warmTick(i * dt, dt); I.step(dt, true); }
-    log = []; hook(true);
+    log = [];
     for (let i = 0; i < n; i++) {
       const t = i * dt; simT = t;
       f.tick && f.tick(t, dt);
@@ -247,6 +248,107 @@
       });
       return [r1, r2];
     },
+    // long range: Washington and Kirishima at 9 km, seen down a telephoto lens from behind Washington, then a
+    // camera riding one 16-inch shell all the way in
+    longrange: async () => {
+      scene();
+      const nc = ship('nc', 'US', '华盛顿号', BX, BZ, 0.05, 0.55, 5), ki = ship('kongo', 'JP', '雾岛', BX - 9000, BZ + 1400, 0.12, 0.55, 5);
+      G.player = nc; ki.hp = ki.maxHp *= 4;
+      const fire = (t, at, s, tgt, err) => { for (const a of at) if (Math.abs(t - a) < 1e-6) { const [x, z] = lead(s, tgt); salvo(s, x, z, err); } };
+      const aim = () => { aimAt(nc, ...lead(nc, ki)); aimAt(ki, ...lead(ki, nc)); };
+      const r1 = await R.shot('long_tele', 8, {
+        warm: 5, warmTick: aim,
+        tick: t => { aim(); fire(t, [0.5], nc, ki, 8); fire(t, [1.4], ki, nc, 30); },
+        cam: t => { const to = Math.atan2(ki.x - nc.x, ki.z - nc.z), f = dirXZ(to), side = dirXZ(to + Math.PI / 2); look(W(nc, 0, 0, 0).add(f.clone().multiplyScalar(-470)).add(side.multiplyScalar(60)).add(V(0, 115, 0)), V(nc.x + f.x * 2600, 0, nc.z + f.z * 2600), lerp(30, 27, ease(t / 8))); },
+      });
+      // a fresh salvo, and the camera tucks in behind one shell
+      let rider = null;
+      const r2 = await R.shot('shellcam', 7, {
+        tick: t => { aim(); if (Math.abs(t - 0.3) < 1e-6) { const n0 = I.shells.length, [x, z] = lead(nc, ki); salvo(nc, x, z, 5); rider = I.shells[n0 + 4] || I.shells[I.shells.length - 1]; } },
+        cam: (t, dt) => {
+          if (!rider) { look(W(nc, 0, 30, 0).add(V(0, 20, 0)), V(ki.x, 0, ki.z), 40); return; }
+          const sp = V(rider.x, rider.y, rider.z), vy = rider.vy0 - rider.g * rider.t, vel = V(rider.vx, vy, rider.vz).normalize();
+          const sideV = V(-vel.z, 0, vel.x).normalize(); if (rider.alive) R._last = { p: sp.clone().add(vel.clone().multiplyScalar(-22)).add(sideV.multiplyScalar(24)).add(V(0, 6, 0)), t: sp.clone().add(vel.clone().multiplyScalar(30)) };
+          else if (!R._hold) R._hold = R._last;
+          const c = R._hold || R._last; look(c.p, c.t, 50);
+        },
+      });
+      R._hold = null;
+      return [r1, r2];
+    },
+    // close-range melee: two columns of cruisers and destroyers trading fire at 2.5 km
+    melee: async () => {
+      const BX = 2500, BZ = 3500;   // open water: no land within 2.5 km, so the wide shots stay clear
+      scene();
+      const hd = SUN + Math.PI / 2, f = dirXZ(hd), right = dirXZ(hd + Math.PI / 2), v = 22 * KN;
+      const at = (side, back) => [BX + right.x * side - f.x * back, BZ + right.z * side - f.z * back];
+      const us = [['brooklyn', '海伦娜号'], ['fletcher', '奥班农号'], ['fletcher', '尼古拉斯号']].map(([k, n], i) => ship(k, 'US', n, ...at(1000, i * 380 - 200), hd, 0.6, 6));
+      const jp = [['aoba', '青叶'], ['aoba', '衣笠'], ['sendai', '川内'], ['fubuki', '白雪']].map(([k, n], i) => ship(k, 'JP', n, ...at(-1000, i * 400), hd, 0.6, 6));
+      const all = [...us, ...jp];
+      for (const s of all) { s.maxV = v; s.speed = v; s.hp = s.maxHp *= 5; s.secT = {}; }
+      G.player = us[0];
+      const foes = s => (s.team === 'US' ? jp : us).filter(o => o.alive);
+      const battle = () => {
+        for (const s of all) {
+          if (!s.alive) continue;
+          const fs = foes(s); if (!fs.length) continue;
+          const tgt = fs.reduce((a, b) => Math.hypot(b.x - s.x, b.z - s.z) < Math.hypot(a.x - s.x, a.z - s.z) ? b : a), [lx, lz] = lead(s, tgt);
+          aimAt(s, lx, lz); s.secAimX = lx; s.secAimZ = lz;
+          for (const t of s.turrets) if (!t.sec && t.reload <= 0 && t.onTarget) I.fireTurret(s, t, lx, lz, s.team === 'US' ? 35 : 45);
+        }
+      };
+      R.melee = { us, jp };
+      const r1 = await R.shot('melee_wide', 7, {
+        warm: 6, warmTick: battle, tick: battle,
+        cam: t => {
+          const k = ease(t / 7), usMid = W(us[1], 0, 0, 0), lane = V(us[1].x + jp[1].x, 0, us[1].z + jp[1].z).multiplyScalar(0.5);
+          const p = usMid.clone().add(right.clone().multiplyScalar(lerp(760, 680, k))).add(f.clone().multiplyScalar(lerp(-260, -140, k))).add(V(0, lerp(175, 150, k), 0));
+          R.camLog && R.camLog.push(I.terrainH(p.x, p.z)); look(p, lane.clone().add(f.clone().multiplyScalar(60)), 46);
+        },
+      });
+      const h = us[0];
+      const r2 = await R.shot('melee_close', 6, {
+        tick: battle,
+        cam: t => { const tg = W(h, 0, 8, 0); look(tg.clone().add(right.clone().multiplyScalar(lerp(150, 135, ease(t / 6)))).add(f.clone().multiplyScalar(-60)).add(V(0, 16, 0)), tg.clone().add(right.clone().multiplyScalar(-400)).add(V(0, 0, 0)), 46); },
+      });
+      const a = jp[0];
+      const r3 = await R.shot('melee_hit', 5.5, {
+        tick: battle,
+        cam: t => { const tg = W(a, 0, 8, 0); look(tg.clone().add(right.clone().multiplyScalar(380)).add(f.clone().multiplyScalar(lerp(-120, -60, ease(t / 5.5)))).add(V(0, 26, 0)), tg, 38); },
+      });
+      return [r1, r2, r3];
+    },
+    // a destroyer turns into a Type 93 spread and combs it; the wakes slide past on both sides. A dry run finds where
+    // the ship will be when the fish arrive, so they can be laid to pass close aboard on either side.
+    evade: async () => {
+      const hT = SUN + 0.5, comb = hT + Math.PI, TP = 5.0, dt = 1 / R.fps;
+      const setup = () => {
+        scene();
+        const fl = ship('fletcher', 'US', '弗莱彻号', BX, BZ, comb + 0.32, 0.9, 6), owner = ship('fubuki', 'JP', '天雾', BX + 3000, BZ + 3000, 0, 0.1, 2);
+        G.player = fl; fl.rudderCmd = -1; return { fl, owner };
+      };
+      const steer = fl => { if (fl.rudderCmd && angDiffL(fl.heading, comb) > -0.02) fl.rudderCmd = 0; if (fl.rudderCmd === 0) fl.heading = comb + (fl.heading - comb) * 0.9; };
+      let { fl } = setup();
+      for (let i = 0, n = Math.round((1 + TP) * R.fps); i < n; i++) { steer(fl); I.step(dt, true); }
+      const P = V(fl.x, 0, fl.z);
+      const sc = setup(); fl = sc.fl;
+      let launched = false;
+      return R.shot('evade', 7, {
+        warm: 1, warmTick: () => steer(fl),
+        tick: t => {
+          steer(fl);
+          if (!launched) {
+            launched = true;
+            const d = dirXZ(hT), lat = dirXZ(comb + Math.PI / 2), run = sc.owner.torp.speed * TP;
+            for (const off of [-52, -20, 22, 54]) {
+              const x = P.x - d.x * run + lat.x * off, z = P.z - d.z * run + lat.z * off;
+              I.torps.push({ x, z, h: hT, dx: d.x, dz: d.z, speed: sc.owner.torp.speed, range: 3000, trav: 200, owner: sc.owner, team: 'JP', spec: sc.owner.torp, alive: true, seenT: 3, emitT: 0, evaded: new Set() });
+            }
+          }
+        },
+        cam: t => { const k = ease(t / 7), fwd = dirXZ(fl.heading); look(W(fl, 0, 0, 0).add(fwd.clone().multiplyScalar(-lerp(95, 80, k))).add(dirXZ(fl.heading + Math.PI / 2).multiplyScalar(18)).add(V(0, lerp(38, 30, k), 0)), W(fl, 0, 0, 0).add(fwd.clone().multiplyScalar(170)), 46); },
+      });
+    },
     // sailing off into the sunset
     outro: () => {
       scene(); const s = ship('nc', 'US', '华盛顿号', BX, BZ, SUN + 0.15, 0.6, 5);
@@ -257,6 +359,7 @@
     },
   };
   function lerp(a, b, t) { return a + (b - a) * t; }
+  function angDiffL(a, b) { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return -Math.abs(d); }
   R.run = async name => {
     const t0 = performance.now();
     const r = name === 'details' ? [
