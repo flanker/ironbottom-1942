@@ -1,4 +1,4 @@
-# 铁底湾 1942
+# 铁底湾1942
 
 3D 网页二战海战游戏。1942 年 11 月，瓜达尔卡纳尔岛外的萨沃岛海峡，黄昏。你驾驶一艘美军战舰、带两艘驱逐舰僚舰，击退日军分三波发起的突入。
 
@@ -66,6 +66,8 @@
 | `incoming_a/b/c` `boom_a/b` | [G33-14 Shell whine and Explosion](https://freesound.org/s/438520/) · craigsmith |
 | `whistle` `flyby` `hit_c` | [R09-51 Long Whistle and Hit](https://freesound.org/s/483279/) · craigsmith |
 | `hit_a` `hit_b` | [S18-01 Incoming shells; explosions](https://freesound.org/s/674897/) · craigsmith |
+
+主界面背景音乐 `music_hymn` 是美国海军赞美诗《Eternal Father, Strong to Save》，美国海军乐队礼仪乐队演奏，来自 [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Eternal_Father,_Strong_to_Save_(Instrumental).mp3)。美国政府作品，属公共领域。
 - 本地运行：在仓库目录执行 `python3 -m http.server`，然后打开 `http://localhost:8000/`。
 
 ## 平衡测试

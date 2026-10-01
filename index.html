@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="3D 网页二战海战游戏：1942 年瓜岛外的铁底湾，驾驶美军战舰击退日军三波夜袭舰队。">
-<title>铁底湾 1942</title>
+<title>铁底湾1942</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700;900&display=swap">
@@ -115,7 +115,8 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
   grid-template-areas:"brand stage oni" "dock dock dock";gap:18px 28px;max-width:1640px;margin:0 auto;min-height:max(100%,640px);box-sizing:border-box;
   padding:clamp(18px,3.6vh,40px) clamp(16px,2.8vw,44px) clamp(14px,2.6vh,26px)}
 .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;color:var(--paper-dim);margin:0}
-.title{font-family:var(--f-display);font-weight:900;font-size:clamp(56px,6.4vw,104px);line-height:.95;letter-spacing:.04em;margin:.14em 0 0;text-wrap:balance}
+.title{font-family:var(--f-display);font-weight:900;font-size:clamp(48px,4.4vw,76px);line-height:.95;letter-spacing:.04em;margin:.14em 0 0;white-space:nowrap}
+.title .yr{font-family:var(--f-stencil);font-weight:900;color:var(--lamp);font-size:.5em;letter-spacing:.06em;margin-left:.14em}
 .en{font-family:var(--f-stencil);font-weight:700;letter-spacing:.3em;color:var(--lamp);font-size:clamp(13px,1.1vw,16px);margin:.5em 0 1.1em}
 .brief{line-height:1.8;font-size:14px;margin:0 0 18px;text-wrap:pretty;color:var(--paper)}
 .keys{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;margin:0;font-size:12.5px}
@@ -177,6 +178,9 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
 .ghost:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
 .diff-note{font-size:12px;color:var(--paper-dim);max-width:19em;line-height:1.5}
 .best{font-size:12px;color:var(--paper-dim);margin:0;font-family:var(--f-mono)}
+.sound-btn{all:unset;cursor:pointer;font-size:12px;letter-spacing:.14em;color:var(--paper-dim);border-bottom:1px solid var(--rule)}
+.sound-btn:hover{color:var(--lamp)}
+.sound-btn:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
 .best:empty{display:none}
 
 .dim{background:rgba(6,9,12,.72);display:grid;place-items:center}
@@ -227,7 +231,7 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
   .oni-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}
   .keys{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px}
 }
-@media (min-width:981px) and (max-height:760px){ .brief{display:none} .title{font-size:clamp(48px,5.4vw,80px)} }
+@media (min-width:981px) and (max-height:760px){ .brief{display:none} }
 @media (max-width:560px){ .keys{grid-template-columns:minmax(0,1fr)} .stage-blurb{font-size:13px} }
 .touch-note{display:none;font-size:13px;color:var(--paper-dim);line-height:1.7;margin:0}
 @media (pointer:coarse) and (not (pointer:fine)){ .brand .keys{display:none} .touch-note{display:block} }
@@ -320,8 +324,8 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
     <div class="menu-grid">
       <header class="brand">
         <p class="eyebrow">所罗门群岛 · 瓜达尔卡纳尔 · 1942 年 11 月</p>
-        <h1 class="title">铁底湾</h1>
-        <p class="en">IRONBOTTOM SOUND · 1942</p>
+        <h1 class="title">铁底湾<span class="yr">1942</span></h1>
+        <p class="en">IRONBOTTOM SOUND</p>
         <p class="brief">萨沃岛与瓜岛之间这片海峡沉船太多，水兵管它叫“铁底湾”。今夜日军舰队分三波从萨沃岛西侧突入，要炮击亨德森机场。你的座舰带两艘驱逐舰守在海峡里，击退全部三波。</p>
         <p class="touch-note">触屏操作：单指拖动画面瞄准，右侧按钮开火、切换武器、开望远镜；左侧按钮加减车钟和转舵。用键盘鼠标玩更顺手。</p>
         <dl class="keys">
@@ -359,6 +363,7 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
             </div>
             <span class="diff-note" id="diffNote"></span>
             <button id="startBtn" class="primary" type="button">起锚出击</button>
+            <button id="soundBtn" class="sound-btn" type="button" aria-pressed="true">声音：开</button>
             <p id="best" class="best"></p>
           </div>
         </div>
@@ -634,7 +639,7 @@ renderer.toneMappingExposure = 1.0;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(55, 1, 3, 70000);
 camera.position.set(0, 120, -400);
-const SUN_DIR = new THREE.Vector3(-0.93, 0.075, 0.36).normalize(), SUN_AZ = Math.atan2(SUN_DIR.x, SUN_DIR.z), MENU_FOV = 34;
+const SUN_DIR = new THREE.Vector3(-0.93, 0.075, 0.36).normalize(), SUN_AZ = Math.atan2(SUN_DIR.x, SUN_DIR.z), MENU_FOV = 34, MENU_LREF = 222;
 const FOG_COLOR = new THREE.Color(0x857a8a);
 const FOG_DENSITY = 0.000082;
 scene.fog = new THREE.FogExp2(FOG_COLOR, FOG_DENSITY);
@@ -1035,7 +1040,7 @@ class Wake {
 // Recorded clips in sfx/ (CC0, see README) carry the gun and shell sounds; the synthesised versions below stay as the
 // fallback until they load, or if they cannot. Loudness (LUFS) is measured per clip so they can be levelled at runtime.
 const SFX_CLIPS = { gun_s: -21, gun_m: -20, gun_l: -19, gun_xl: -18.6, distant: -15.5, incoming_a: -16.9, incoming_b: -16, incoming_c: -14.6, whistle: -11.3, flyby: -12.9, outgoing: -11.1,
-  hit_a: -17.2, hit_b: -15.4, hit_c: -15.9, boom_a: -12.3, boom_b: -12.7 };
+  hit_a: -17.2, hit_b: -15.4, hit_c: -15.9, boom_a: -12.3, boom_b: -12.7, music_hymn: -20 };
 // which recording each calibre fires, and the playback rate that makes the reference calibre sound right
 const GUN_CLIP = [[135, 'gun_s', 127, 1.4], [180, 'gun_m', 152, 1], [300, 'gun_l', 203, 1], [1e9, 'gun_xl', 406, 1]];
 // Every positional sound goes through a voice: air absorption (distant guns lose their crack), stereo pan relative to the
@@ -1079,12 +1084,33 @@ const Sfx = {
     const g2 = c.createGain(); g2.gain.value = 0.018; src2.connect(bp); bp.connect(g2); g2.connect(this.out); src2.start();
     this.buf = {};
     for (const n in SFX_CLIPS) fetch((window.__IBS_BASE || '') + 'sfx/' + n + '.mp3').then(r => r.ok ? r.arrayBuffer() : Promise.reject(r.status))
-      .then(a => new Promise((res, rej) => c.decodeAudioData(a, res, rej))).then(b => { this.buf[n] = b; }).catch(() => {});
+      .then(a => new Promise((res, rej) => c.decodeAudioData(a, res, rej))).then(b => { this.buf[n] = b; if (n === 'music_hymn' && this.wantMusic) this.music(true); }).catch(() => {});
     this.eng = c.createOscillator(); this.eng.type = 'sawtooth'; this.eng.frequency.value = 34;
     const el = c.createBiquadFilter(); el.type = 'lowpass'; el.frequency.value = 110;
     this.engG = c.createGain(); this.engG.gain.value = 0; this.eng.connect(el); el.connect(this.engG); this.engG.connect(this.out); this.eng.start();
   },
-  setMuted(m) { this.muted = m; store.set('muted', m); if (this.out) this.out.gain.setTargetAtTime(m ? 0 : 0.85, this.ctx.currentTime, 0.05); },
+  setMuted(m) { this.muted = m; store.set('muted', m); if (this.out) this.out.gain.setTargetAtTime(m ? 0 : 0.85, this.ctx.currentTime, 0.05); syncSoundBtn(); },
+  // Menu music: the Navy Hymn, looped with a pause between verses of the sea; fades out when the battle starts.
+  music(on) {
+    this.wantMusic = on;
+    if (!this.ctx) return;
+    const c = this.ctx, now = c.currentTime;
+    if (!on) { if (this.musicG) { const g = this.musicG; g.gain.cancelScheduledValues(now); g.gain.setTargetAtTime(0, now, 0.6); const s = this.musicSrc; setTimeout(() => { try { s.stop(); } catch (e) {} }, 3000); this.musicG = this.musicSrc = null; } clearTimeout(this.musicT); return; }
+    if (this.musicG || !this.buf.music_hymn) return;
+    const g = this.musicG = c.createGain(); g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.5, now + 3); g.connect(this.out);
+    const play = () => {
+      if (this.musicG !== g) return;
+      const s = this.musicSrc = c.createBufferSource(); s.buffer = this.buf.music_hymn; s.connect(g); s.start();
+      s.onended = () => { if (this.musicG === g) this.musicT = setTimeout(play, 7000); };
+    };
+    play();
+  },
+  // picking a ship fires her main battery off the preview hull, so each class announces its calibre
+  pick(key) {
+    const P = G.preview; if (!P || !this.ctx) return;
+    const spec = SPECS[key], n = Math.min(3, TS[spec.tur[0].kind].n);
+    this.last = -1; this.gun(GUNS[spec.gun].cal, P.x, P.z, n);
+  },
   ok(cap = 8) {
     if (!this.ctx || this.muted) return false;
     const t = this.ctx.currentTime; if (t - this.last > 0.05) { this.last = t; this.count = 0; }
@@ -1628,7 +1654,7 @@ function canvasTex(cv, repeat) {
   if (repeat) t.wrapS = t.wrapT = THREE.RepeatWrapping;
   return t;
 }
-const HULL_PAINT = { US: '#46515f', JP: '#686d72' };
+const HULL_PAINT = { US: '#6b7581', JP: '#72777c' };   // same paint as the superstructure (MATS)
 function hullTexture(spec, no) {
   const W = 2048, H = 256, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const c = cv.getContext('2d'), yMin = -spec.D, yMax = hullTopY(spec), pxv = H / (yMax - yMin), pxu = (W / 2) / spec.L;
@@ -1703,8 +1729,8 @@ function shipLit(m) {
   return m;
 }
 const MATS = {
-  US: { sup: shipLit(std(0x8a939c, .78, .06, THREE.FrontSide, { vertexColors: true })), dark: shipLit(std(0x262b30, .62, .25, THREE.FrontSide, { vertexColors: true })) },
-  JP: { sup: shipLit(std(0x7a7f84, .78, .06, THREE.FrontSide, { vertexColors: true })), dark: shipLit(std(0x262b30, .62, .25, THREE.FrontSide, { vertexColors: true })) },
+  US: { sup: shipLit(std(0x6b7581, .78, .06, THREE.FrontSide, { vertexColors: true })), dark: shipLit(std(0x262b30, .62, .25, THREE.FrontSide, { vertexColors: true })) },
+  JP: { sup: shipLit(std(0x72777c, .78, .06, THREE.FrontSide, { vertexColors: true })), dark: shipLit(std(0x262b30, .62, .25, THREE.FrontSide, { vertexColors: true })) },
 };
 const LINE_MAT = new THREE.LineBasicMaterial({ color: 0x15191d, transparent: true, opacity: 0.75 });
 const matCache = {};
@@ -2205,7 +2231,7 @@ function clearWorld() {
 function waterSpot(x, z) { let k = 0; while (terrainH(x, z) > -20 && k < 30) { x *= 0.92; z *= 0.92; k++; } return [x, z]; }
 function playableMeta(key) { return PLAYABLE.find(p => p.key === key); }
 function startGame() {
-  Sfx.init();
+  Sfx.init(); Sfx.music(false);
   clearWorld();
   const meta = playableMeta(G.shipKey), df = DIFF[G.diff];
   const hd = Math.atan2(-0.62, -0.78);
@@ -2733,10 +2759,12 @@ function buildMenu() {
       <div><div class="card-h"><b>${p.name}</b><span>${p.no}</span></div><div class="ty">${s.type}</div></div>
       <dl><dt>航速</dt><dd>${s.kn} kn</dd><dt>主炮</dt><dd>${nb} × ${g.cal} mm</dd><dt>鱼雷</dt><dd>${tp}</dd><dt>射程</dt><dd>${(g.range / 1000).toFixed(1)} km</dd></dl></button>`;
   }).join('');
-  cards.querySelectorAll('.card').forEach(el => el.addEventListener('click', () => selectShip(el.dataset.k)));
+  cards.querySelectorAll('.card').forEach(el => el.addEventListener('click', () => { Sfx.init(); selectShip(el.dataset.k); Sfx.music(true); Sfx.pick(el.dataset.k); }));
   $('#oni').innerHTML = ONI.map(([k, n, c]) => `<figure><canvas aria-hidden="true"></canvas><figcaption>${n}<span>${c} · ${SPECS[k].L} m</span></figcaption></figure>`).join('');
   $('#diff').querySelectorAll('button').forEach(b => b.addEventListener('click', () => selectDiff(b.dataset.d)));
   $('#startBtn').addEventListener('click', () => startGame());
+  $('#soundBtn').addEventListener('click', () => { Sfx.init(); Sfx.setMuted(!Sfx.muted); if (!Sfx.muted && G.mode === 'menu') Sfx.music(true); });
+  syncSoundBtn();
   $('#resumeBtn').addEventListener('click', () => resume());
   $('#quitBtn').addEventListener('click', () => toMenu());
   $('#againBtn').addEventListener('click', () => startGame());
@@ -2775,7 +2803,10 @@ function setupPreview() {
   const e = new Ship('fubuki', 'JP', '白雪', { x: -1500, z: 400, heading: 1.9, speedFrac: 0.6 }); e.throttle = 5; e.rudderCmd = -0.1; ships.push(e);
   menuCam.t = 0;
 }
-function toMenu() { G.mode = 'menu'; exitLock(); showScreen('menu'); setupPreview(); drawMenuArt(); measureStage(); }
+function toMenu() { G.mode = 'menu'; exitLock(); showScreen('menu'); setupPreview(); drawMenuArt(); measureStage(); Sfx.music(true); }
+function syncSoundBtn() { const b = $('#soundBtn'); if (b) { b.textContent = Sfx.muted ? '声音：关' : '声音：开'; b.setAttribute('aria-pressed', !Sfx.muted); } }
+// browsers only allow audio after a gesture: the first click or key on the menu starts the sea and the music
+['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, () => { if (G.mode === 'menu') { Sfx.init(); Sfx.music(true); } }, { passive: true }));
 const menuCam = { t: 0, stage: { fx: 0.5, fy: 0.42, w: 600 } };
 // where the stage sits on screen; the menu camera frames the ship inside it (and follows it when the menu scrolls)
 function measureStage() {
@@ -2794,10 +2825,11 @@ function updateCamera(dt) {
   const reduce = reduceMotion ? 0.25 : 1, sh = G.shake * reduce, shx = randn() * sh * 1.5, shy = randn() * sh * 1.2;
   if (G.mode === 'menu' && G.preview) {
     // Stand off to the sunward side so the hull is lit, drift slowly across it, and size the ship to the stage: the
-    // distance is set so the hull spans about 80% of the stage width, then the view is offset onto the stage's centre.
+    // distance comes from the stage size, then the view is offset onto the stage's centre.
     menuCam.t += dt;
     const s = G.preview, st = menuCam.stage, fpx = (VH / 2) / Math.tan(camera.fov * DEG / 2);
-    const span = Math.min(st.w * 0.8, st.h * 2.8), R = clamp(s.spec.L * fpx / Math.max(120, span), s.spec.L * 0.9, s.spec.L * 8);
+    // one scale for every ship (sized so the 222 m battleship fills the stage), so destroyer, cruiser and battleship compare at a glance
+    const span = Math.min(st.w * 0.8, st.h * 2.8), R = clamp(MENU_LREF * fpx / Math.max(120, span), MENU_LREF * 0.9, MENU_LREF * 8);
     const a = SUN_AZ + 0.95 + Math.sin(menuCam.t * 0.045) * 0.4, el = 0.12;
     camera.position.set(s.x + Math.sin(a) * R * Math.cos(el), s.spec.F + R * Math.sin(el), s.z + Math.cos(a) * R * Math.cos(el));
     camera.lookAt(s.x, s.spec.F + s.spec.top * 0.22, s.z);
