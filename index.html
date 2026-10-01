@@ -2880,8 +2880,16 @@ function resize() {
 window.addEventListener('resize', resize);
 let lastT = performance.now();
 const PERF = { step: 0, render: 0, ui: 0, frames: 0, dt: 0.016 };
+function renderView() {
+  sky.position.copy(camera.position);
+  waterMesh.position.set(Math.round(camera.position.x / 40) * 40, 0, Math.round(camera.position.z / 40) * 40);
+  const scale = renderer.domElement.height / (2 * Math.tan(camera.fov * DEG / 2));
+  FXN.mat.uniforms.uScale.value = FXA.mat.uniforms.uScale.value = scale;
+  renderer.render(scene, camera);
+}
 function frame(now) {
   requestAnimationFrame(frame);
+  if (G.hold) { lastT = now; return; }   // dev recorder drives the loop itself
   let dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
   const active = G.mode === 'play' || G.mode === 'menu' || G.mode === 'end';
   if (G.mode === 'paused') dt = 0;
@@ -2889,11 +2897,7 @@ function frame(now) {
   if (dt > 0) step(dt, active);
   const p1 = performance.now();
   updateCamera(dt);
-  sky.position.copy(camera.position);
-  waterMesh.position.set(Math.round(camera.position.x / 40) * 40, 0, Math.round(camera.position.z / 40) * 40);
-  const scale = renderer.domElement.height / (2 * Math.tan(camera.fov * DEG / 2));
-  FXN.mat.uniforms.uScale.value = FXA.mat.uniforms.uScale.value = scale;
-  renderer.render(scene, camera);
+  renderView();
   const p2 = performance.now();
   drawOverlay();
   if (G.mode === 'play' || G.mode === 'paused') { drawMini(); }
@@ -2967,7 +2971,11 @@ function start(data) {
   requestAnimationFrame(t => { lastT = t; frame(t); });
 }
 window.claude?.hot?.snapshot?.(() => ({ ship: G.shipKey, diff: G.diff }));
-if (window.__IBS_DEBUG) window.__ibs = { PERF, renderer, G, advance(sec, fn) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) { if (fn) fn(); if (G.mode !== 'paused') step(1 / 30, true); updateCamera(1 / 30); } }, leadPoint, intercept, angDiff, terrainH, get ships() { return ships; }, get torps() { return torps; }, aim, startGame, SPECS, camera, scene, Ship, clearWorld, showScreen, Sfx };
+if (window.__IBS_DEBUG) window.__ibs = { PERF, renderer, G, advance(sec, fn) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) { if (fn) fn(); if (G.mode !== 'paused') step(1 / 30, true); updateCamera(1 / 30); } }, leadPoint, intercept, angDiff, terrainH, get ships() { return ships; }, get torps() { return torps; }, aim, startGame, SPECS, camera, scene, Ship, clearWorld, showScreen, Sfx,
+  // used by dev/record.js
+  step, updateCamera, renderView, drawOverlay, setupPreview, selectShip, spawnWave, fireTurret, fireShell, launchFan, AI, FX, TS, GUNS, menuCam, glCanvas, ov, SUN_AZ,
+  get shells() { return shells; },
+  forceSize(w, h) { VW = w; VH = h; ODPR = 1; renderer.setPixelRatio(1); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); ov.width = w; ov.height = h; } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data ?? {});
 })();
 </script>
