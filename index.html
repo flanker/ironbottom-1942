@@ -2973,7 +2973,7 @@ function start(data) {
 window.claude?.hot?.snapshot?.(() => ({ ship: G.shipKey, diff: G.diff }));
 if (window.__IBS_DEBUG) window.__ibs = { PERF, renderer, G, advance(sec, fn) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) { if (fn) fn(); if (G.mode !== 'paused') step(1 / 30, true); updateCamera(1 / 30); } }, leadPoint, intercept, angDiff, terrainH, get ships() { return ships; }, get torps() { return torps; }, aim, startGame, SPECS, camera, scene, Ship, clearWorld, showScreen, Sfx,
   // used by dev/record.js
-  step, updateCamera, renderView, drawOverlay, setupPreview, selectShip, spawnWave, fireTurret, fireShell, launchFan, AI, FX, TS, GUNS, menuCam, glCanvas, ov, SUN_AZ,
+  step, updateCamera, renderView, drawOverlay, setupPreview, selectShip, spawnWave, fireTurret, fireShell, launchFan, AI, FX, TS, GUNS, menuCam, glCanvas, ov, SUN_AZ, keys, drawMini, setWeapon, intercept,
   get shells() { return shells; },
   forceSize(w, h) { VW = w; VH = h; ODPR = 1; renderer.setPixelRatio(1); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); ov.width = w; ov.height = h; } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data ?? {});

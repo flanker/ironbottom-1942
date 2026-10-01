@@ -5,7 +5,7 @@
   // Frame-by-frame recorder for promo footage. Needs the receiver from dev/recserver.py on 127.0.0.1:8766.
   fetch('../index.html').then(r => r.text()).then(html => {
     html = html.replace('<head>', '<head><script>window.__IBS_DEBUG = true; window.__IBS_BASE = "../"<\/script>')
-               .replace('</body>', '<script src="record.js"><\/script><script src="record-cards.js"><\/script></body>');
+               .replace('</body>', '<script src="record.js"><\/script><script src="record-cards.js"><\/script><script src="record-hud.js"><\/script></body>');
     document.open(); document.write(html); document.close();
   });
 </script>

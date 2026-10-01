@@ -8,8 +8,14 @@
   const comp = document.createElement('canvas'), cx = comp.getContext('2d');
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
   let inflight = [];
+  async function send(path, body, tries = 4) {
+    for (let i = 1; ; i++) {
+      try { const r = await fetch(RX + encodeURIComponent(path), { method: 'POST', body }); if (r.ok) return; throw new Error('post ' + path + ' ' + r.status); }
+      catch (e) { if (i >= tries) throw e; await new Promise(res => setTimeout(res, 300 * i)); }
+    }
+  }
   async function post(path, body) {
-    inflight.push(fetch(RX + encodeURIComponent(path), { method: 'POST', body }).then(r => { if (!r.ok) throw new Error('post ' + path); }));
+    inflight.push(send(path, body));
     if (inflight.length > 8) await inflight.shift();
   }
   async function flush() { await Promise.all(inflight); inflight = []; }
@@ -24,7 +30,7 @@
   };
 
   // ---- audio: log during the shot, replay offline afterwards
-  const SFX = ['gun', 'hit', 'splash', 'incoming', 'flyby', 'torpHit', 'boom', 'launch'], orig = {};
+  const SFX = ['gun', 'hit', 'splash', 'incoming', 'flyby', 'torpHit', 'boom', 'launch', 'alarm'], orig = {};
   for (const k of SFX) orig[k] = I.Sfx[k];
   let log = null, simT = 0;
   function hook(on) {
@@ -79,6 +85,7 @@
       cx.drawImage(I.glCanvas, 0, 0, R.w, R.h);
       if (f.overlay) { I.drawOverlay(); cx.drawImage(I.ov, 0, 0, R.w, R.h); }
       f.paint && f.paint(cx, t + dt);
+      if (f.hud) R.hudPaint(cx, dt);   // dev/record-hud.js: overlay canvas, minimap and the HTML HUD
       const blob = await new Promise(r => comp.toBlob(r, 'image/jpeg', R.q));
       await post(`shots/${name}/f${String(i).padStart(5, '0')}.jpg`, blob);
     }
