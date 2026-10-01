@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="3D 网页二战海战游戏：1942 年瓜岛外的铁底湾，驾驶美军战舰击退日军三波夜袭舰队。">
 <title>铁底湾1942</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#06090c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700;900&display=swap">
@@ -163,9 +167,6 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
 .card-h span{white-space:nowrap}
 .card-h span{font-family:var(--f-stencil);font-weight:700;letter-spacing:.1em;color:var(--lamp);font-size:13px}
 .card .ty{font-size:12px;color:var(--paper-dim);margin-top:2px}
-.card .size{grid-column:1 / -1;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid rgba(235,227,205,.12);padding-top:6px;font-size:12px;color:var(--paper-dim)}
-.card .size b{font-family:var(--f-mono);font-weight:500;font-size:12.5px;color:var(--paper)}
-.card.sel .size b{color:var(--lamp)}
 .card dl{margin:0;display:grid;grid-template-columns:auto auto;gap:2px 10px;font-size:12px;align-content:start}
 .card dt{color:var(--paper-dim)}
 .card dd{margin:0;font-family:var(--f-mono);font-size:11.5px;text-align:right}
@@ -2764,8 +2765,7 @@ function buildMenu() {
     return `<button type="button" class="card" data-k="${p.key}" aria-pressed="false">
       <canvas aria-hidden="true"></canvas>
       <div><div class="card-h"><b>${p.name}</b><span>${p.no}</span></div><div class="ty">${s.type}</div></div>
-      <dl><dt>航速</dt><dd>${s.kn} kn</dd><dt>主炮</dt><dd>${nb} × ${g.cal} mm</dd><dt>鱼雷</dt><dd>${tp}</dd><dt>射程</dt><dd>${(g.range / 1000).toFixed(1)} km</dd></dl>
-      <div class="size"><span>舰长 <b>${s.L}</b> m</span><span>标准排水量 <b>${fmt(s.tons)}</b> 吨</span></div></button>`;
+      <dl><dt>航速</dt><dd>${s.kn} kn</dd><dt>主炮</dt><dd>${nb} × ${g.cal} mm</dd><dt>鱼雷</dt><dd>${tp}</dd><dt>射程</dt><dd>${(g.range / 1000).toFixed(1)} km</dd><dt>舰长</dt><dd>${s.L} m</dd><dt>吨位</dt><dd>${fmt(s.tons)} t</dd></dl></button>`;
   }).join('');
   cards.querySelectorAll('.card').forEach(el => el.addEventListener('click', () => { Sfx.init(); selectShip(el.dataset.k); Sfx.music(true); Sfx.pick(el.dataset.k); }));
   $('#oni').innerHTML = ONI.map(([k, n, c]) => `<figure><canvas aria-hidden="true"></canvas><figcaption>${n}<span>${c} · ${SPECS[k].L} m</span></figcaption></figure>`).join('');
@@ -2792,7 +2792,7 @@ function selectShip(k, silent) {
   document.querySelectorAll('#cards .card').forEach(el => { const on = el.dataset.k === k; el.classList.toggle('sel', on); el.setAttribute('aria-pressed', on); });
   const meta = playableMeta(k), spec = SPECS[k];
   $('#stageNo').textContent = meta.no; $('#stageName').textContent = meta.name;
-  $('#stageType').textContent = `${spec.type} · 舰长 ${spec.L} 米 · 标准排水量 ${fmt(spec.tons)} 吨`; $('#stageBlurb').textContent = meta.blurb;
+  $('#stageType').textContent = `${spec.type} · 舰长 ${spec.L} 米 · 吨位 ${fmt(spec.tons)} 吨`; $('#stageBlurb').textContent = meta.blurb;
   if (!silent) drawMenuArt();
   measureStage();
   if (G.mode === 'menu') setupPreview();
