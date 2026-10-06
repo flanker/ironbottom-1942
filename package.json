@@ -1,0 +1,14 @@
+{
+  "name": "ironbottom-1942",
+  "private": true,
+  "description": "铁底湾1942：网页二战海战游戏，联机对战服务器",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

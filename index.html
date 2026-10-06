@@ -208,6 +208,52 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
 .kills li.none{color:var(--paper-dim)}
 .btns{display:flex;flex-wrap:wrap;gap:12px}
 .pause-keys{font-size:12.5px}
+/* ---------- Duel: entry, lobby ---------- */
+.launch .mp-btn{width:100%;box-sizing:border-box;text-align:center;letter-spacing:.2em}
+.mp-note{margin:0;line-height:1.75;font-size:14px;color:var(--paper);text-wrap:pretty}
+.mp-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.mp-or{color:var(--paper-dim);font-size:13px}
+.mp-code{all:unset;box-sizing:border-box;width:7.5em;padding:10px 12px;border:1px solid var(--rule-strong);font-family:var(--f-stencil);font-weight:700;font-size:20px;letter-spacing:.3em;color:var(--paper);background:rgba(0,0,0,.25)}
+.mp-code:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+.mp-code::placeholder{color:var(--paper-dim);font-family:var(--f-body);font-size:14px;letter-spacing:.1em}
+.mp-msg{margin:0;min-height:1.4em;font-size:13px;color:var(--lamp)}
+.sheet.lobby{width:min(94vw,900px)}
+/* tall sheets: centred while they fit, scrolled from the top when they don't */
+#mp,#lobby{place-items:start center;padding:12px 0;box-sizing:border-box}
+#mp .sheet,#lobby .sheet{margin-block:auto}
+.lb-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.lb-head .eyebrow{margin:0 0 6px}
+.lb-head h2{font-family:var(--f-stencil);letter-spacing:.18em;color:var(--lamp)}
+.lb-share{display:flex;gap:12px;align-items:center}
+.lb-net{font-family:var(--f-mono);font-size:12px;color:var(--paper-dim)}
+.lb-cfg{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.lb-cfg > div{display:flex;gap:10px;align-items:center}
+.lb-cfg .seg button{white-space:nowrap}
+@media (max-width:480px){.lb-cfg .seg button{padding:8px 9px}}
+.lb-label{font-size:12px;color:var(--paper-dim);letter-spacing:.14em}
+.lb-cfg .seg button:disabled{cursor:default}
+.lb-cfg .seg button:disabled:not([aria-checked="true"]){opacity:.45}
+.lb-sides{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.lb-sides{grid-template-columns:minmax(0,1fr)}}
+.lb-side{border:1px solid var(--rule);padding:12px 14px;display:grid;gap:8px;align-content:start;background:rgba(0,0,0,.18)}
+.lb-side.mine{border-color:var(--rule-strong)}
+.lb-side h3{margin:0;font-family:var(--f-body);font-size:15px;display:flex;gap:10px;align-items:baseline}
+.lb-side h3 span{font-family:var(--f-stencil);letter-spacing:.2em;font-size:12px;color:var(--lamp-dim)}
+.lb-side[data-side="US"] h3{color:var(--friend)}.lb-side[data-side="JP"] h3{color:var(--foe)}
+.lb-who{margin:0;font-size:13px;color:var(--paper-dim)}
+.lb-who b{color:var(--paper)}.lb-who .ok{color:var(--good)}
+.lb-ships{display:grid;gap:8px}
+.lb-ships .card{grid-template-columns:minmax(0,1fr)}
+.lb-ships .card[disabled]{cursor:default}
+.lb-status{margin:0;min-height:1.4em;font-size:14px;color:var(--lamp)}
+.lb-hostnote{letter-spacing:.04em}
+@media (max-height:760px){
+  .sheet.lobby{gap:12px;padding:18px clamp(14px,3vw,28px)}
+  .lb-head h2{font-size:36px}
+  .lb-ships .card dl{grid-template-columns:repeat(4,auto)}
+  .lb-ships .card{padding:8px 10px}
+}
+#hud .net{font-size:11px;color:var(--paper-dim);letter-spacing:.06em}
 
 /* ---------- Touch ---------- */
 #touch{position:absolute;inset:0;pointer-events:none;z-index:6}
@@ -324,6 +370,19 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
   .launch .primary{width:auto;flex:1;padding:9px 12px;font-size:15px}
   .seg button{padding:7px 10px;font-size:12px}
   .diff-note,.best{display:none}
+  .launch .mp-btn{width:auto;padding:8px 12px;font-size:13px}
+  /* duel screens on a landscape phone: one tight sheet, silhouettes beside the names */
+  .sheet{padding:12px 16px;gap:10px;margin-block:8px}
+  .sheet h2{font-size:28px}
+  .mp-note{font-size:12.5px;line-height:1.6}
+  .lb-head h2{font-size:28px}
+  .lb-hostnote,.lb-net{display:none}
+  .lb-side{padding:8px 10px;gap:4px}
+  .lb-side h3{font-size:13px}.lb-who{font-size:12px}
+  .lb-ships{gap:4px}
+  .lb-ships .card{grid-template-columns:96px minmax(0,1fr)}
+  .lb-status{font-size:13px;min-height:0}
+  .btns{gap:8px}.btns .primary,.btns .ghost{padding:8px 16px;font-size:14px}
 }
 html.app,html.app *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html.app,html.app body{touch-action:manipulation}
@@ -439,6 +498,7 @@ html.app,html.app body{touch-action:manipulation}
             </div>
             <span class="diff-note" id="diffNote"></span>
             <button id="startBtn" class="primary" type="button">起锚出击</button>
+            <button id="mpBtn" class="ghost mp-btn" type="button">联机对战 · 1v1</button>
             <button id="soundBtn" class="sound-btn" type="button" aria-pressed="true">声音：开</button>
             <p id="best" class="best"></p>
           </div>
@@ -465,6 +525,43 @@ html.app,html.app body{touch-action:manipulation}
     </div>
   </div>
 
+  <div id="mp" class="screen dim" hidden>
+    <div class="sheet">
+      <p class="eyebrow">联机对战 · 1v1</p>
+      <h2>同级舰对决</h2>
+      <p class="mp-note">两名舰长各指挥一艘同级战舰，一方美军、一方日军，各带两艘驱逐舰僚舰。两国同级舰的耐久和火力已经拉平，航速、射程和鱼雷保留各自特点。击沉对方全部舰船获胜；你的座舰沉没后可以继续观战。</p>
+      <div class="mp-row">
+        <button class="primary" id="mpCreate" type="button">创建房间</button>
+        <span class="mp-or">或</span>
+        <input id="mpCode" class="mp-code" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="房间号" aria-label="房间号">
+        <button class="ghost" id="mpJoin" type="button">加入</button>
+      </div>
+      <p class="mp-msg" id="mpMsg" role="status"></p>
+      <div class="btns"><button class="ghost" id="mpBack" type="button">返回港口</button></div>
+    </div>
+  </div>
+
+  <div id="lobby" class="screen dim" hidden>
+    <div class="sheet lobby">
+      <div class="lb-head">
+        <div><p class="eyebrow">联机对战 · 房间</p><h2 id="lbCode">----</h2></div>
+        <div class="lb-share"><button class="ghost" id="lbCopy" type="button">复制邀请链接</button><span id="lbNet" class="lb-net"></span></div>
+      </div>
+      <div class="lb-cfg">
+        <div><span class="lb-label">舰种</span><div class="seg" id="lbCls" role="radiogroup" aria-label="舰种"></div></div>
+        <div><span class="lb-label">僚舰</span><div class="seg" id="lbEsc" role="radiogroup" aria-label="僚舰">
+          <button type="button" role="radio" data-v="2" aria-checked="true">两艘驱逐舰</button><button type="button" role="radio" data-v="0" aria-checked="false">无</button></div></div>
+        <span class="lb-label lb-hostnote" id="lbHostNote"></span>
+      </div>
+      <div class="lb-sides">
+        <section class="lb-side" data-side="US"><h3>美国海军 <span>US NAVY</span></h3><p class="lb-who"></p><div class="lb-ships"></div></section>
+        <section class="lb-side" data-side="JP"><h3>日本海军 <span>IJN</span></h3><p class="lb-who"></p><div class="lb-ships"></div></section>
+      </div>
+      <p class="lb-status" id="lbStatus" role="status"></p>
+      <div class="btns"><button class="primary" id="lbReady" type="button">准备</button><button class="ghost" id="lbSwap" type="button">换到对面</button><button class="ghost" id="lbLeave" type="button">离开房间</button></div>
+    </div>
+  </div>
+
   <div id="end" class="screen dim" hidden>
     <div class="sheet">
       <p class="eyebrow" id="endEyebrow"></p>
@@ -481,202 +578,21 @@ html.app,html.app body{touch-action:manipulation}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<script src="sim.js"></script>
 <script>
 (() => {
 'use strict';
 const $ = s => document.querySelector(s);
-const TAU = Math.PI * 2, DEG = Math.PI / 180;
-const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
-const lerp = (a, b, t) => a + (b - a) * t;
-const rand = (a, b) => a + Math.random() * (b - a);
-const randn = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); };
-const wrapA = a => { a %= TAU; if (a > Math.PI) a -= TAU; if (a < -Math.PI) a += TAU; return a; };
-const angDiff = (a, b) => wrapA(b - a);
+// the battle itself (ships, guns, torpedoes, AI) lives in sim.js, shared with the duel server; this page draws and plays it
+const S = window.IBSim;
+const { TAU, DEG, clamp, lerp, rand, randn, wrapA, angDiff, KN, MAP_R, vnoise, GUNS, TORPS, TS, SPECS, THROTTLE, DIFF, WAVE_DEF, terrainH, interpSheer, deckY, halfW, intercept, leadPoint } = S;
 const fmt = n => Math.round(n).toLocaleString('zh-CN');
-const KN = 0.5144 * 2.6;             // knots -> game m/s (time-compressed)
-const MAP_R = 6500;
 const store = {
   get(k, d) { try { const v = localStorage.getItem('ibs.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem('ibs.' + k, JSON.stringify(v)); } catch (e) {} }
 };
 
-// ---------------------------------------------------------------- noise
-function hash2(ix, iy) { let h = Math.imul(ix | 0, 374761393) ^ Math.imul(iy | 0, 668265263); h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967296; }
-function vnoise(x, y) { const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy, ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy); return lerp(lerp(hash2(ix, iy), hash2(ix + 1, iy), ux), lerp(hash2(ix, iy + 1), hash2(ix + 1, iy + 1), ux), uy); }
-function fbm(x, y) { let s = 0, a = 0.5, f = 1; for (let i = 0; i < 5; i++) { s += a * vnoise(x * f, y * f); f *= 2.03; a *= 0.5; } return s / 0.97; }
-
 // ---------------------------------------------------------------- data
-const GUNS = {
-  us127: { cal: 127, label: '5"/38', dmg: 430, reload: 3.2, range: 5600, vh: 1350, arc: .075, disp: 95, fire: .05, trav: 28 },
-  us152: { cal: 152, label: '6"/47', dmg: 640, reload: 5.2, range: 7200, vh: 1420, arc: .085, disp: 115, fire: .07, trav: 14 },
-  us406: { cal: 406, label: '16"/45', dmg: 4400, reload: 24, range: 9800, vh: 1520, arc: .12, disp: 165, fire: .2, trav: 7 },
-  jp127: { cal: 127, label: '12.7cm', dmg: 400, reload: 5, range: 5400, vh: 1300, arc: .08, disp: 105, fire: .05, trav: 14 },
-  jp140: { cal: 140, label: '14cm', dmg: 520, reload: 6, range: 6200, vh: 1350, arc: .09, disp: 120, fire: .06, trav: 12 },
-  jp203: { cal: 203, label: '20.3cm', dmg: 1350, reload: 12, range: 8000, vh: 1450, arc: .1, disp: 145, fire: .1, trav: 8 },
-  jp356: { cal: 356, label: '35.6cm', dmg: 3600, reload: 22, range: 9200, vh: 1480, arc: .12, disp: 165, fire: .18, trav: 5 },
-  sec127: { cal: 127, label: '5"/38', dmg: 260, reload: 4.5, range: 4300, vh: 1300, arc: .07, disp: 95, fire: .03, trav: 22 },
-  sec152: { cal: 152, label: '15.2cm', dmg: 330, reload: 6, range: 4500, vh: 1320, arc: .08, disp: 110, fire: .04, trav: 15 },
-};
-for (const k in GUNS) { const g = GUNS[k]; g.g = 8 * g.arc * g.vh * g.vh / g.range; }
-const TORPS = {
-  mk15: { label: 'Mk15', speed: 62, range: 4600, dmg: 6500, reload: 38, salvo: 5, spread: 3.0, visR: 1e9 },
-  t93: { label: '九三式', speed: 66, range: 7800, dmg: 6200, reload: 75, salvo: 4, spread: 3.4, visR: 2300 },
-};
-// turret houses: cf front-corner chamfer, fs/rs front/rear slope, ss side slope, rr rounded rear, hood sight hoods, ears rangefinder
-const TS = {
-  us5s: { len: 5.4, h: 2.8, w: 4.0, bl: 6.2, br: .17, n: 1, cf: .12, fs: .3, ss: .1, rs: .04, hood: 1 },
-  us5d: { len: 4.6, h: 2.3, w: 3.8, bl: 5.6, br: .15, n: 2, cf: .12, fs: .28, ss: .1, rs: .04, hood: 1 },
-  us6t: { len: 9.5, h: 3.2, w: 7.4, bl: 9.5, br: .26, n: 3, cf: .16, fs: .2, ss: .08, rs: .02, ears: 1 },
-  us16t: { len: 15, h: 4.8, w: 12.4, bl: 17, br: .55, n: 3, cf: .2, fs: .24, ss: .12, rs: .02, ears: 1 },
-  jp5d: { len: 5.6, h: 2.7, w: 4.4, bl: 6.0, br: .16, n: 2, cf: .35, fs: .24, ss: .12, rs: .1 },
-  jp5s: { len: 4.4, h: 2.5, w: 3.2, bl: 6.0, br: .16, n: 1, cf: .35, fs: .24, ss: .12, rs: .1 },
-  jp55: { len: 4.6, h: 2.4, w: 3.2, bl: 7.0, br: .18, n: 1, cf: .45, fs: .22, ss: .16, rs: .05 },
-  jp8d: { len: 8.2, h: 3.3, w: 7.0, bl: 10, br: .3, n: 2, cf: .45, fs: .22, ss: .16, rs: .06 },
-  jp14d: { len: 13, h: 4.4, w: 10.5, bl: 15, br: .5, n: 2, cf: .3, fs: .2, ss: .1, rr: .35, ears: 1 },
-  jp6c: { len: 2.6, h: 1.6, w: 2.2, bl: 5, br: .16, n: 1, cf: .3, fs: .2, ss: .1 },
-};
-// Ship parts, in hull-local metres (z toward the bow, y above the deck at z).
-// Bx block (rf/rr rounded front/rear, fs front slope, ta top inset, win window band), Cy funnel, Ms mast (tri tripod legs),
-// Pl platform, Tt torpedo mount, Aa light gun (o Oerlikon, b2/b4 Bofors, j2/j3 25 mm, ha/ha2 HA mounts), Sl searchlight,
-// Rf rangefinder, Dr director, Bt boat, Cp catapult (+ floatplane), Cr crane, Gm fixed gun mount, Dc depth-charge rack.
-const Bx = (z, y, len, h, w, x = 0, m = 's', o = {}) => ({ k: 'b', z, y, len, h, w, x, m, ...o });
-const Cy = (z, y, r, h, rake = 0, x = 0, o = {}) => ({ k: 'c', z, y, r, h, rake: rake * DEG, x, ...o });
-const Ms = (z, y, h, r, o = {}) => ({ k: 'm', z, y, h, r, x: 0, ...o, rake: (o.rake || 0) * DEG });
-const Pl = (z, y, len, w, x = 0) => ({ k: 'pl', z, y, len, w, x });
-const Tt = (z, y, n, x = 0, len = 7.5, sh = 0) => ({ k: 'tt', z, y, n, x, len, sh });
-const Aa = (z, y, x, kind) => ({ k: 'aa', z, y, x, kind });
-const Sl = (z, y, x) => ({ k: 'sl', z, y, x });
-const Rf = (z, y, len, x = 0) => ({ k: 'rf', z, y, len, x });
-const Dr = (z, y, kind) => ({ k: 'dr', z, y, kind, x: 0 });
-const Bt = (z, y, x, len) => ({ k: 'bt', z, y, x, len });
-const Cp = (z, y, x, len, face, plane) => ({ k: 'cp', z, y, x, len, face: face * DEG, plane });
-const Cr = (z, y, x, h, boom) => ({ k: 'cr', z, y, x, h, boom });
-const Gm = (z, y, x, face, kind) => ({ k: 'gm', z, y, x, face: face * DEG, kind });
-const Dc = (z, x) => ({ k: 'dc', z, y: 0, x });
-const Tu = (z, y, face, kind, x = 0, sec = false) => ({ z, y, face: face * DEG, kind, x, sec });
-
-const SENDAI_BASE = [
-  Bx(40.5, 0, 11, 4.6, 8.6, 0, 's', { rf: .4 }), Bx(41, 4.6, 7.5, 3, 7.4, 0, 's', { rf: .6, win: .7 }), Bx(41.3, 7.6, 5, 2, 5.6, 0, 's', { rf: .8, win: .8 }),
-  Rf(41, 9.6, 4.5), Ms(36.5, 4.6, 20, .4, { tri: 3, yards: [[.66, 7]], top: [.5, 2] }), Aa(37, 4.6, 3.6, 'j2'), Aa(37, 4.6, -3.6, 'j2'),
-  Bx(9, 0, 30, 2.2, 5.6, 0, 's', { rf: .3, rr: .3 }),
-  Tt(9, 0, 2, 4.4, 7), Tt(9, 0, 2, -4.4, 7), Tt(-13, 0, 2, 4.4, 7), Tt(-13, 0, 2, -4.4, 7),
-  Bt(17.5, 1.4, 5.4, 8), Bt(17.5, 1.4, -5.4, 8),
-  Bx(-22, 0, 16, 3, 7, 0, 's', { rr: .3, rf: .2 }), Rf(-22, 3, 3.5), Ms(-28.5, 3, 13, .3, { tri: 2, yards: [[.75, 5]] }),
-];
-const SPECS = {
-  fletcher: { cls: 'DD', nation: 'US', type: '弗莱彻级驱逐舰', L: 114, B: 12, F: 5.2, D: 4, sheer: [[0, .9], [.5, .95], [1, 1.4]], top: 12,
-    kn: 36.5, turn: 6.2, rudderT: 1.5, accelT: 9, hp: 16000, tons: 2050, gun: 'us127', torp: 'mk15', torpMounts: 2, prefRange: 3800, aiErr: 70, cam: [300, 88], dc: 3,
-    parts: [
-      Bx(22, 0, 14, 2.6, 8.6, 0, 's', { rf: .35 }), Bx(22.5, 2.6, 8.5, 2.4, 7.6, 0, 's', { rf: .7, win: .7, fs: .4 }), Bx(23, 5.0, 5.6, 1.9, 6.4, 0, 's', { rf: .8, win: .6 }),
-      Pl(22.5, 6.9, 7.6, 8.4), Dr(20.6, 6.9, 'us37'), Aa(20.5, 5, 3.5, 'o'), Aa(20.5, 5, -3.5, 'o'),
-      Ms(17, 2.6, 19, .35, { yards: [[.64, 7.5], [.8, 4]], radar: 'sc', rake: 4 }),
-      Bx(1, 0, 27, 2.4, 6.4, 0, 's', { rf: .25, rr: .25 }),
-      Cy(8, 2.4, 1.75, 8.2, 5, 0, { cap: 'us' }), Cy(-6, 2.4, 1.75, 7.6, 5, 0, { cap: 'us' }),
-      Tt(1, 2.4, 5), Bx(-17.5, 0, 6, 0.9, 4.6), Tt(-17.5, 0.9, 5),
-      Pl(-9.8, 6.6, 2.6, 3.4), Sl(-9.8, 6.6, 0), Bt(-3, 1.4, -4.6, 7.5), Aa(-11, 0, 4.1, 'o'), Aa(-11, 0, -4.1, 'o'),
-      Bx(-27, 0, 11, 2.8, 7, 0, 's', { rr: .2 }), Aa(-23, 2.8, 0, 'b2'),
-      Dc(-54.5, 2.2), Dc(-54.5, -2.2)],
-    tur: [Tu(40, 0, 0, 'us5s'), Tu(31, 2.6, 0, 'us5s'), Tu(-28, 2.8, 180, 'us5s'), Tu(-38, 1.2, 180, 'us5s'), Tu(-47, 0, 180, 'us5s')] },
-  brooklyn: { cls: 'CL', nation: 'US', type: '布鲁克林级轻巡洋舰', L: 185, B: 18.6, F: 6.4, D: 6.9, sheer: [[0, .85], [.45, .95], [1, 1.35]], top: 22,
-    kn: 32.5, turn: 4.2, rudderT: 2.4, accelT: 14, hp: 34000, tons: 9767, gun: 'us152', torp: null, prefRange: 5600, aiErr: 80, cam: [400, 115], dc: 3,
-    parts: [
-      Bx(27, 0, 22, 5.5, 13.5, 0, 's', { rf: .25 }), Bx(29, 5.5, 13, 3.2, 11, 0, 's', { rf: .55, win: .8 }), Bx(30, 8.7, 8, 2.6, 8.4, 0, 's', { rf: .7, win: .7 }),
-      Pl(30, 11.3, 9, 10.5), Dr(29.5, 11.3, 'us37'), Aa(20, 5.5, 5, 'b4'), Aa(20, 5.5, -5, 'b4'),
-      Ms(23.5, 5.5, 23, .5, { yards: [[.62, 11], [.78, 6]], top: [.45, 2.6], radar: 'sc' }),
-      Bx(-1, 0, 32, 3, 12.5, 0, 's', { rf: .2, rr: .2 }),
-      Gm(12, 3, 5.2, 90, 'us5d'), Gm(12, 3, -5.2, -90, 'us5d'), Gm(-13, 3, 5.2, 90, 'us5d'), Gm(-13, 3, -5.2, -90, 'us5d'),
-      Cy(5, 3, 2.6, 11, 0, 0, { cap: 'us' }), Cy(-7, 3, 2.6, 10.5, 0, 0, { cap: 'us' }),
-      Pl(-1, 9, 4.5, 9), Sl(-1, 9, 3.2), Sl(-1, 9, -3.2), Bt(-1, 3.2, 4.3, 8), Bt(-1, 3.2, -4.3, 8),
-      Bx(-27, 0, 13, 5, 11.5, 0, 's', { rr: .3 }), Bx(-26.5, 5, 7, 2.4, 7, 0, 's', { win: .5, rf: .4 }), Dr(-27.5, 7.4, 'us37'),
-      Ms(-20, 5, 18, .4, { yards: [[.72, 8]] }), Aa(-36, 0, 5.2, 'b4'), Aa(-36, 0, -5.2, 'b4'),
-      Bx(-72, 0, 11, 0.12, 9, 0, 'd'), Cp(-79, 0.6, 4.6, 15, 25, 1), Cp(-79, 0.6, -4.6, 15, -25, 1), Cr(-88.5, 0, 0, 6.5, 11)],
-    tur: [Tu(63, 0, 0, 'us6t'), Tu(52, 2.9, 0, 'us6t'), Tu(42, 4.2, 0, 'us6t'), Tu(-44, 2.9, 180, 'us6t'), Tu(-55, 0, 180, 'us6t')] },
-  nc: { cls: 'BB', nation: 'US', type: '北卡罗来纳级战列舰', L: 222, B: 33, F: 8.5, D: 10, sheer: [[0, .9], [.5, .95], [1, 1.3]], top: 30,
-    kn: 28, turn: 2.6, rudderT: 4, accelT: 22, hp: 72000, tons: 36600, gun: 'us406', sec: 'sec127', torp: null, prefRange: 7600, aiErr: 100, cam: [480, 140], dc: 4,
-    parts: [
-      Bx(3, 0, 64, 6, 25, 0, 's', { rf: .3, rr: .3 }), Bx(38.5, 0, 6.5, 10, 6.5, 0, 's', { rf: 1, rr: 1 }),
-      Bx(31, 6, 11, 4, 13, 0, 's', { rf: .6, win: .6 }), Bx(31.5, 10, 9, 4.5, 10.5, 0, 's', { rf: .7, win: .7 }),
-      Bx(32, 14.5, 7, 4, 8.5, 0, 's', { rf: .75, win: .7 }), Bx(32, 18.5, 5.5, 3.5, 6.5, 0, 's', { rf: .8, win: .6 }),
-      Pl(32, 22, 7.5, 9), Dr(32.5, 22, 'us38'), Ms(29.5, 22, 13, .45, { yards: [[.55, 9]], radar: 'sc' }), Dr(25.5, 6, 'us37'),
-      Cy(12, 6, 4.2, 14, 4, 0, { cap: 'us' }), Cy(-5, 6, 4.2, 13, 4, 0, { cap: 'us' }),
-      Pl(3.5, 12.5, 5, 11), Sl(3.5, 12.5, 3.8), Sl(3.5, 12.5, -3.8), Bt(3.5, 6.3, 6.8, 10), Bt(3.5, 6.3, -6.8, 10),
-      Ms(-15, 6, 22, .55, { yards: [[.75, 10]], tri: 3, top: [.55, 2.4] }),
-      Bx(-22, 6, 10, 3, 12, 0, 's', { rr: .5, win: .5 }), Dr(-22.5, 9, 'us37'), Dr(-26.5, 6, 'us38'),
-      Aa(33, 6, 9.5, 'b4'), Aa(33, 6, -9.5, 'b4'), Aa(-26, 6, 9.5, 'b4'), Aa(-26, 6, -9.5, 'b4'),
-      Aa(45, 0, 12, 'o'), Aa(45, 0, -12, 'o'), Aa(-40, 0, 12, 'o'), Aa(-40, 0, -12, 'o'),
-      Cp(-96, 0.6, 7, 16, 25, 1), Cp(-96, 0.6, -7, 16, -25, 1), Cr(-106, 0, 0, 8, 14)],
-    tur: [Tu(72, 0, 0, 'us16t'), Tu(57, 4, 0, 'us16t'), Tu(-52, 3, 180, 'us16t'),
-      Tu(20, 6, 90, 'us5d', 10.5, true), Tu(10, 6, 90, 'us5d', 10.5, true), Tu(0, 6, 90, 'us5d', 10.5, true), Tu(-10, 6, 90, 'us5d', 10.5, true), Tu(-20, 6, 90, 'us5d', 10.5, true),
-      Tu(20, 6, -90, 'us5d', -10.5, true), Tu(10, 6, -90, 'us5d', -10.5, true), Tu(0, 6, -90, 'us5d', -10.5, true), Tu(-10, 6, -90, 'us5d', -10.5, true), Tu(-20, 6, -90, 'us5d', -10.5, true)] },
-  shiratsuyu: { cls: 'DD', nation: 'JP', type: '白露型驱逐舰', L: 111, B: 9.9, F: 4.4, D: 3.5, sheer: [[0, .85], [.618, .85], [.622, 1.45], [1, 1.65]], top: 12, stem: 'clipper',
-    kn: 34, turn: 6.5, rudderT: 1.6, accelT: 9, hp: 10000, tons: 1685, gun: 'jp127', torp: 't93', torpMounts: 2, prefRange: 3600, aiErr: 80, dc: 1,
-    parts: [
-      Bx(23.5, 0, 9, 2.6, 7, 0, 's', { rf: .5 }), Bx(24, 2.6, 6.5, 1.9, 6, 0, 's', { rf: .75, win: .6 }), Bx(24.3, 4.5, 4.4, 1.7, 5, 0, 's', { rf: .85, win: .8 }),
-      Rf(24.3, 6.2, 3), Ms(19.5, 2.6, 13, .3, { tri: 2.2, yards: [[.7, 5]], top: [.52, 1.4] }),
-      Cy(7.5, 0, 1.6, 7.4, 12, 0, { cap: 'jp', pipe: 1 }), Cy(-4, 0, 1.35, 6.4, 12, 0, { cap: 'jp', pipe: 1 }),
-      Tt(1.5, 0.6, 4, 0, 8, 1), Tt(-12, 0.6, 4, 0, 8, 1), Bx(-7.8, 0, 2.8, 1.2, 2.8), Aa(-7.8, 1.2, 0, 'j2'),
-      Bt(6, 1.4, 3.6, 6), Bt(6, 1.4, -3.6, 6),
-      Bx(-24.5, 0, 8, 2.2, 5.2, 0, 's', { rr: .3 }), Ms(-18.5, 0, 10, .25, { yards: [[.8, 3]] }), Dc(-52, 1.6), Dc(-52, -1.6)],
-    tur: [Tu(34, 0, 0, 'jp5d'), Tu(-30, 2.2, 180, 'jp5d'), Tu(-40, 0, 180, 'jp5s')] },
-  fubuki: { cls: 'DD', nation: 'JP', type: '吹雪型驱逐舰', L: 118, B: 10.4, F: 4.6, D: 3.2, sheer: [[0, .85], [.618, .85], [.622, 1.45], [1, 1.65]], top: 12, stem: 'clipper',
-    kn: 38, turn: 6.3, rudderT: 1.6, accelT: 9, hp: 10500, tons: 1750, gun: 'jp127', torp: 't93', torpMounts: 3, torpSalvo: 3, prefRange: 3600, aiErr: 80, dc: 1,
-    parts: [
-      Bx(26.5, 0, 9.5, 2.8, 7.4, 0, 's', { rf: .5 }), Bx(27, 2.8, 7, 2.0, 6.4, 0, 's', { rf: .75, win: .6 }), Bx(27.3, 4.8, 4.6, 1.7, 5.2, 0, 's', { rf: .85, win: .8 }),
-      Rf(27.3, 6.5, 3), Ms(22, 2.8, 13.5, .3, { tri: 2.2, yards: [[.7, 5]], top: [.52, 1.4] }),
-      Cy(9, 0, 1.95, 7.8, 10, 0, { cap: 'jp', pipe: 1, ov: .62 }), Cy(-3, 0, 1.55, 6.8, 10, 0, { cap: 'jp', pipe: 1 }),
-      Tt(3.5, 0.6, 3, 0, 8, 1), Tt(-10, 0.6, 3, 0, 8, 1), Tt(-18.5, 0.6, 3, 0, 8, 1),
-      Bt(8, 1.4, 3.8, 6), Bt(8, 1.4, -3.8, 6),
-      Bx(-27, 0, 7.5, 2.2, 5, 0, 's', { rr: .3 }), Ms(-24, 2.2, 9, .25, { yards: [[.8, 3]] }), Dc(-56, 1.6), Dc(-56, -1.6)],
-    tur: [Tu(39, 0, 0, 'jp5d'), Tu(-33, 2.2, 180, 'jp5d'), Tu(-44, 0, 180, 'jp5d')] },
-  sendai: { cls: 'CL', nation: 'JP', type: '川内型轻巡洋舰', L: 162, B: 14.2, F: 5.4, D: 4.8, sheer: [[0, .85], [.678, .85], [.682, 1.4], [1, 1.55]], top: 20, stem: 'clipper',
-    kn: 35, turn: 4.8, rudderT: 2.2, accelT: 12, hp: 17000, tons: 5195, gun: 'jp140', torp: 't93', torpMounts: 2, prefRange: 4300, aiErr: 85, dc: 2,
-    parts: [...SENDAI_BASE, ...[22, 13, 4, -5].map((z, i) => Cy(z, 0, 1.8, i === 0 || i === 3 ? 8.5 : 9, 6, 0, { cap: 'jp', ov: .8, pipe: 1 }))],
-    tur: [Tu(62, 0, 0, 'jp55'), Tu(53, 2, 0, 'jp55'), Tu(30, 0, 90, 'jp55', 5), Tu(30, 0, -90, 'jp55', -5), Tu(-34, 3, 180, 'jp55'), Tu(-46, 0, 180, 'jp55'), Tu(-58, 0, 180, 'jp55')] },
-  aoba: { cls: 'CA', nation: 'JP', type: '青叶型重巡洋舰', L: 185, B: 17.6, F: 5.8, D: 5.7, sheer: [[0, .8], [.438, .8], [.442, 1.25], [1, 1.45]], top: 24, stem: 'clipper',
-    kn: 33, turn: 4.4, rudderT: 2.4, accelT: 13, hp: 22000, tons: 8700, gun: 'jp203', torp: 't93', torpMounts: 2, prefRange: 4800, aiErr: 90, dc: 2,
-    parts: [
-      Bx(33, 0, 15, 6.5, 11, 0, 's', { rf: .4 }), Bx(33.5, 6.5, 10.5, 4.3, 9, 0, 's', { rf: .55, win: .8 }), Bx(34, 10.8, 7, 3.4, 7, 0, 's', { rf: .7, win: .8 }),
-      Pl(34, 14.2, 8.5, 9.5), Dr(33.5, 14.2, 'jp'), Ms(27.5, 6.5, 21, .45, { tri: 4, yards: [[.62, 9]], top: [.45, 2.6] }),
-      Bx(5, 0, 28, 2.6, 8.4, 0, 's', { rf: .3, rr: .3 }),
-      Cy(12, 0, 3, 12, 8, 0, { cap: 'jp', ov: .62, pipe: 2 }), Cy(-1, 0, 2.2, 10, 8, 0, { cap: 'jp', pipe: 1 }),
-      Aa(18, 0, 5.6, 'ha'), Aa(18, 0, -5.6, 'ha'), Bt(4, 1.6, 5.9, 9), Bt(4, 1.6, -5.9, 9),
-      Tt(-5, 0, 4, 5.8, 7), Tt(-5, 0, 4, -5.8, 7), Cp(-17, 3, 0, 15, 0, 1),
-      Bx(-27, 0, 11, 3, 8.4, 0, 's', { rr: .3 }), Rf(-25, 3, 4), Ms(-31, 3, 16, .4, { tri: 3, yards: [[.75, 6]] }), Cr(-30.5, 3, 0, 8, 12)],
-    tur: [Tu(58, 0, 0, 'jp8d'), Tu(47, 2.8, 0, 'jp8d'), Tu(-50, 0, 180, 'jp8d')] },
-  takao: { cls: 'CA', nation: 'JP', type: '高雄型重巡洋舰', L: 193, B: 19, F: 5.8, D: 6.1, sheer: [[0, .8], [.438, .8], [.442, 1.25], [1, 1.45]], top: 28, stem: 'clipper',
-    kn: 35, turn: 4.2, rudderT: 2.4, accelT: 13, hp: 24000, tons: 9850, gun: 'jp203', torp: 't93', torpMounts: 2, prefRange: 5000, aiErr: 90, dc: 2,
-    parts: [
-      Bx(30, 0, 22, 8, 13.5, 0, 's', { rf: .3 }), Bx(30.5, 8, 17, 6, 12, 0, 's', { rf: .45, win: .9 }), Pl(31, 14, 14, 16),
-      Bx(31, 14, 12, 5, 9.5, 0, 's', { rf: .6, win: .9 }), Bx(31.5, 19, 7, 4, 7, 0, 's', { rf: .75, win: .8 }),
-      Pl(31.5, 23, 8.5, 10), Dr(32, 23, 'jp'), Rf(29, 23, 6), Ms(21, 8, 25, .5, { tri: 3.5, yards: [[.66, 10]], top: [.52, 2.4] }),
-      Bx(2, 0, 18, 2.8, 8.4, 0, 's', { rf: .3, rr: .3 }),
-      Cy(8, 0, 3.8, 12.5, 14, 0, { cap: 'jp', ov: .6, pipe: 2 }), Cy(-5, 0, 2.5, 11.5, 14, 0, { cap: 'jp', pipe: 1 }),
-      Aa(1, 2.8, 3, 'ha'), Aa(1, 2.8, -3, 'ha'), Bt(14, 1.4, 6.3, 9), Bt(14, 1.4, -6.3, 9),
-      Tt(-8, 0, 4, 6.8, 8), Tt(-8, 0, 4, -6.8, 8),
-      Bx(-18, 0, 13, 3.4, 12, 0, 's', { rr: .2 }), Cp(-16, 3.4, 4.2, 17, 12, 1), Cp(-16, 3.4, -4.2, 17, -12, 1),
-      Bx(-29, 0, 8, 3, 8.4, 0, 's', { rr: .3 }), Rf(-26.5, 3, 4), Ms(-30, 3, 19, .45, { tri: 3, yards: [[.72, 7]] }), Cr(-29.5, 3, 0, 7, 14)],
-    tur: [Tu(72, 0, 0, 'jp8d'), Tu(61, 2.8, 0, 'jp8d'), Tu(50, 4.8, 0, 'jp8d'), Tu(-46, 2.8, 180, 'jp8d'), Tu(-57, 0, 180, 'jp8d')] },
-  kongo: { cls: 'BB', nation: 'JP', type: '金刚型战列舰', L: 222, B: 31, F: 8, D: 9.7, sheer: [[0, .85], [.5, .9], [1, 1.35]], top: 40,
-    kn: 30, turn: 2.9, rudderT: 3.6, accelT: 20, hp: 48000, tons: 32156, gun: 'jp356', sec: 'sec152', torp: null, prefRange: 6000, aiErr: 95, dc: 3, deck: 'wood',
-    parts: [
-      Bx(40, 0, 16, 8, 14.5, 0, 's', { rf: .5 }), Bx(40, 8, 12, 5, 11, 0, 's', { rf: .5, win: .6 }), Pl(40, 13, 14, 15),
-      Bx(40.5, 13, 9.5, 5, 9, 0, 's', { rf: .6, win: .6 }), Pl(40.5, 18, 12, 13), Bx(41, 18, 7.5, 5, 7.5, 0, 's', { rf: .6, win: .7 }), Pl(41, 23, 10, 11),
-      Bx(41, 23, 6, 4.5, 6.5, 0, 's', { rf: .7, win: .8 }), Pl(41, 27.5, 8, 9), Bx(41, 27.5, 5, 4, 5.5, 0, 's', { rf: .8, win: .7 }),
-      Bx(41, 31.5, 3.5, 2.5, 4.5, 0, 's', { rf: .5 }), Rf(41, 34, 9), Ms(38.5, 34, 10, .45, { yards: [[.5, 7]] }), Ms(37, 8, 26, .7, { tri: 4.5 }),
-      Bx(8, 0, 36, 3.6, 16, 0, 's', { rf: .3, rr: .3 }),
-      Cy(16, 0, 3.9, 14, 6, 0, { cap: 'jp', ov: .78, pipe: 2 }), Cy(0, 0, 3.7, 13, 6, 0, { cap: 'jp', ov: .78, pipe: 1 }),
-      Pl(8, 11, 5, 13), Sl(8, 11, 4.5), Sl(8, 11, -4.5),
-      Aa(24, 3.6, 6.4, 'ha2'), Aa(24, 3.6, -6.4, 'ha2'), Aa(-7, 3.6, 6.4, 'ha2'), Aa(-7, 3.6, -6.4, 'ha2'), Aa(8, 3.6, 6.2, 'j3'), Aa(8, 3.6, -6.2, 'j3'),
-      Bx(-19, 0, 16, 6, 14, 0, 's', { rr: .4 }), Rf(-19, 6, 6), Ms(-25, 6, 22, .55, { tri: 4, yards: [[.7, 10]], top: [.5, 3] }), Cr(-24.5, 6, 0, 8, 15),
-      Aa(-14, 6, 5, 'j3'), Aa(-14, 6, -5, 'j3')],
-    tur: [Tu(74, 0, 0, 'jp14d'), Tu(60, 3.6, 0, 'jp14d'), Tu(-42, 3.6, 180, 'jp14d'), Tu(-58, 0, 180, 'jp14d'),
-      Tu(30, -3.5, 90, 'jp6c', 15.2, true), Tu(20, -3.5, 90, 'jp6c', 15.3, true), Tu(10, -3.5, 90, 'jp6c', 15.4, true), Tu(-10, -3.5, 90, 'jp6c', 15.3, true),
-      Tu(30, -3.5, -90, 'jp6c', -15.2, true), Tu(20, -3.5, -90, 'jp6c', -15.3, true), Tu(10, -3.5, -90, 'jp6c', -15.4, true), Tu(-10, -3.5, -90, 'jp6c', -15.3, true)] },
-};
-SPECS.nagara = Object.assign({}, SPECS.sendai, { type: '长良型轻巡洋舰', kn: 36, tons: 5170,
-  parts: [...SENDAI_BASE, ...[20, 10, 0].map(z => Cy(z, 0, 1.9, 8.8, 6, 0, { cap: 'jp', ov: .8, pipe: 1 }))] });
-for (const k in SPECS) SPECS[k].key = k;
-
 const PLAYABLE = [
   { key: 'fletcher', name: '弗莱彻号', no: 'DD-445', blurb: '快、脆，带十条鱼雷。三艘里最难开：贴近四公里放雷，靠转向躲炮弹。' },
   { key: 'brooklyn', name: '海伦娜号', no: 'CL-50', blurb: '十五门六英寸炮，五秒一轮。埃斯佩兰斯角一战，日军以为她装的是机关枪。' },
@@ -684,7 +600,6 @@ const PLAYABLE = [
 ];
 const ONI = [['fubuki', '吹雪型', 'DD'], ['shiratsuyu', '白露型', 'DD'], ['sendai', '川内型', 'CL'], ['aoba', '青叶型', 'CA'], ['takao', '高雄型', 'CA'], ['kongo', '金刚型', 'BB']];
 const CLS_CN = { DD: '驱', CL: '轻巡', CA: '重巡', BB: '战列' };
-const SIZE_ERR = { DD: 1.35, CL: 1.1, CA: 1, BB: 0.9 };   // small hulls are harder to range at dusk
 const FATE = {
   '夕立': '史实：1942.11.13 第一次瓜岛海战中沉没', '春雨': '史实：1944.6 被美军 B-25 击沉', '天雾': '史实：1943.8 撞沉 PT-109（肯尼迪的鱼雷艇），1944 年触雷沉没',
   '白雪': '史实：1943.3 俾斯麦海海战中被飞机击沉', '青叶': '史实：一直活到 1945 年，在吴港坐沉', '衣笠': '史实：1942.11.14 被企业号舰载机击沉',
@@ -698,13 +613,7 @@ const WAVES = [
   { name: '挺身攻击队', note: '战列舰雾岛在爱宕、高雄护卫下前来炮击机场', from: [-5900, 500], to: [0, 1400], ships: [['fubuki', '绫波'], ['nagara', '长良'], ['kongo', '雾岛'], ['takao', '爱宕'], ['takao', '高雄'], ['shiratsuyu', '五月雨']] },
 ];
 const WAVE_CN = ['第一波', '第二波', '第三波'];
-const THROTTLE = [-.5, -.25, 0, .25, .5, .75, 1];
 const THROTTLE_CN = ['全速后退', '半速后退', '停车', '1/4 前进', '1/2 前进', '3/4 前进', '全速前进'];
-const DIFF = {
-  cadet: { name: '见习', dmgTaken: .35, aiErr: 1.6, hpMul: 1.8, note: '敌炮散布大，受到的伤害大幅减少' },
-  captain: { name: '舰长', dmgTaken: .55, aiErr: 1.15, hpMul: 1.5, note: '标准难度' },
-  admiral: { name: '提督', dmgTaken: .85, aiErr: .85, hpMul: 1.25, note: '日军夜战训练有素，炮弹更准、更疼' },
-};
 
 // ---------------------------------------------------------------- renderer
 const glCanvas = $('#gl'), ov = $('#overlay'), octx = ov.getContext('2d');
@@ -783,7 +692,6 @@ sky.frustumCulled = false; sky.renderOrder = -10;
 scene.add(sky);
 
 // waves shared CPU / GPU
-const WAVE_DEF = [[0.35, 190, 1.0, 0.0], [-0.55, 115, 0.6, 1.3], [1.15, 72, 0.35, 2.1], [2.45, 46, 0.2, 4.2]];
 const WV = WAVE_DEF.map(([a, L, A, ph]) => { const k = TAU / L; return { dx: Math.cos(a), dz: Math.sin(a), k, A, w: Math.sqrt(9.8 * k), ph, L }; });
 function waveH(x, z, t) {
   const dc = Math.hypot(x - camera.position.x, z - camera.position.z);
@@ -868,29 +776,6 @@ const waterMesh = (() => {
 })();
 
 // ---------------------------------------------------------------- terrain
-const ISL = [
-  { x: -3300, z: -2400, r: 1300, h: 480, volc: 1, seed: 1 },
-  { x: 2700, z: 1300, r: 340, h: 60, seed: 2 },
-  { x: -700, z: 3500, r: 430, h: 85, seed: 3 },
-  { x: 4100, z: -2900, r: 280, h: 48, seed: 4 },
-  { x: -11000, z: 9900, r: 3700, h: 900, seed: 5 }, { x: -5000, z: 9500, r: 3200, h: 1100, seed: 6 }, { x: 1000, z: 9400, r: 3100, h: 800, seed: 7 },
-  { x: 7000, z: 9600, r: 3300, h: 950, seed: 8 }, { x: 12500, z: 10000, r: 3500, h: 700, seed: 9 },
-  { x: -9000, z: -10000, r: 3400, h: 380, seed: 10 }, { x: -2500, z: -9700, r: 3000, h: 420, seed: 11 }, { x: 4500, z: -9900, r: 3300, h: 350, seed: 12 }, { x: 11000, z: -10300, r: 3500, h: 300, seed: 13 },
-];
-function islH(I, x, z) {
-  const d = Math.hypot(x - I.x, z - I.z) / I.r;
-  const n = fbm((x + I.seed * 977) * 0.0011, (z - I.seed * 613) * 0.0011);
-  const s = 1 - (d + (n - 0.5) * 0.55);
-  if (s <= 0) return -30;
-  const prof = I.volc ? Math.pow(s, 1.35) : s * s * (3 - 2 * s);
-  const rough = fbm(x * 0.004 + I.seed * 3.1, z * 0.004 - I.seed * 1.7);
-  return -6 + (I.h + 6) * prof * (0.55 + 0.9 * rough);
-}
-function terrainH(x, z) {
-  let best = -40;
-  for (const I of ISL) { const dx = x - I.x, dz = z - I.z, rr = I.r * 1.3; if (dx * dx + dz * dz > rr * rr) continue; const h = islH(I, x, z); if (h > best) best = h; }
-  return best;
-}
 const landMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.96, metalness: 0, flatShading: true });
 function terrainPatch(x0, z0, x1, z1, nx, nz) {
   const g = new THREE.PlaneGeometry(x1 - x0, z1 - z0, nx, nz); g.rotateX(-Math.PI / 2); g.translate((x0 + x1) / 2, 0, (z0 + z1) / 2);
@@ -1396,18 +1281,6 @@ const Sfx = {
 
 // ---------------------------------------------------------------- ship models
 const sstep = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
-function interpSheer(pts, s) {
-  if (s <= pts[0][0]) return pts[0][1];
-  for (let i = 0; i < pts.length - 1; i++) if (s <= pts[i + 1][0]) { const t = (s - pts[i][0]) / (pts[i + 1][0] - pts[i][0]); return lerp(pts[i][1], pts[i + 1][1], t); }
-  return pts[pts.length - 1][1];
-}
-const deckY = (spec, z) => spec.F * interpSheer(spec.sheer, clamp(z / spec.L + 0.5, 0, 1));
-// waterline plan (also the hit-test outline)
-function halfW(s) {
-  if (s < 0.12) return 0.74 + 0.26 * Math.sin((s / 0.12) * Math.PI / 2);
-  if (s < 0.58) return 1;
-  const u = clamp((s - 0.58) / 0.42, 0, 1); return Math.max(0.018, Math.pow(Math.max(0, Math.cos(u * Math.PI / 2)), 0.8));
-}
 // visual plans: finer stern at the waterline, flared bow at the deck
 function halfWL(s) { return s < 0.14 ? 0.42 + 0.58 * Math.sin((s / 0.14) * Math.PI / 2) : halfW(s); }
 function halfWDeck(s) {
@@ -1824,484 +1697,193 @@ function deckMat(spec) {
 }
 
 // ---------------------------------------------------------------- world state
-let ships = [], shells = [], torps = [];
-let shipSeq = 0;
+// world: the battle on screen (an S.World). Single player steps it here; in a duel it mirrors the server's (see Net).
+let world = null;
 const G = {
   mode: 'menu', time: 0, clock: 0, wave: 0, nextWaveT: 0, waveActive: false, player: null, preview: null,
   shipKey: store.get('ship', 'fletcher'), diff: store.get('diff', 'captain'),
   weapon: 'guns', lead: true, zoomToggle: false, shiftHeld: false, rmb: false, touchZoom: false, fireReq: false,
   shake: 0, endT: -1, result: null, stats: null, hintT: 0, locked: false, lockFailed: false, lockWanted: false,
-  camZoom: 1, torpWarnT: 0, lastAlarm: 0, keysT: 0,
+  camZoom: 1, torpWarnT: 0, lastAlarm: 0, keysT: 0, net: null,
 };
 const aim = { yaw: 0, range: 3000, fov: 55 };
 const keys = {};
 
-class Ship {
-  constructor(key, team, name, o = {}) {
-    const spec = this.spec = SPECS[key];
-    this.id = ++shipSeq; this.team = team; this.name = name; this.isPlayer = !!o.player; this.hullNo = o.no || '';
-    this.typeLabel = o.type || spec.type;
-    this.x = o.x || 0; this.z = o.z || 0; this.heading = o.heading || 0;
-    this.maxV = spec.kn * KN; this.speed = this.maxV * (o.speedFrac != null ? o.speedFrac : 0.8); this.vx = 0; this.vz = 0;
-    this.throttle = 6; this.rudder = 0; this.rudderCmd = 0;
-    this.maxHp = spec.hp * (o.hpMul || 1); this.hp = this.maxHp;
-    this.alive = true; this.sinkT = -1; this.removed = false;
-    this.fires = []; this.dc = { charges: spec.dc || 2, cd: 0, active: 0 };
-    this.gun = GUNS[spec.gun]; this.secGun = spec.sec ? GUNS[spec.sec] : null;
-    this.torp = spec.torp ? TORPS[spec.torp] : null;
-    this.torpSalvo = spec.torpSalvo || (this.torp ? this.torp.salvo : 0);
-    this.torpReady = Array.from({ length: spec.torpMounts || 0 }, () => rand(0, 3));
-    this.aimX = this.x; this.aimZ = this.z; this.secT = null; this.secAimX = 0; this.secAimZ = 0;
-    this.dmgBy = new Map(); this.lastRam = 0; this.funnelT = rand(0, 0.3); this.fireT = 0;
-    this.sinkRoll = rand(0.6, 1.1) * (Math.random() < 0.5 ? -1 : 1); this.sinkPitch = rand(-0.25, 0.25); this.bob = 0;
+// ---------------------------------------------------------------- ship views
+// The model, wake and smoke of one sim ship. Each frame the view copies the ship's course and turret bearings onto the
+// model, rides it on the swell, and puts out its funnel smoke, bow foam and fires.
+const views = new Map();
+class ShipView {
+  constructor(s) {
+    const spec = s.spec, M = MATS[spec.nation];
+    this.s = s;
     const g = this.group = new THREE.Group(); g.rotation.order = 'YXZ';
-    const geos = shipGeometry(spec), M = MATS[spec.nation];
-    g.add(new THREE.Mesh(geos.hull, hullMat(spec, o.no)), new THREE.Mesh(geos.deck, deckMat(spec)), new THREE.Mesh(geos.sup, M.sup), new THREE.Mesh(geos.dark, M.dark));
+    const geos = shipGeometry(spec);
+    g.add(new THREE.Mesh(geos.hull, hullMat(spec, s.hullNo)), new THREE.Mesh(geos.deck, deckMat(spec)), new THREE.Mesh(geos.sup, M.sup), new THREE.Mesh(geos.dark, M.dark));
     this.lines = new THREE.LineSegments(geos.lines, LINE_MAT); g.add(this.lines);
-    this.turrets = [];
-    for (const t of spec.tur) {
-      const ts = TS[t.kind], tg = turretGeo(t.kind), dy = deckY(spec, t.z);
-      const pivot = new THREE.Group(); pivot.position.set(t.x, dy + t.y, t.z); pivot.rotation.y = t.face;
+    this.turrets = spec.tur.map((t, i) => {
+      const ts = TS[t.kind], tg = turretGeo(t.kind);
+      const pivot = new THREE.Group(); pivot.position.set(t.x, s.turrets[i].y, t.z); pivot.rotation.y = t.face;
       pivot.add(new THREE.Mesh(tg.base, M.sup));
       if (t.y > 0.6) { const bb = new THREE.Mesh(tg.barb, M.sup); bb.scale.y = t.y; pivot.add(bb); }
       const bp = new THREE.Group(); bp.position.set(0, ts.h * 0.5, ts.len * 0.18); bp.add(new THREE.Mesh(tg.bar, M.dark)); pivot.add(bp);
       g.add(pivot);
-      const side = Math.abs(Math.abs(t.face) - Math.PI / 2) < 0.3;
-      const gun = t.sec ? this.secGun : this.gun;
-      this.turrets.push({ x: t.x, y: dy + t.y, z: t.z, home: t.face, rel: t.face, arc: (t.sec ? 80 : side ? 100 : 148) * DEG, sec: t.sec, ts, pivot, bp, gun,
-        trav: gun.trav * DEG * (t.sec ? 1.5 : 1), reload: rand(0.2, 1.5), onTarget: false, inArc: false, elev: 0 });
-    }
-    this.mainTurrets = this.turrets.filter(t => !t.sec);
+      return { pivot, bp };
+    });
     scene.add(g);
     this.wake = new Wake(52, spec.B * 0.45, spec.B * 2.3, 15, 0.3);
     this.funnels = spec.parts.filter(p => p.k === 'c').map(p => ({ x: p.x, y: deckY(spec, p.z) + p.y + p.h, z: p.z - p.h * Math.tan(p.rake) }));
-    this.updateVisual(G.time);
+    this.funnelT = rand(0, 0.3); this.fireT = 0; this.bob = 0;
+    this.pose(G.time);
   }
-  toWorld(lx, lz) { const c = Math.cos(this.heading), s = Math.sin(this.heading); return [this.x + lx * c + lz * s, this.z - lx * s + lz * c]; }
-  toLocal(wx, wz) { const c = Math.cos(this.heading), s = Math.sin(this.heading), dx = wx - this.x, dz = wz - this.z; return [dx * c - dz * s, dx * s + dz * c]; }
-  physics(dt) {
-    const spec = this.spec;
-    if (this.alive) {
-      const target = THROTTLE[this.throttle] * this.maxV, acc = this.maxV / spec.accelT;
-      this.speed += clamp(target - this.speed, -acc * dt * 1.4, acc * dt);
-      this.rudder += clamp(this.rudderCmd - this.rudder, -dt / spec.rudderT, dt / spec.rudderT);
-    } else { this.speed *= 1 - 0.35 * dt; this.rudder *= 1 - dt; }
-    const eff = clamp(Math.abs(this.speed) / this.maxV * 1.1 + 0.12, 0, 1) * Math.sign(this.speed || 1);
-    this.heading = wrapA(this.heading + spec.turn * DEG * this.rudder * eff * dt);
-    this.speed *= 1 - Math.abs(this.rudder) * 0.07 * dt;
-    const s = Math.sin(this.heading), c = Math.cos(this.heading);
-    this.vx = s * this.speed; this.vz = c * this.speed;
-    const nx = this.x + this.vx * dt, nz = this.z + this.vz * dt;
-    const probe = Math.sign(this.speed || 1) * spec.L * 0.46;
-    const gh = terrainH(nx + s * probe, nz + c * probe);
-    if (gh > -5 && this.alive) {
-      this.groundT = G.time;
-      if (Math.abs(this.speed) > this.maxV * 0.25 && G.time - this.lastRam > 2) { this.lastRam = G.time; this.damage(this.maxHp * 0.02 * Math.abs(this.speed) / this.maxV, null, 'ground'); if (this.isPlayer) hint('搁浅！倒车脱离'); }
-      this.speed = -this.speed * 0.15;
-    } else { this.x = nx; this.z = nz; }
-    const r = Math.hypot(this.x, this.z);
-    if (r > MAP_R && this.alive) { const k = MAP_R / r; this.x *= k; this.z *= k; if (this.isPlayer && G.hintT <= 0) hint('已到作战海域边界'); }
-    // fires & damage control
-    if (this.alive) {
-      if (this.dc.cd > 0) this.dc.cd -= dt;
-      if (this.dc.active > 0) { this.dc.active -= dt; this.hp = Math.min(this.maxHp, this.hp + this.maxHp * 0.012 * dt); }
-      for (let i = this.fires.length - 1; i >= 0; i--) {
-        const f = this.fires[i]; f.t -= dt;
-        if (f.t <= 0) this.fires.splice(i, 1);
-        this.damage(this.maxHp * 0.0016 * dt, f.src, 'fire');
-        if (!this.alive) break;
-      }
-    }
-  }
-  startFire(lz, src) {
-    if (this.dc.active > 0 || this.fires.length >= 3 || !this.alive) return false;
-    this.fires.push({ lx: rand(-0.3, 0.3) * this.spec.B, lz: clamp(lz, -this.spec.L * 0.4, this.spec.L * 0.4), t: rand(14, 20), src });
-    return true;
-  }
-  useDC() {
-    if (!this.alive || this.dc.cd > 0 || this.dc.charges <= 0) return false;
-    this.dc.charges--; this.dc.cd = 50; this.dc.active = 10; this.fires.length = 0; return true;
-  }
-  damage(amount, src, kind) {
-    if (!this.alive || amount <= 0) return 0;
-    amount = Math.min(amount, this.hp); this.hp -= amount;
-    if (src) { this.dmgBy.set(src, (this.dmgBy.get(src) || 0) + amount); this.lastHitBy = src; }
-    if (G.stats) {
-      if (src && src.isPlayer) G.stats.dmgDealt += amount;
-      if (this.isPlayer) { G.stats.dmgTaken += amount; if (kind !== 'fire') flashVignette(Math.min(1, amount / this.maxHp * 12)); }
-    }
-    if (this.hp <= 0.5) this.die(src || this.lastHitBy);
-    return amount;
-  }
-  die(killer) {
-    this.alive = false; this.hp = 0; this.sinkT = 0; this.fires.length = 0; this.throttle = 2;
-    const big = Math.random() < (this.spec.cls === 'DD' ? 0.45 : 0.3);
-    FX.explosion(this.x, this.spec.F + 4, this.z, big ? 1.4 : 0.8);
-    if (big) { const [bx, bz] = this.toWorld(0, this.spec.L * 0.25); FX.explosion(bx, this.spec.F + 8, bz, 1.1); }
-    Sfx.boom(big ? 2.2 : 1.4, this.x, this.z);
-    onShipSunk(this, killer);
-  }
-  updateVisual(t) {
-    const spec = this.spec, L = spec.L, B = spec.B, s = Math.sin(this.heading), c = Math.cos(this.heading);
-    const hb = waveH(this.x + s * L * 0.38, this.z + c * L * 0.38, t), hs = waveH(this.x - s * L * 0.38, this.z - c * L * 0.38, t);
-    const hpt = waveH(this.x + c * B * 0.5, this.z - s * B * 0.5, t), hsb = waveH(this.x - c * B * 0.5, this.z + s * B * 0.5, t);
-    let pitch = Math.atan2(hb - hs, L * 0.76) * 0.8, roll = Math.atan2(hpt - hsb, B) * 0.45 + Math.sin(t * 0.6 + this.id) * 0.012 * (120 / L);
-    roll += this.rudder * (this.speed / this.maxV) * 0.06;
+  pose(t) {
+    const s = this.s, spec = s.spec, L = spec.L, B = spec.B, sn = Math.sin(s.heading), c = Math.cos(s.heading);
+    const hb = waveH(s.x + sn * L * 0.38, s.z + c * L * 0.38, t), hs = waveH(s.x - sn * L * 0.38, s.z - c * L * 0.38, t);
+    const hpt = waveH(s.x + c * B * 0.5, s.z - sn * B * 0.5, t), hsb = waveH(s.x - c * B * 0.5, s.z + sn * B * 0.5, t);
+    let pitch = Math.atan2(hb - hs, L * 0.76) * 0.8, roll = Math.atan2(hpt - hsb, B) * 0.45 + Math.sin(t * 0.6 + s.id) * 0.012 * (120 / L);
+    roll += s.rudder * (s.speed / s.maxV) * 0.06;
     let y = (hb + hs + hpt + hsb) * 0.25 * 0.8;
-    if (this.sinkT >= 0) {
-      const k = Math.min(1, this.sinkT / 9), e = k * k * (3 - 2 * k);
-      roll += this.sinkRoll * e; pitch += this.sinkPitch * e;
-      y -= Math.pow(this.sinkT, 1.7) * (spec.F + spec.D) * 0.028;
+    if (s.sinkT >= 0) {
+      const k = Math.min(1, s.sinkT / 9), e = k * k * (3 - 2 * k);
+      roll += s.sinkRoll * e; pitch += s.sinkPitch * e;
+      y -= Math.pow(s.sinkT, 1.7) * (spec.F + spec.D) * 0.028;
     }
     this.bob = y;
     // rails and rigging only read up close; beyond that they just add shimmer
-    this.lines.visible = Math.hypot(this.x - camera.position.x, this.z - camera.position.z) * camera.fov / 55 < L * 9;
-    this.group.position.set(this.x, y, this.z);
-    this.group.rotation.set(-pitch, this.heading, roll);
+    this.lines.visible = Math.hypot(s.x - camera.position.x, s.z - camera.position.z) * camera.fov / 55 < L * 9;
+    this.turrets.forEach((v, i) => { const st = s.turrets[i]; v.pivot.rotation.y = st.rel; v.bp.rotation.x = -st.elev; });
+    this.group.position.set(s.x, y, s.z);
+    this.group.rotation.set(-pitch, s.heading, roll);
     this.group.updateMatrixWorld(true);
   }
-  remove() { if (this.removed) return; this.removed = true; scene.remove(this.group); this.wake.attached = false; }
+  effects(dt) {
+    const s = this.s;
+    if (s.alive) {
+      const [sx, sz] = s.toWorld(0, -s.spec.L * 0.45), str = clamp(Math.abs(s.speed) / s.maxV, 0, 1);
+      this.wake.push(G.time, sx, sz, s.heading, str, dt);
+      if (str > 0.3 && Math.random() < 0.6) {
+        const side = Math.random() < 0.5 ? 1 : -1, [bx, bz] = s.toWorld(side * s.spec.B * 0.35, s.spec.L * 0.42), c = Math.cos(s.heading), sn = Math.sin(s.heading);
+        FX.foam(bx, bz, c * side * 6 + s.vx * 0.2, -sn * side * 6 + s.vz * 0.2, s.spec.B / 12);
+      }
+      this.funnelT -= dt;
+      if (this.funnelT <= 0 && this.funnels.length) {
+        this.funnelT = 0.22; const f = this.funnels[(Math.random() * this.funnels.length) | 0], [fx, fz] = s.toWorld(f.x, f.z);
+        FX.funnel(fx, f.y + this.bob + 1, fz, s.hp < s.maxHp * 0.4);
+      }
+      if (s.fires.length) { this.fireT -= dt; if (this.fireT <= 0) { this.fireT = 0.08; for (const f of s.fires) { const [fx, fz] = s.toWorld(f.lx, f.lz); FX.fire(fx, s.spec.F + this.bob + 2, fz); } } }
+      if (s.dc.active > 0 && Math.random() < 0.3) { const [fx, fz] = s.toWorld(rand(-3, 3), rand(-s.spec.L * .3, s.spec.L * .3)); FXN.emit(fx, s.spec.F + 3, fz, rand(-2, 2), rand(3, 7), rand(-2, 2), 1.5, 3, 12, 0.8, 0.82, 0.84, 0.6, 0.62, 0.65, 0.35, 0, 0.5); }
+    } else if (Math.random() < 0.5) {
+      const [fx, fz] = s.toWorld(rand(-s.spec.B * .4, s.spec.B * .4), rand(-s.spec.L * .4, s.spec.L * .4)); FX.fire(fx, Math.max(1, s.spec.F + this.bob), fz);
+    }
+  }
+  dispose() { scene.remove(this.group); this.wake.attached = false; }
+}
+// make a view for every ship afloat, drop the views of ships gone under, and pose the rest
+function syncViews(dt) {
+  for (const s of world.ships) if (!s.removed && !views.has(s)) views.set(s, new ShipView(s));
+  for (const [s, v] of views) {
+    if (s.removed || !world.ships.includes(s)) { v.dispose(); views.delete(s); continue; }
+    v.pose(G.time);
+    if (dt > 0) v.effects(dt);
+  }
 }
 
-// ---------------------------------------------------------------- weapons
-const tv = new THREE.Vector3();
-function muzzleWorld(t, k) { tv.set((k - (t.ts.n - 1) / 2) * t.ts.w * 0.28, 0, t.ts.bl); return t.bp.localToWorld(tv); }
-function turretWorld(s, t) { return s.toWorld(t.x, t.z); }
-function updateTurrets(s, dt) {
-  for (const t of s.turrets) {
-    t.reload -= dt;
-    let ax, az;
-    if (t.sec) { if (!s.secT) { ax = null; } else { ax = s.secAimX; az = s.secAimZ; } }
-    else { ax = s.aimX; az = s.aimZ; }
-    let want = 0, dist = 0;
-    const [wx, wz] = turretWorld(s, t);
-    if (ax != null) {
-      const b = Math.atan2(ax - wx, az - wz), rel = wrapA(b - s.heading), off0 = angDiff(t.home, rel);
-      t.inArc = Math.abs(off0) <= t.arc; want = clamp(off0, -t.arc, t.arc); dist = Math.hypot(ax - wx, az - wz);
-    } else { t.inArc = false; }
-    const off = angDiff(t.home, t.rel), step = t.trav * dt, noff = off + clamp(want - off, -step, step);
-    t.rel = t.home + noff; t.pivot.rotation.y = t.rel;
-    t.onTarget = t.inArc && Math.abs(want - noff) < 0.035;
-    const T = Math.min(dist, t.gun.range) / t.gun.vh; const el = ax != null ? Math.atan2(0.5 * t.gun.g * T, t.gun.vh) : 0.02;
-    t.elev += (el - t.elev) * Math.min(1, dt * 3); t.bp.rotation.x = -t.elev;
-  }
-}
-function fireShell(owner, gun, mx, my, mz, tx, tz, err) {
-  let dx = tx - mx, dz = tz - mz, d = Math.hypot(dx, dz) || 1; const ux = dx / d, uz = dz / d;
-  if (d > gun.range) { d = gun.range; tx = mx + ux * d; tz = mz + uz * d; }
-  const k = d / gun.range, sl = gun.disp * 0.5 * (0.3 + 0.7 * k), st = sl * 0.42;
-  const e1 = randn() * sl + randn() * err, e2 = randn() * st + randn() * err * 0.5;
-  tx += ux * e1 - uz * e2; tz += uz * e1 + ux * e2;
-  const D2 = Math.hypot(tx - mx, tz - mz), T = Math.max(0.2, D2 / gun.vh);
-  const vy = (-my + 0.5 * gun.g * T * T) / T;
-  const sh = { x: mx, y: my, z: mz, x0: mx, y0: my, z0: mz, vx: (tx - mx) / T, vz: (tz - mz) / T, vy0: vy, g: gun.g, t: 0, T, owner, team: owner.team, gun, alive: true, px: mx, py: my, pz: mz, whistle: 0, fly: 0 };
-  const P = G.player;
-  if (P && P.alive && owner.team !== P.team) {
+// ---------------------------------------------------------------- sights and sounds
+// Every event the sim emits comes through here: straight away in single player, off the wire (on the shared clock) in a duel.
+// Shells in flight are drawn from the 'gun' event alone: their path is fixed at the muzzle, so only hits need telling.
+let vshells = [], lastHaptic = 0;
+const isMe = id => !!G.player && G.player.id === id;
+function hurt(dmg) { const P = G.player; if (P && dmg > 0) flashVignette(Math.min(1, dmg / P.maxHp * 12)); }
+function addShell([id, x0, y0, z0, vx, vy0, vz, g, T], cal, team, t0) {
+  const sh = { id, x0, y0, z0, vx, vy0, vz, g, T, cal, team, t0, x: x0, y: y0, z: z0, whistle: 0, fly: 0, alive: true }, P = G.player;
+  if (P && P.alive && team !== P.team) {
     // audible flight: shells landing close get the incoming rush; ones skimming low overhead get a fly-by
-    const lead = Math.min(T * 0.8, 1.0 + gun.cal / 406 * 0.9);
-    if (Math.hypot(tx - P.x, tz - P.z) < 160) sh.whistle = lead;
+    const lead = Math.min(T * 0.8, 1.0 + cal / 406 * 0.9);
+    if (Math.hypot(x0 + vx * T - P.x, z0 + vz * T - P.z) < 160) sh.whistle = lead;
     else {
-      const ux = sh.vx, uz = sh.vz, tc = ((P.x - mx) * ux + (P.z - mz) * uz) / (ux * ux + uz * uz);
-      if (tc > 0.8 && tc < T && Math.hypot(mx + ux * tc - P.x, mz + uz * tc - P.z) < 110 && my + vy * tc - 0.5 * gun.g * tc * tc < 180) sh.fly = tc;
+      const tc = ((P.x - x0) * vx + (P.z - z0) * vz) / (vx * vx + vz * vz);
+      if (tc > 0.8 && tc < T && Math.hypot(x0 + vx * tc - P.x, z0 + vz * tc - P.z) < 110 && y0 + vy0 * tc - 0.5 * g * tc * tc < 180) sh.fly = tc;
     }
   }
-  shells.push(sh);
-  if (owner.isPlayer && G.stats) G.stats.shots++;
+  vshells.push(sh);
 }
-function fireTurret(s, t, tx, tz, err) {
-  const gun = t.gun; t.reload = gun.reload * rand(0.97, 1.05);
-  let mx = 0, my = 0, mz = 0;
-  for (let k = 0; k < t.ts.n; k++) { const m = muzzleWorld(t, k); mx += m.x; my += m.y; mz += m.z; fireShell(s, gun, m.x, m.y, m.z, tx, tz, err); }
-  mx /= t.ts.n; my /= t.ts.n; mz /= t.ts.n;
-  const b = s.heading + t.rel;
-  FX.muzzle(mx, my, mz, Math.sin(b), Math.cos(b), gun.cal * (t.sec ? 0.8 : 1) * (0.7 + 0.3 * t.ts.n / 3));
-  Sfx.gun(t.sec ? gun.cal * 0.8 : gun.cal, mx, mz, t.ts.n, s.isPlayer && !t.sec, tx, tz);
-  if (s.isPlayer) G.shake = Math.max(G.shake, gun.cal / 406 * (t.sec ? 0.3 : 1.2));
-}
-function segHitShip(sh, a, b) {
-  const spec = sh.spec, c = Math.cos(sh.heading), s = Math.sin(sh.heading);
-  const ax = a[0] - sh.x, az = a[2] - sh.z, bx = b[0] - sh.x, bz = b[2] - sh.z;
-  const lax = ax * c - az * s, laz = ax * s + az * c, lbx = bx * c - bz * s, lbz = bx * s + bz * c;
-  const lay = a[1] - sh.bob, lby = b[1] - sh.bob;
-  const mn = [-spec.B / 2, -1.5, -spec.L / 2], mx = [spec.B / 2, spec.F + spec.top * 0.55, spec.L / 2];
-  const o = [lax, lay, laz], d = [lbx - lax, lby - lay, lbz - laz];
-  let t0 = 0, t1 = 1;
-  for (let i = 0; i < 3; i++) {
-    if (Math.abs(d[i]) < 1e-9) { if (o[i] < mn[i] || o[i] > mx[i]) return -1; continue; }
-    let ta = (mn[i] - o[i]) / d[i], tb = (mx[i] - o[i]) / d[i]; if (ta > tb) { const q = ta; ta = tb; tb = q; }
-    t0 = Math.max(t0, ta); t1 = Math.min(t1, tb); if (t0 > t1) return -1;
-  }
-  const hz = laz + d[2] * t0, hx = lax + d[0] * t0, sN = hz / spec.L + 0.5;
-  if (Math.abs(hx) > spec.B / 2 * halfW(clamp(sN, 0, 1)) + 1.5) return -1;
-  return t0;
-}
-function updateShells(dt) {
+function shellsFx() {
   const P = G.player;
-  for (const s of shells) {
+  for (const s of vshells) {
     if (!s.alive) continue;
-    s.px = s.x; s.py = s.y; s.pz = s.z; s.t += dt;
-    s.x = s.x0 + s.vx * s.t; s.z = s.z0 + s.vz * s.t; s.y = s.y0 + s.vy0 * s.t - 0.5 * s.g * s.t * s.t;
-    if (s.whistle && s.T - s.t < s.whistle) { if (P && P.alive) Sfx.incoming(s.gun.cal, s.x0 + s.vx * s.T, s.z0 + s.vz * s.T, s.T - s.t); s.whistle = 0; }
-    if (s.fly && s.fly - s.t < 0.9) { if (P && P.alive) { const t1 = s.fly + 0.6; Sfx.flyby(s.gun.cal, s.x, s.z, s.x0 + s.vx * t1, s.z0 + s.vz * t1, s.fly - s.t); } s.fly = 0; }
-    const A = [s.px, s.py, s.pz], Bp = [s.x, s.y, s.z];
-    let hit = null, ht = 2;
-    if (s.y < 70) for (const sh of ships) {
-      if (!sh.alive || sh.team === s.team) continue;
-      const qx = sh.x - s.x, qz = sh.z - s.z, r = sh.spec.L * 0.55 + 60; if (qx * qx + qz * qz > r * r) continue;
-      const t = segHitShip(sh, A, Bp); if (t >= 0 && t < ht) { ht = t; hit = sh; }
-    }
-    if (hit) {
-      const hx = lerp(s.px, s.x, ht), hy = lerp(s.py, s.y, ht), hz = lerp(s.pz, s.z, ht);
-      s.alive = false; shellHit(hit, s, hx, hy, hz); continue;
-    }
-    if (s.y < 1100) { const th = terrainH(s.x, s.z); if (s.y < th && th > 0) { s.alive = false; FX.hit(s.x, th, s.z, s.gun.cal * 0.8); Sfx.hit(s.x, s.z, s.gun.cal, false, false, true); continue; } }
-    if (s.y <= 0 && s.t > 0.05) {
-      s.alive = false; FX.splash(s.x, s.z, s.gun.cal); Sfx.splash(s.gun.cal, s.x, s.z);
-      if (P && P.alive && s.team !== P.team) { const dd = Math.hypot(s.x - P.x, s.z - P.z); if (dd < 120) G.shake = Math.max(G.shake, 0.4 * (1 - dd / 120) * s.gun.cal / 200); }
+    const t = G.time - s.t0; if (t < 0) continue;
+    s.x = s.x0 + s.vx * t; s.z = s.z0 + s.vz * t; s.y = s.y0 + s.vy0 * t - 0.5 * s.g * t * t;
+    if (s.whistle && s.T - t < s.whistle) { if (P && P.alive) Sfx.incoming(s.cal, s.x0 + s.vx * s.T, s.z0 + s.vz * s.T, s.T - t); s.whistle = 0; }
+    if (s.fly && s.fly - t < 0.9) { if (P && P.alive) { const t1 = s.fly + 0.6; Sfx.flyby(s.cal, s.x, s.z, s.x0 + s.vx * t1, s.z0 + s.vz * t1, s.fly - t); } s.fly = 0; }
+    if (s.y < 1100) { const th = terrainH(s.x, s.z); if (s.y < th && th > 0) { s.alive = false; FX.hit(s.x, th, s.z, s.cal * 0.8); Sfx.hit(s.x, s.z, s.cal, false, false, true); continue; } }
+    if (t >= s.T) {
+      const x = s.x0 + s.vx * s.T, z = s.z0 + s.vz * s.T;
+      s.alive = false; FX.splash(x, z, s.cal); Sfx.splash(s.cal, x, z);
+      if (P && P.alive && s.team !== P.team) { const dd = Math.hypot(x - P.x, z - P.z); if (dd < 120) G.shake = Math.max(G.shake, 0.4 * (1 - dd / 120) * s.cal / 200); }
       continue;
     }
-    if (s.t > 30) { s.alive = false; continue; }
-    FX.tracer(s.x, s.y, s.z, s.gun.cal);
+    FX.tracer(s.x, s.y, s.z, s.cal);
   }
-  shells = shells.filter(s => s.alive);
+  vshells = vshells.filter(s => s.alive);
 }
-function shellHit(ship, sh, x, y, z) {
-  const gun = sh.gun, spec = ship.spec, [, lz] = ship.toLocal(x, z);
-  let dmg = gun.dmg * rand(0.75, 1.15), crit = false, fire = false;
-  if (gun.cal >= 300 && spec.cls === 'DD') dmg *= 0.35; else if (gun.cal >= 300 && spec.cls === 'CL') dmg *= 0.65; else if (gun.cal >= 200 && spec.cls === 'DD') dmg *= 0.6;
-  if (gun.cal >= 200 && spec.cls !== 'DD' && Math.abs(lz) < spec.L * 0.22 && Math.random() < (gun.cal >= 300 ? 0.22 : 0.12)) { dmg *= 2.6; crit = true; }
-  if (ship.team === 'US' && sh.team === 'JP') dmg *= DIFF[G.diff].dmgTaken;
-  if (Math.random() < gun.fire) fire = ship.startFire(lz, sh.owner);
-  const dealt = ship.damage(dmg, sh.owner, 'shell');
-  FX.hit(x, y, z, gun.cal); Sfx.hit(x, z, gun.cal, ship.isPlayer, crit, false, sh.owner.isPlayer);
-  if (sh.owner.isPlayer && G.stats) { G.stats.hits++; ribbon(crit ? '重创' : '命中', dealt); if (fire) ribbon('引发火灾', 0); }
-  if (ship.isPlayer) { G.shake = Math.max(G.shake, gun.cal / 406 * 1.4); if (crit) hint('我舰要害中弹！'); haptic(crit || gun.cal >= 300 ? 'hitHeavy' : 'hit'); }
+const torpSeen = t => S.torpVisible(t, G.player && G.player.team);
+function torpsFx(dt) {
+  for (const t of world.torps) { t.emitT = (t.emitT || 0) - dt; if (torpSeen(t) && t.emitT <= 0) { t.emitT = 0.07; FX.bubble(t.x - t.dx * 4, t.z - t.dz * 4); } }
 }
-function launchFan(ship, heading) {
-  const tp = ship.torp, n = ship.torpSalvo;
-  const side = angDiff(ship.heading, heading) > 0 ? 1 : -1;
-  const [x, z] = ship.toWorld(side * ship.spec.B * 0.5, 0);
-  for (let k = 0; k < n; k++) {
-    const h = heading + (k - (n - 1) / 2) * tp.spread * DEG;
-    torps.push({ x, z, h, dx: Math.sin(h), dz: Math.cos(h), speed: tp.speed, range: tp.range, trav: 0, owner: ship, team: ship.team, spec: tp, alive: true, seenT: 0, emitT: 0, evaded: new Set() });
-  }
-  if (ship.isPlayer && G.stats) G.stats.torps += n;
-  Sfx.launch(x, z);
-}
-function torpVisible(t) {
-  if (!G.player || t.team === G.player.team) return true;
-  return t.seenT > 0;
-}
-function updateTorps(dt) {
-  const friends = G.player ? ships.filter(s => s.alive && s.team === G.player.team) : [];
-  for (const t of torps) {
-    if (!t.alive) continue;
-    const step = t.speed * dt; t.x += t.dx * step; t.z += t.dz * step; t.trav += step;
-    if (t.trav > t.range) { t.alive = false; continue; }
-    if (G.player && t.team !== G.player.team) {
-      t.seenT -= dt;
-      for (const f of friends) { const qx = f.x - t.x, qz = f.z - t.z; if (qx * qx + qz * qz < t.spec.visR * t.spec.visR) { t.seenT = 3; break; } }
-    }
-    const vis = torpVisible(t);
-    t.emitT -= dt;
-    if (vis && t.emitT <= 0) { t.emitT = 0.07; FX.bubble(t.x - t.dx * 4, t.z - t.dz * 4); }
-    if (terrainH(t.x, t.z) > -3) { t.alive = false; FX.splash(t.x, t.z, 200); continue; }
-    if (t.trav < 120) continue;
-    for (const sh of ships) {
-      if (!sh.alive || sh.team === t.team) continue;
-      const qx = sh.x - t.x, qz = sh.z - t.z, r = sh.spec.L * 0.55; if (qx * qx + qz * qz > r * r) continue;
-      const [lx, lz] = sh.toLocal(t.x, t.z);
-      if (Math.abs(lz) < sh.spec.L / 2 && Math.abs(lx) < sh.spec.B / 2 * halfW(clamp(lz / sh.spec.L + 0.5, 0, 1)) + 1.5) {
-        t.alive = false;
-        let dmg = t.spec.dmg * rand(0.9, 1.1) * (sh.spec.cls === 'BB' ? 0.75 : 1);
-        if (sh.team === 'US' && t.team === 'JP') dmg *= DIFF[G.diff].dmgTaken;
-        const dealt = sh.damage(dmg, t.owner, 'torp');
-        FX.column(t.x, t.z, 1.2); FX.hit(t.x, 3, t.z, 300); Sfx.torpHit(t.x, t.z, sh.isPlayer, t.owner.isPlayer);
-        if (t.owner.isPlayer && G.stats) { G.stats.torpHits++; ribbon('鱼雷命中', dealt); }
-        if (sh.isPlayer) { G.shake = Math.max(G.shake, 1.6); hint('我舰中雷！'); haptic('torp'); }
-        break;
+function present(e) {
+  const ship = world.byId(e.id);
+  switch (e.k) {
+    case 'gun': {
+      const own = isMe(e.id);
+      FX.muzzle(e.x, e.y, e.z, Math.sin(e.b), Math.cos(e.b), e.cal * (e.sec ? 0.8 : 1) * (0.7 + 0.3 * e.n / 3));
+      Sfx.gun(e.sec ? e.cal * 0.8 : e.cal, e.x, e.z, e.n, own && !e.sec, e.tx, e.tz);
+      if (own) {
+        G.shake = Math.max(G.shake, e.cal / 406 * (e.sec ? 0.3 : 1.2));
+        if (!e.sec && performance.now() - lastHaptic > 80) { lastHaptic = performance.now(); haptic(e.cal >= 300 ? 'heavy' : e.cal >= 150 ? 'medium' : 'light'); }
       }
+      for (const q of e.sh) addShell(q, e.cal, ship ? ship.team : null, e.t);
+      break;
     }
-  }
-  torps = torps.filter(t => t.alive);
-}
-function intercept(sx, sz, tx, tz, tvx, tvz, v) {
-  const dx = tx - sx, dz = tz - sz, a = tvx * tvx + tvz * tvz - v * v, b = 2 * (dx * tvx + dz * tvz), c = dx * dx + dz * dz;
-  let t;
-  if (Math.abs(a) < 1e-6) t = -c / b;
-  else { const disc = b * b - 4 * a * c; if (disc < 0) return null; const r = Math.sqrt(disc), t1 = (-b - r) / (2 * a), t2 = (-b + r) / (2 * a); t = Math.min(t1, t2) > 0 ? Math.min(t1, t2) : Math.max(t1, t2); }
-  if (!(t > 0)) return null;
-  return { h: Math.atan2(dx + tvx * t, dz + tvz * t), t, x: tx + tvx * t, z: tz + tvz * t };
-}
-function leadPoint(fromX, fromZ, tgt, gun) {
-  let px = tgt.x, pz = tgt.z;
-  for (let i = 0; i < 3; i++) { const T = Math.hypot(px - fromX, pz - fromZ) / gun.vh; px = tgt.x + tgt.vx * T; pz = tgt.z + tgt.vz * T; }
-  return [px, pz];
-}
-
-// ---------------------------------------------------------------- AI
-class AI {
-  constructor(s) {
-    this.s = s; this.target = null; this.retarget = 0; this.side = Math.random() < 0.5 ? 1 : -1; this.sideT = rand(20, 40);
-    this.torpCd = rand(10, 22); this.disengage = 0; this.seed = Math.random() * 100; this.salvos = 0; this.lastTarget = null;
-    this.dcDelay = rand(3, 8); this.slot = 0;
-  }
-  pick() {
-    const s = this.s; let best = null, bs = 1e18;
-    for (const o of ships) {
-      if (!o.alive || o.team === s.team) continue;
-      const d = Math.hypot(o.x - s.x, o.z - s.z);
-      const big = s.spec.cls === 'CA' || s.spec.cls === 'BB', sc = d + (o.isPlayer ? -450 : 0) - (o.hp / o.maxHp < 0.3 ? 500 : 0) - (big && o.spec.cls === 'BB' ? 900 : 0) + rand(0, 600);
-      if (sc < bs) { bs = sc; best = o; }
-    }
-    this.target = best;
-  }
-  avoid(desired) {
-    const s = this.s, L = s.spec.L;
-    for (const o of ships) {
-      if (o === s || !o.alive) continue;
-      const dx = o.x - s.x, dz = o.z - s.z, d = Math.hypot(dx, dz), lim = (L + o.spec.L) * 1.3;
-      if (d < lim) { const rel = angDiff(s.heading, Math.atan2(dx, dz)); if (Math.abs(rel) < 1.1) desired = s.heading - Math.sign(rel || 1) * 0.9; }
-    }
-    const clear = h => { for (const d of [L * 1.2, L * 2.6, L * 4.5]) if (terrainH(s.x + Math.sin(h) * d, s.z + Math.cos(h) * d) > -12) return false; return true; };
-    if (!clear(desired)) {
-      for (let k = 1; k <= 7; k++) {
-        for (const sg of [1, -1]) { const h = desired + sg * k * 25 * DEG; if (clear(h)) return h; }
+    case 'hit':
+      for (const s of vshells) if (s.id === e.s) s.alive = false;
+      FX.hit(e.x, e.y, e.z, e.cal); Sfx.hit(e.x, e.z, e.cal, isMe(e.id), !!e.crit, false, isMe(e.o));
+      if (isMe(e.o)) { ribbon(e.crit ? '重创' : '命中', e.dmg); if (e.fire) ribbon('引发火灾', 0); }
+      if (isMe(e.id)) { G.shake = Math.max(G.shake, e.cal / 406 * 1.4); if (e.crit) hint('我舰要害中弹！'); haptic(e.crit || e.cal >= 300 ? 'hitHeavy' : 'hit'); hurt(e.dmg); }
+      break;
+    case 'torpHit':
+      FX.column(e.x, e.z, 1.2); FX.hit(e.x, 3, e.z, 300); Sfx.torpHit(e.x, e.z, isMe(e.id), isMe(e.o));
+      if (isMe(e.o)) ribbon('鱼雷命中', e.dmg);
+      if (isMe(e.id)) { G.shake = Math.max(G.shake, 1.6); hint('我舰中雷！'); haptic('torp'); hurt(e.dmg); }
+      break;
+    case 'torpLand': FX.splash(e.x, e.z, 200); break;
+    case 'launch': Sfx.launch(e.x, e.z); if (isMe(e.id)) { ribbon('鱼雷出管', 0); haptic('light'); } break;
+    case 'sunk': {
+      if (ship) {
+        FX.explosion(ship.x, ship.spec.F + 4, ship.z, e.big ? 1.4 : 0.8);
+        if (e.big) { const [bx, bz] = ship.toWorld(0, ship.spec.L * 0.25); FX.explosion(bx, ship.spec.F + 8, bz, 1.1); }
+        Sfx.boom(e.big ? 2.2 : 1.4, ship.x, ship.z);
+        if (G.net) G.net.sunk(ship, world.byId(e.killer)); else onShipSunk(ship, world.byId(e.killer));
       }
+      break;
     }
-    const r = Math.hypot(s.x, s.z);
-    if (r > MAP_R * 0.86) { const toC = Math.atan2(-s.x, -s.z); const w = clamp((r - MAP_R * 0.86) / (MAP_R * 0.12), 0, 1); desired = desired + angDiff(desired, toC) * w; }
-    return desired;
-  }
-  update(dt) {
-    const s = this.s; if (!s.alive) return;
-    this.retarget -= dt; this.torpCd -= dt;
-    if (this.retarget <= 0 || !this.target || !this.target.alive) { this.pick(); this.retarget = rand(3, 5); }
-    const T = this.target;
-    let desired = s.heading, throttle = 6;
-    if (T) {
-      const dx = T.x - s.x, dz = T.z - s.z, d = Math.hypot(dx, dz), b = Math.atan2(dx, dz), pref = s.spec.prefRange;
-      this.sideT -= dt; if (this.sideT <= 0) { this.side *= -1; this.sideT = rand(25, 45); }
-      if (this.disengage > 0) { this.disengage -= dt; desired = b + Math.PI - this.side * 0.7; }
-      else if (d > pref * 1.2) desired = b + this.side * 0.32;
-      else if (d < pref * 0.7) desired = b + this.side * 2.0;
-      else desired = b + this.side * Math.PI * 0.45;
-      desired += Math.sin(G.time * 0.21 + this.seed) * 0.22;
-      // guns
-      const [lx, lz] = leadPoint(s.x, s.z, T, s.gun); s.aimX = lx; s.aimZ = lz;
-      if (this.lastTarget !== T) { this.lastTarget = T; this.salvos = 0; }
-      if (d < s.gun.range * 1.02) {
-        const evasive = (1 + Math.abs(T.rudder) * clamp(Math.abs(T.speed) / T.maxV, 0, 1) * 1.3) * SIZE_ERR[T.spec.cls];
-        const rf = Math.max(0.8, 2.0 - 0.15 * this.salvos), err = s.spec.aiErr * (s.team === 'JP' ? DIFF[G.diff].aiErr : 1) * rf * evasive * (0.25 + d / s.gun.range);
-        let fired = false;
-        for (const t of s.mainTurrets) if (t.reload <= 0 && t.onTarget) { fireTurret(s, t, lx, lz, err); fired = true; }
-        if (fired) this.salvos++;
-      }
-      // torpedoes
-      if (s.torp && this.torpCd <= 0 && d < s.torp.range * (s.team === 'JP' ? 0.6 : 0.8)) {
-        const mount = s.torpReady.findIndex(v => v <= 0);
-        if (mount >= 0 && T.spec.cls === 'DD' && Math.random() < 0.4) this.torpCd = rand(8, 14);
-        else if (mount >= 0) {
-          const ic = intercept(s.x, s.z, T.x, T.z, T.vx, T.vz, s.torp.speed);
-          if (ic) {
-            const rel = Math.abs(angDiff(s.heading, ic.h));
-            if (rel > 35 * DEG && rel < 145 * DEG) {
-              launchFan(s, ic.h + randn() * 3 * DEG); s.torpReady[mount] = s.torp.reload * rand(0.9, 1.2); this.torpCd = rand(18, 30);
-              if (s.spec.cls === 'DD') this.disengage = rand(8, 14);
-            } else if (s.spec.cls === 'DD' && this.disengage <= 0) {
-              const h1 = ic.h - Math.PI / 2, h2 = ic.h + Math.PI / 2;
-              desired = Math.abs(angDiff(s.heading, h1)) < Math.abs(angDiff(s.heading, h2)) ? h1 : h2;
-            }
-          }
-        }
-      }
-    } else if (s.team === 'US' && G.player && G.player.alive) {
-      const P = G.player, off = [[-420, -520], [420, -520], [0, -900]][this.slot % 3];
-      const [fx, fz] = P.toWorld(off[0], off[1]); const d = Math.hypot(fx - s.x, fz - s.z);
-      desired = d > 150 ? Math.atan2(fx - s.x, fz - s.z) : P.heading;
-      throttle = d > 600 ? 6 : clamp(P.throttle + (d > 250 ? 1 : 0), 2, 6);
-      s.aimX = s.x + Math.sin(s.heading) * 2000; s.aimZ = s.z + Math.cos(s.heading) * 2000;
-    } else { desired = Math.atan2(-s.x, -s.z); }
-    // secondaries
-    if (s.secGun) this.secondaries(dt);
-    // torpedo evasion
-    for (const t of torps) {
-      if (t.team === s.team || t.evaded.has(s.id)) continue;
-      const qx = s.x - t.x, qz = s.z - t.z; if (qx * qx + qz * qz > 1300 * 1300) continue;
-      t.evaded.add(s.id);
-      if (Math.random() > (s.team === 'JP' ? 0.55 : 0.7)) continue;
-      const dvx = s.vx - t.dx * t.speed, dvz = s.vz - t.dz * t.speed, dv2 = dvx * dvx + dvz * dvz;
-      const tc = clamp(-(-qx * dvx + -qz * dvz) / (dv2 || 1), 0, 20);
-      const cx = -qx + dvx * tc, cz = -qz + dvz * tc;
-      if (Math.hypot(cx, cz) < s.spec.L * 0.7) { this.evadeH = Math.abs(angDiff(s.heading, t.h)) < Math.PI / 2 ? t.h : t.h + Math.PI; this.evadeT = 6; }
-    }
-    if (this.evadeT > 0) { this.evadeT -= dt; desired = this.evadeH; }
-    // damage control
-    if (s.fires.length >= 2 || (s.fires.length && s.hp < s.maxHp * 0.4)) { this.dcDelay -= dt; if (this.dcDelay <= 0) { s.useDC(); this.dcDelay = rand(3, 8); } }
-    desired = this.avoid(desired);
-    s.rudderCmd = clamp(angDiff(s.heading, desired) * 2.2, -1, 1);
-    s.throttle = throttle;
-    // grounded or wedged against a coast: back off, swinging the bow toward open water
-    const L = s.spec.L, hs = Math.sin(s.heading), hc = Math.cos(s.heading);
-    this.slowT = Math.abs(s.speed) < s.maxV * 0.12 && throttle > 3 ? (this.slowT || 0) + dt : 0;
-    if (!(this.reverseT > 0) && (G.time - (s.groundT || -99) < 0.3 || this.slowT > 3 || terrainH(s.x + hs * L * 0.75, s.z + hc * L * 0.75) > -6)) {
-      const hl = terrainH(s.x + Math.sin(s.heading + 1) * L * 1.6, s.z + Math.cos(s.heading + 1) * L * 1.6), hr = terrainH(s.x + Math.sin(s.heading - 1) * L * 1.6, s.z + Math.cos(s.heading - 1) * L * 1.6);
-      this.reverseT = rand(4, 6); this.revRudder = hl < hr ? -1 : 1; this.slowT = 0;
-    }
-    if (this.reverseT > 0) { this.reverseT -= dt; s.throttle = 0; s.rudderCmd = this.revRudder; }
-    for (let i = 0; i < s.torpReady.length; i++) s.torpReady[i] -= dt;
-  }
-  secondaries() { secondaryLogic(this.s); }
-}
-function secondaryLogic(s) {
-  let best = null, bd = s.secGun.range;
-  for (const o of ships) { if (!o.alive || o.team === s.team) continue; const d = Math.hypot(o.x - s.x, o.z - s.z); if (d < bd) { bd = d; best = o; } }
-  s.secT = best;
-  if (!best) return;
-  const [lx, lz] = leadPoint(s.x, s.z, best, s.secGun); s.secAimX = lx; s.secAimZ = lz;
-  const err = s.spec.aiErr * 1.1 * (s.team === 'JP' ? DIFF[G.diff].aiErr : 1) * (0.3 + bd / s.secGun.range);
-  for (const t of s.turrets) if (t.sec && t.reload <= 0 && t.onTarget) fireTurret(s, t, lx, lz, err);
-}
-
-// ---------------------------------------------------------------- collisions between ships
-function segClosest(p1x, p1z, q1x, q1z, p2x, p2z, q2x, q2z) {
-  const d1x = q1x - p1x, d1z = q1z - p1z, d2x = q2x - p2x, d2z = q2z - p2z, rx = p1x - p2x, rz = p1z - p2z;
-  const a = d1x * d1x + d1z * d1z, e = d2x * d2x + d2z * d2z, f = d2x * rx + d2z * rz, c = d1x * rx + d1z * rz, b = d1x * d2x + d1z * d2z, den = a * e - b * b;
-  let s = den > 1e-6 ? clamp((b * f - c * e) / den, 0, 1) : 0, t = (b * s + f) / e;
-  if (t < 0) { t = 0; s = clamp(-c / a, 0, 1); } else if (t > 1) { t = 1; s = clamp((b - c) / a, 0, 1); }
-  return [p1x + d1x * s, p1z + d1z * s, p2x + d2x * t, p2z + d2z * t];
-}
-function shipCollisions() {
-  for (let i = 0; i < ships.length; i++) {
-    const A = ships[i]; if (!A.alive) continue;
-    for (let j = i + 1; j < ships.length; j++) {
-      const B = ships[j]; if (!B.alive) continue;
-      const dx = B.x - A.x, dz = B.z - A.z, rr = (A.spec.L + B.spec.L) / 2; if (dx * dx + dz * dz > rr * rr) continue;
-      const ha = A.spec.L / 2 - A.spec.B / 2, hb = B.spec.L / 2 - B.spec.B / 2, sa = Math.sin(A.heading), ca = Math.cos(A.heading), sb = Math.sin(B.heading), cb = Math.cos(B.heading);
-      const [x1, z1, x2, z2] = segClosest(A.x - sa * ha, A.z - ca * ha, A.x + sa * ha, A.z + ca * ha, B.x - sb * hb, B.z - cb * hb, B.x + sb * hb, B.z + cb * hb);
-      const nx = x2 - x1, nz = z2 - z1, d = Math.hypot(nx, nz) || 0.01, min = (A.spec.B + B.spec.B) / 2;
-      if (d < min) {
-        const push = (min - d) / 2, ux = nx / d, uz = nz / d;
-        A.x -= ux * push; A.z -= uz * push; B.x += ux * push; B.z += uz * push;
-        const rel = Math.hypot(A.vx - B.vx, A.vz - B.vz);
-        if (rel > 8 && G.time - A.lastRam > 1.5) {
-          A.lastRam = B.lastRam = G.time; const dmg = rel * 45;
-          A.damage(dmg * Math.sqrt(B.spec.tons / A.spec.tons) * 0.5, B.team !== A.team ? B : null, 'ram');
-          B.damage(dmg * Math.sqrt(A.spec.tons / B.spec.tons) * 0.5, A.team !== B.team ? A : null, 'ram');
-          if (A.isPlayer || B.isPlayer) { hint('撞舰！'); G.shake = 1.2; }
-        }
-        A.speed *= 0.6; B.speed *= 0.6;
-      }
-    }
+    case 'ground': if (isMe(e.id)) { hint('搁浅！倒车脱离'); hurt(e.dmg); } break;
+    case 'edge': if (isMe(e.id) && G.hintT <= 0) hint('已到作战海域边界'); break;
+    case 'ram': if (isMe(e.a) || isMe(e.b)) { hint('撞舰！'); G.shake = 1.2; hurt(isMe(e.a) ? e.da : e.db); } break;
+    case 'hint': if (isMe(e.id)) hint(e.msg); break;
+    case 'dc': if (isMe(e.id)) { if (e.ok) { hint('损管队出动：灭火并抢修'); ribbon('损管', 0); } else hint(e.none ? '损管次数已用完' : '损管冷却中'); } break;
   }
 }
 
 // ---------------------------------------------------------------- game flow
 function distToCam(x, z) { return Math.hypot(x - camera.position.x, z - camera.position.z); }
-function clearWorld() {
-  for (const s of ships) s.remove();
+// a fresh, empty battle (o: World options, e.g. the duel mirror's)
+function clearWorld(o) {
+  for (const v of views.values()) v.dispose();
+  views.clear();
   for (const w of wakes) w.dispose();
-  ships = []; shells = []; torps = []; wakes = []; FXN.n = 0; FXA.n = 0;
+  wakes = []; vshells = []; FXN.n = 0; FXA.n = 0;
+  world = new S.World(Object.assign({ mode: 'campaign', diff: G.diff, onEvent: present }, o));
+  world.time = G.time;
   G.player = null; G.preview = null;
 }
 function waterSpot(x, z) { let k = 0; while (terrainH(x, z) > -20 && k < 30) { x *= 0.92; z *= 0.92; k++; } return [x, z]; }
@@ -2311,21 +1893,26 @@ function startGame() {
   clearWorld();
   const meta = playableMeta(G.shipKey), df = DIFF[G.diff];
   const hd = Math.atan2(-0.62, -0.78);
-  const P = new Ship(G.shipKey, 'US', meta.name, { player: true, no: meta.no, x: 2300, z: 2700, heading: hd, hpMul: df.hpMul * (SPECS[G.shipKey].cls === 'DD' ? 1.2 : 1), speedFrac: 0.7 });
-  ships.push(P); G.player = P;
+  const P = world.add(new S.Ship(world, G.shipKey, 'US', meta.name, { player: true, no: meta.no, x: 2300, z: 2700, heading: hd, hpMul: df.hpMul * (SPECS[G.shipKey].cls === 'DD' ? 1.2 : 1), speedFrac: 0.7 }));
+  G.player = P;
   const allies = [['fletcher', '奥班农号', 'DD-450', -420], ['fletcher', '尼古拉斯号', 'DD-449', 420]];
   allies.forEach(([k, n, no, off], i) => {
-    const [x, z] = P.toWorld(off, -560); const a = new Ship(k, 'US', n, { no, x, z, heading: hd, hpMul: 1.3, speedFrac: 0.7 });
-    a.ai = new AI(a); a.ai.slot = i; ships.push(a);
+    const [x, z] = P.toWorld(off, -560); const a = world.add(new S.Ship(world, k, 'US', n, { no, x, z, heading: hd, hpMul: 1.3, speedFrac: 0.7 }));
+    a.ai = new S.AI(a); a.ai.slot = i; a.ai.leader = P;
   });
-  G.mode = 'play'; G.time = 0; G.clock = 0; G.wave = 0; G.nextWaveT = 5; G.waveActive = false; G.endT = -1; G.result = null;
+  G.time = world.time = 0; G.wave = 0; G.nextWaveT = 5; G.waveActive = false;
+  battleStations(P);
+  G.stats = { kills: [], tons: 0, lost: [], ship: P.stats };
+  banner('1942 年 11 月 · 铁底湾', meta.name + '就位', '日军舰队将从萨沃岛西侧突入。准备迎击。');
+}
+// hand the captain the ship: fresh HUD, aim ahead, controls live (single player and duel alike)
+function battleStations(P) {
+  G.mode = 'play'; G.clock = 0; G.endT = -1; G.result = null;
   G.weapon = 'guns'; G.zoomToggle = false; G.fireReq = false; G.fireHeld = false; G.lock = null; touchState.rud = 0; G.shake = 0; G.keysT = 22;
-  G.stats = { shots: 0, hits: 0, torps: 0, torpHits: 0, dmgDealt: 0, dmgTaken: 0, kills: [], tons: 0, lost: [] };
   aim.yaw = P.heading; aim.range = P.gun.range * 0.55;
   G.camZoom = 1;
   showScreen(null);
   buildWeaponHud();
-  banner('1942 年 11 月 · 铁底湾', meta.name + '就位', '日军舰队将从萨沃岛西侧突入。准备迎击。');
   $('#feed').innerHTML = '';
   if (!coarse) { $('#lockHint').hidden = G.locked; }
   requestLock();
@@ -2337,14 +1924,14 @@ function spawnWave(i) {
     const back = k * 300, lat = (k % 2 ? 1 : -1) * 140;
     let x = sx - sn * back + cs * lat, z = sz - cs * back - sn * lat;
     [x, z] = waterSpot(x, z);
-    const s = new Ship(key, 'JP', name, { x, z, heading: hd, speedFrac: 0.9 });
-    s.ai = new AI(s); ships.push(s);
+    const s = world.add(new S.Ship(world, key, 'JP', name, { x, z, heading: hd, speedFrac: 0.9 }));
+    s.ai = new S.AI(s);
   });
   if (i === 2) {
     const P = G.player, isW = G.shipKey === 'nc';
     const [x, z] = waterSpot(P.x + 1200, P.z + 1400);
-    const a = new Ship('nc', 'US', isW ? '南达科他号' : '华盛顿号', { no: isW ? 'BB-57' : 'BB-56', type: isW ? '南达科他级战列舰' : null, x, z, heading: P.heading, hpMul: 1.1 });
-    a.ai = new AI(a); a.ai.slot = 2; ships.push(a);
+    const a = world.add(new S.Ship(world, 'nc', 'US', isW ? '南达科他号' : '华盛顿号', { no: isW ? 'BB-57' : 'BB-56', type: isW ? '南达科他级战列舰' : null, x, z, heading: P.heading, hpMul: 1.1 }));
+    a.ai = new S.AI(a); a.ai.slot = 2; a.ai.leader = P;
     feed(`<b>${a.name}</b> 赶到战场增援`, 'friend');
   }
   G.waveActive = true;
@@ -2353,12 +1940,12 @@ function spawnWave(i) {
 function waveLogic(dt) {
   if (!G.player) return;
   if (G.nextWaveT > 0) { G.nextWaveT -= dt; if (G.nextWaveT <= 0) spawnWave(G.wave); return; }
-  if (G.waveActive && !ships.some(s => s.team === 'JP' && s.alive)) {
+  if (G.waveActive && !world.ships.some(s => s.team === 'JP' && s.alive)) {
     G.waveActive = false;
     if (G.wave >= WAVES.length - 1) { if (G.player.alive) finish(true); return; }
     const P = G.player;
     if (P.alive) { P.hp = Math.min(P.maxHp, P.hp + P.maxHp * 0.4); P.fires.length = 0; P.dc.charges++; P.torpReady = P.torpReady.map(() => 0); }
-    for (const s of ships) if (s.alive && s.team === 'US' && !s.isPlayer) s.hp = Math.min(s.maxHp, s.hp + s.maxHp * 0.3);
+    for (const s of world.ships) if (s.alive && s.team === 'US' && !s.isPlayer) s.hp = Math.min(s.maxHp, s.hp + s.maxHp * 0.3);
     G.wave++; G.nextWaveT = 12;
     banner(WAVE_CN[G.wave - 1] + '击退', '抢修中', `耐久恢复 40%，损管 +1，鱼雷装填完毕。${WAVE_CN[G.wave]}将在 12 秒后抵达。`);
   }
@@ -2379,11 +1966,12 @@ function finish(win) { G.result = win; G.endT = win ? 4 : 5; }
 function showEnd() {
   const st = G.stats, win = G.result, meta = playableMeta(G.shipKey), P = G.player;
   G.mode = 'end'; exitLock();
+  $('#againBtn').textContent = '再战一次'; $('#portBtn').textContent = '返回港口';
   $('#endEyebrow').textContent = (win ? '战报 · 海峡守住' : '战报 · 舰沉') + ' · 难度 ' + DIFF[G.diff].name;
   $('#endTitle').textContent = win ? '亨德森机场安全' : meta.name + '沉入铁底湾';
   $('#endLine').textContent = win ? `三波来袭舰队全部击退，${meta.name}${P && P.hp < P.maxHp * 0.3 ? '伤痕累累地' : ''}守住了海峡。` : `${meta.name}在${WAVE_CN[G.wave]}中沉没。和它一起躺在海底的，还有这片海峡里的几十艘舰船。`;
-  const acc = st.shots ? st.hits / st.shots * 100 : 0;
-  const cells = [['击沉吨位', fmt(st.tons), '吨'], ['击沉', st.kills.length, '艘'], ['主炮命中率', acc.toFixed(1), '%'], ['鱼雷命中', st.torpHits + ' / ' + st.torps, ''], ['造成伤害', fmt(st.dmgDealt), ''], ['承受伤害', fmt(st.dmgTaken), ''], ['战斗时间', clockStr(G.clock), ''], ['友舰损失', st.lost.length, '艘']];
+  const sh = st.ship, acc = sh.shots ? sh.hits / sh.shots * 100 : 0;
+  const cells = [['击沉吨位', fmt(st.tons), '吨'], ['击沉', st.kills.length, '艘'], ['主炮命中率', acc.toFixed(1), '%'], ['鱼雷命中', sh.torpHits + ' / ' + sh.torps, ''], ['造成伤害', fmt(sh.dealt), ''], ['承受伤害', fmt(sh.taken), ''], ['战斗时间', clockStr(G.clock), ''], ['友舰损失', st.lost.length, '艘']];
   $('#endStats').innerHTML = cells.map(([a, b, c]) => `<div><dt>${a}</dt><dd>${b}<small>${c}</small></dd></div>`).join('');
   $('#endKills').innerHTML = st.kills.length ? st.kills.map(k => `<li><b>${k.name}</b><span>${k.type} · ${fmt(k.tons)} 吨</span>${k.fate ? `<em>${k.fate}</em>` : ''}</li>`).join('') : '<li class="none">本舰没有取得击沉。</li>';
   const best = store.get('best', null), score = st.tons + (win ? 5000 : 0);
@@ -2412,35 +2000,22 @@ function updatePlayer(dt) {
     if (G.weapon === 'guns' ? P.mainTurrets.some(t => t.reload <= 0 && t.onTarget) : (P.torp && P.torpReady.some(v => v <= 0))) G.fireReq = true;
   }
   P.aimX = P.x + Math.sin(aim.yaw) * aim.range; P.aimZ = P.z + Math.cos(aim.yaw) * aim.range;
-  if (P.secGun) secondaryLogic(P);
-  for (let i = 0; i < P.torpReady.length; i++) P.torpReady[i] -= dt;
+  if (G.net) G.net.control(P, dt);
   if (G.fireReq) { G.fireReq = false; playerFire(); }
   Sfx.engine(P.speed / P.maxV);
 }
 function playerFire() {
   const P = G.player; if (!P || !P.alive) return;
-  if (G.weapon === 'guns') {
-    const ready = P.mainTurrets.filter(t => t.reload <= 0), aimed = ready.filter(t => t.onTarget);
-    if (!aimed.length) { hint(!ready.length ? '主炮装填中' : P.mainTurrets.some(t => t.inArc) ? '炮塔转向中' : '炮塔无法指向该方位'); return; }
-    for (const t of aimed) fireTurret(P, t, P.aimX, P.aimZ, 0);
-    haptic(P.gun.cal >= 300 ? 'heavy' : P.gun.cal >= 150 ? 'medium' : 'light');
-    if (aim.range > P.gun.range) hint('超出射程，炮弹落在最大射程处');
-  } else {
-    const rel = Math.abs(angDiff(P.heading, aim.yaw));
-    if (rel < 25 * DEG || rel > 155 * DEG) { hint('鱼雷需向舷侧发射，转向或调整方位'); return; }
-    const m = P.torpReady.findIndex(v => v <= 0);
-    if (m < 0) { hint('鱼雷装填中'); return; }
-    launchFan(P, aim.yaw); P.torpReady[m] = P.torp.reload; haptic('light');
-    ribbon('鱼雷出管', 0);
-  }
+  if (G.net) G.net.fire(G.weapon, P.aimX, P.aimZ); else S.playerFire(world, P, G.weapon, P.aimX, P.aimZ);
 }
 function setWeapon(w) {
   const P = G.player; if (!P) return;
+  if (G.net && !P.alive) { G.net.cycleWatch(); return; }
   if (w === 'torps' && !P.torp) { hint('本舰没有鱼雷'); return; }
   G.weapon = w; $('#wGun').classList.toggle('sel', w === 'guns'); $('#wTorp').classList.toggle('sel', w === 'torps');
 }
 function throttleStep(d) { const P = G.player; if (!P || !P.alive) return; P.throttle = clamp(P.throttle + d, 0, 6); hint('车钟：' + THROTTLE_CN[P.throttle]); }
-function useDC() { const P = G.player; if (!P) return; if (P.useDC()) { hint('损管队出动：灭火并抢修'); ribbon('损管', 0); } else hint(P.dc.charges <= 0 ? '损管次数已用完' : '损管冷却中'); }
+function useDC() { const P = G.player; if (!P || !P.alive) return; if (G.net) G.net.send({ t: 'dc' }); else S.cmdDC(world, P); }
 
 // ---------------------------------------------------------------- input
 const coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches && !matchMedia('(pointer: fine)').matches;
@@ -2521,7 +2096,7 @@ const endTouch = e => {
 function tapLock(x, y) {
   const P = G.player; if (!P || !P.alive) return;
   let best = null, bd = 1e9;
-  for (const s of ships) {
+  for (const s of world.ships) {
     if (!s.alive || s.removed || s.team === P.team) continue;
     for (const [py, slack] of [[s.spec.F + 4, 1], [s.spec.top + 34, 0.8]]) {
       const sp = toScreen(s.x, py, s.z); if (!sp) continue;
@@ -2585,7 +2160,11 @@ window.addEventListener('keyup', e => { keys[e.code] = false; if (e.code === 'Sh
 window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; G.shiftHeld = false; G.rmb = false; });
 
 function pause(on) {
-  if (on && G.mode === 'play') { G.mode = 'paused'; G.pausedAt = performance.now(); G.lockWanted = false; if (document.pointerLockElement) document.exitPointerLock(); showScreen('pause'); }
+  if (on && G.mode === 'play') {
+    G.mode = 'paused'; G.pausedAt = performance.now(); G.lockWanted = false; if (document.pointerLockElement) document.exitPointerLock();
+    $('#pause .eyebrow').textContent = G.net ? '联机对战 · 战斗仍在进行' : '战斗暂停'; $('#quitBtn').textContent = G.net ? '认输并离开' : '返回港口';
+    showScreen('pause');
+  }
 }
 function resume() { if (G.mode !== 'paused') return; G.mode = 'play'; showScreen(null); requestLock(); }
 
@@ -2593,6 +2172,7 @@ function resume() { if (G.mode !== 'paused') return; G.mode = 'play'; showScreen
 const hud = $('#hud'), vign = $('#vignette');
 function showScreen(name) {
   $('#menu').hidden = name !== 'menu'; $('#pause').hidden = name !== 'pause'; $('#end').hidden = name !== 'end';
+  $('#mp').hidden = name !== 'mp'; $('#lobby').hidden = name !== 'lobby';
   hud.hidden = !(G.mode === 'play' || G.mode === 'paused');
   $('#touch').hidden = !(coarse && G.mode === 'play');
   if (name === 'pause') $('#resumeBtn').focus({ preventScroll: true });
@@ -2681,9 +2261,14 @@ function updateHud(dt) {
   $('#wDcSub').textContent = P.dc.active > 0 ? '抢修中 ' + P.dc.active.toFixed(0) + ' s' : P.dc.cd > 0 ? '冷却 ' + P.dc.cd.toFixed(0) + ' s' : P.dc.charges > 0 ? (P.fires.length ? '起火 ×' + P.fires.length + ' · 按 R' : '就绪') : '已用完';
   $('#wDc').classList.toggle('sel', P.fires.length > 0 && P.dc.cd <= 0 && P.dc.charges > 0);
   $('#wDcPips').innerHTML = P.fires.map(() => '<span class="pip ready" style="width:10px"><i style="height:100%;background:var(--foe)"></i></span>').join('');
-  const foes = ships.filter(s => s.team === 'JP' && s.alive).length, fr = ships.filter(s => s.team === 'US' && s.alive).length;
-  $('#hWave').textContent = WAVE_CN[G.wave] + ' / 3';
-  $('#hWaveName').textContent = G.waveActive ? WAVES[G.wave].name : (G.nextWaveT > 0 ? '敌舰抵达 ' + Math.ceil(G.nextWaveT) + ' s' : WAVES[G.wave].name);
+  const foes = world.ships.filter(s => s.team !== P.team && s.alive).length, fr = world.ships.filter(s => s.team === P.team && s.alive).length;
+  if (G.net) {
+    $('#hWave').textContent = '1v1 · ' + S.DUEL.classes[G.net.picks.cls];
+    $('#hWaveName').textContent = G.net.away >= 0 ? `对手掉线，${G.net.away} 秒后判负` : G.net.result ? '战斗结束' : '剩余时间 ' + clockStr(Math.max(0, S.DUEL.limit - G.clock));
+  } else {
+    $('#hWave').textContent = WAVE_CN[G.wave] + ' / 3';
+    $('#hWaveName').textContent = G.waveActive ? WAVES[G.wave].name : (G.nextWaveT > 0 ? '敌舰抵达 ' + Math.ceil(G.nextWaveT) + ' s' : WAVES[G.wave].name);
+  }
   $('#hFoe').textContent = '敌舰 ' + foes; $('#hFriend').textContent = '我舰 ' + fr;
   $('#hTons').textContent = fmt(G.stats.tons); $('#hClock').textContent = '战斗时间 ' + clockStr(G.clock);
   if (G.hintT > 0) { G.hintT -= 0.1; if (G.hintT <= 0) $('#hint').classList.remove('on'); }
@@ -2695,6 +2280,7 @@ function updateHud(dt) {
 let VW = 1, VH = 1, ODPR = 1;
 const torpWarnEl = $('#torpWarn');
 const camInv = new THREE.Matrix4();
+const tv = new THREE.Vector3();
 function toScreen(x, y, z) {
   tv.set(x, y, z).applyMatrix4(camera.matrixWorldInverse); if (tv.z > -5) return null;
   tv.applyMatrix4(camera.projectionMatrix);
@@ -2719,7 +2305,7 @@ function drawOverlay() {
   // ship labels & lead markers
   c.textAlign = 'center'; c.textBaseline = 'alphabetic';
   let hover = null, hoverD = 60;
-  for (const s of ships) {
+  for (const s of world.ships) {
     if (s === P || s.removed || (!s.alive && s.sinkT > 6)) continue;
     const foe = s.team !== P.team, col = !s.alive ? '#8a8578' : foe ? '#ef5a40' : '#8fd3e6';
     const sp = toScreen(s.x, s.spec.top + 34, s.z); if (!sp) continue;
@@ -2752,8 +2338,8 @@ function drawOverlay() {
   // torpedoes
   const now = G.time;
   let danger = null;
-  for (const t of torps) {
-    if (!torpVisible(t)) continue;
+  for (const t of world.torps) {
+    if (!torpSeen(t)) continue;
     const foe = t.team !== P.team;
     if (foe && P.alive) {
       const qx = P.x - t.x, qz = P.z - t.z, dvx = P.vx - t.dx * t.speed, dvz = P.vz - t.dz * t.speed, dv2 = dvx * dvx + dvz * dvz;
@@ -2854,11 +2440,11 @@ function drawMini() {
     c.strokeStyle = 'rgba(240,181,74,.25)'; c.beginPath(); c.arc(X(P.x), Y(P.z), P.gun.range * k, 0, TAU); c.stroke();
     c.strokeStyle = 'rgba(240,181,74,.8)'; c.beginPath(); c.moveTo(X(P.x), Y(P.z)); c.lineTo(X(P.aimX), Y(P.aimZ)); c.stroke();
   }
-  for (const t of torps) { if (!torpVisible(t)) continue; c.strokeStyle = t.team === 'JP' ? '#ef5a40' : '#8fd3e6'; c.beginPath(); c.moveTo(X(t.x), Y(t.z)); c.lineTo(X(t.x - t.dx * 180), Y(t.z - t.dz * 180)); c.stroke(); }
-  for (const s of ships) {
+  for (const t of world.torps) { if (!torpSeen(t)) continue; c.strokeStyle = t.team !== (P ? P.team : 'US') ? '#ef5a40' : '#8fd3e6'; c.beginPath(); c.moveTo(X(t.x), Y(t.z)); c.lineTo(X(t.x - t.dx * 180), Y(t.z - t.dz * 180)); c.stroke(); }
+  for (const s of world.ships) {
     if (s.removed) continue;
     const x = X(s.x), y = Y(s.z), fx = Math.sin(s.heading), fz = Math.cos(s.heading), sz = s.spec.cls === 'BB' ? 6 : s.spec.cls === 'DD' ? 4 : 5;
-    c.fillStyle = !s.alive ? '#6c675d' : s.isPlayer ? '#ffffff' : s.team === 'JP' ? '#ef5a40' : '#8fd3e6';
+    c.fillStyle = !s.alive ? '#6c675d' : s === P ? '#ffffff' : s.team !== (P ? P.team : 'US') ? '#ef5a40' : '#8fd3e6';
     c.beginPath(); c.moveTo(x + fx * sz * 1.4, y + fz * sz * 1.4); c.lineTo(x - fx * sz + fz * sz * 0.6, y - fz * sz - fx * sz * 0.6); c.lineTo(x - fx * sz - fz * sz * 0.6, y - fz * sz + fx * sz * 0.6); c.closePath(); c.fill();
   }
 }
@@ -2921,9 +2507,9 @@ function buildMenu() {
   $('#soundBtn').addEventListener('click', () => { Sfx.init(); Sfx.setMuted(!Sfx.muted); if (!Sfx.muted && G.mode === 'menu') Sfx.music(true); });
   syncSoundBtn();
   $('#resumeBtn').addEventListener('click', () => resume());
-  $('#quitBtn').addEventListener('click', () => toMenu());
-  $('#againBtn').addEventListener('click', () => startGame());
-  $('#portBtn').addEventListener('click', () => toMenu());
+  $('#quitBtn').addEventListener('click', () => G.net ? duelQuit() : toMenu());
+  $('#againBtn').addEventListener('click', () => G.net ? duelAgain() : startGame());
+  $('#portBtn').addEventListener('click', () => G.net ? duelQuit() : toMenu());
   selectShip(G.shipKey, true); selectDiff(G.diff);
   drawMenuArt();
 }
@@ -2950,14 +2536,16 @@ function selectDiff(d) {
   $('#diff').querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', b.dataset.d === d));
   $('#diffNote').textContent = DIFF[d].note;
 }
-function setupPreview() {
-  clearWorld();
-  const meta = playableMeta(G.shipKey);
-  const s = new Ship(G.shipKey, 'US', meta.name, { x: 0, z: 0, heading: 0.9, speedFrac: 0.5 });
-  s.throttle = 4; s.rudderCmd = 0.18; ships.push(s); G.preview = s;
-  const e = new Ship('fubuki', 'JP', '白雪', { x: -1500, z: 400, heading: 1.9, speedFrac: 0.6 }); e.throttle = 5; e.rudderCmd = -0.1; ships.push(e);
+// the ship on the menu's stage (the selected one, or a duel pick of either navy), with an enemy destroyer passing far off
+function setupPreview(key, team, name) {
+  clearWorld({ mode: 'view' });
+  if (!key) { key = G.shipKey; team = 'US'; name = playableMeta(key).name; }
+  const s = world.add(new S.Ship(world, key, team, name, { x: 0, z: 0, heading: 0.9, speedFrac: 0.5 }));
+  s.throttle = 4; s.rudderCmd = 0.18; G.preview = s;
+  const e = team === 'JP' ? world.add(new S.Ship(world, 'fletcher', 'US', '奥班农号', { no: 'DD-450', x: -1500, z: 400, heading: 1.9, speedFrac: 0.6 })) : world.add(new S.Ship(world, 'fubuki', 'JP', '白雪', { x: -1500, z: 400, heading: 1.9, speedFrac: 0.6 }));
+  e.throttle = 5; e.rudderCmd = -0.1;
 }
-function toMenu() { G.mode = 'menu'; exitLock(); showScreen('menu'); setupPreview(); drawMenuArt(); measureStage(); Sfx.music(true); }
+function toMenu() { G.mode = 'menu'; G.net = null; G.watch = null; exitLock(); showScreen('menu'); setupPreview(); drawMenuArt(); measureStage(); Sfx.music(true); }
 function syncSoundBtn() { const b = $('#soundBtn'); if (b) { b.textContent = Sfx.muted ? '声音：关' : '声音：开'; b.setAttribute('aria-pressed', !Sfx.muted); } }
 // browsers only allow audio after a gesture: the first click or key on the menu starts the sea and the music
 ['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, () => { if (G.mode === 'menu') { Sfx.init(); Sfx.music(true); } }, { passive: true }));
@@ -3008,7 +2596,7 @@ function updateCamera(dt) {
     return;
   }
   if (camera.view && camera.view.enabled) camera.clearViewOffset();
-  const P = G.player; if (!P) return;
+  const P = G.net && G.watch ? G.watch : G.player; if (!P) return;
   const [cd, ch] = P.spec.cam || [380, 110], z = G.camZoom;
   const fx = Math.sin(aim.yaw), fz = Math.cos(aim.yaw);
   const ax = P.x + fx * aim.range, az = P.z + fz * aim.range;
@@ -3039,7 +2627,7 @@ function frame(now) {
   if (G.hold) { lastT = now; return; }   // dev recorder drives the loop itself
   let dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
   const active = G.mode === 'play' || G.mode === 'menu' || G.mode === 'end';
-  if (G.mode === 'paused') dt = 0;
+  if (G.mode === 'paused' && !G.net) dt = 0;   // a duel goes on without you
   const p0 = performance.now();
   if (dt > 0) step(dt, active);
   const p1 = performance.now();
@@ -3058,55 +2646,286 @@ function frame(now) {
   vignT = Math.max(0, vignT - (dt || 0.016) * 1.2); vign.style.opacity = Math.min(0.9, vignT).toFixed(2);
 }
 function step(dt, active) {
-  G.time += dt; U.uTime.value = G.time;
-  if (G.mode === 'play') {
-    G.clock += dt;
-    updatePlayer(dt);
-    for (const s of ships) if (s.ai) s.ai.update(dt);
-    waveLogic(dt);
-  }
-  for (const s of ships) s.physics(dt);
-  shipCollisions();
-  for (const s of ships) {
-    s.updateVisual(G.time);
-    if (!s.removed) updateTurrets(s, dt);
-    if (s.alive) {
-      const [sx, sz] = s.toWorld(0, -s.spec.L * 0.45), str = clamp(Math.abs(s.speed) / s.maxV, 0, 1);
-      s.wake.push(G.time, sx, sz, s.heading, str, dt);
-      if (str > 0.3 && Math.random() < 0.6) {
-        const side = Math.random() < 0.5 ? 1 : -1, [bx, bz] = s.toWorld(side * s.spec.B * 0.35, s.spec.L * 0.42), c = Math.cos(s.heading), sn = Math.sin(s.heading);
-        FX.foam(bx, bz, c * side * 6 + s.vx * 0.2, -sn * side * 6 + s.vz * 0.2, s.spec.B / 12);
-      }
-      s.funnelT -= dt;
-      if (s.funnelT <= 0 && s.funnels.length) {
-        s.funnelT = 0.22; const f = s.funnels[(Math.random() * s.funnels.length) | 0], [fx, fz] = s.toWorld(f.x, f.z);
-        FX.funnel(fx, f.y + s.bob + 1, fz, s.hp < s.maxHp * 0.4);
-      }
-      if (s.fires.length) { s.fireT -= dt; if (s.fireT <= 0) { s.fireT = 0.08; for (const f of s.fires) { const [fx, fz] = s.toWorld(f.lx, f.lz); FX.fire(fx, s.spec.F + s.bob + 2, fz); } } }
-      if (s.dc.active > 0 && Math.random() < 0.3) { const [fx, fz] = s.toWorld(rand(-3, 3), rand(-s.spec.L * .3, s.spec.L * .3)); FXN.emit(fx, s.spec.F + 3, fz, rand(-2, 2), rand(3, 7), rand(-2, 2), 1.5, 3, 12, 0.8, 0.82, 0.84, 0.6, 0.62, 0.65, 0.35, 0, 0.5); }
-    } else if (!s.removed) {
-      s.sinkT += dt;
-      if (Math.random() < 0.5) { const [fx, fz] = s.toWorld(rand(-s.spec.B * .4, s.spec.B * .4), rand(-s.spec.L * .4, s.spec.L * .4)); FX.fire(fx, Math.max(1, s.spec.F + s.bob), fz); }
-      if (s.sinkT > 16) s.remove();
+  if (G.net) G.net.frame(dt);
+  else {
+    if (G.mode === 'play') { G.clock += dt; updatePlayer(dt); waveLogic(dt); }
+    if (G.mode === 'menu' && G.preview) {
+      const e = world.ships[1]; if (e && Math.hypot(e.x, e.z) > 3500) e.rudderCmd = 0.4;
+      for (const s of world.ships) { s.aimX = s.x + Math.sin(s.heading) * 3000; s.aimZ = s.z + Math.cos(s.heading) * 3000; }
     }
+    world.step(dt, G.mode === 'play');
   }
-  if (G.mode === 'menu' && G.preview) {
-    const e = ships[1]; if (e && Math.hypot(e.x, e.z) > 3500) e.rudderCmd = 0.4;
-    for (const s of ships) { s.aimX = s.x + Math.sin(s.heading) * 3000; s.aimZ = s.z + Math.cos(s.heading) * 3000; }
-  }
-  updateShells(dt);
-  updateTorps(dt);
+  G.time = world.time; U.uTime.value = G.time;
+  syncViews(dt);
+  shellsFx();
+  torpsFx(dt);
   FXN.update(dt); FXA.update(dt);
   wakes = wakes.filter(w => { const keep = w.update(G.time); if (!keep) w.dispose(); return keep; });
-  ships = ships.filter(s => !s.removed || s === G.player);
   for (const L of flashLights) L.intensity *= Math.exp(-dt * 22);
   for (let i = ribbons.length - 1; i >= 0; i--) { ribbons[i].t -= dt; if (ribbons[i].t <= 0) ribbons.splice(i, 1); }
   if (G.mode === 'play') {
     updateHud(dt);
-    if (G.endT > 0) { G.endT -= dt; if (G.endT <= 0) showEnd(); }
-    if (G.player && !G.player.alive) { aim.yaw += dt * 0.08; aim.range = lerp(aim.range, 600, dt); }
+    if (G.endT > 0) { G.endT -= dt; if (G.endT <= 0) G.net ? showDuelEnd() : showEnd(); }
+    if (G.player && !G.player.alive && !G.net) { aim.yaw += dt * 0.08; aim.range = lerp(aim.range, 600, dt); }
   }
 }
+
+// ---------------------------------------------------------------- duel (online)
+// The server (server/) runs the battle; this page sends the captain's orders and shows what it is sent back. Snapshots
+// arrive 15 times a second and are shown about 150 ms late, interpolating between the two either side, so ships glide
+// rather than jump; events carry their sim time and play as the shown clock passes it.
+const SERVER_ORIGIN = 'https://ironbottom-1942-production.up.railway.app';
+const INTERP = 0.15;
+function serverUrl() {
+  const q = new URLSearchParams(location.search).get('server');
+  if (q) return q;
+  // pages served by the duel server itself (Railway, or npm start locally) talk to it directly; the static site and the app use SERVER_ORIGIN
+  if (/^https?:$/.test(location.protocol) && !/(^|\.)ironbottom1942\.com$|github\.io$/.test(location.hostname)) return (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+  return SERVER_ORIGIN.replace(/^http/, 'ws') + '/ws';
+}
+const SIDE_CN = { US: '美军', JP: '日军' }, OTHER = { US: 'JP', JP: 'US' };
+const Net = {
+  ws: null, connected: false, closed: true, retry: 0, queue: [], rtt: 0, session: null, side: null, lobby: null, pingT: 0,
+  open() {
+    if (!this.closed) return;
+    this.closed = false; this.connect();
+    this.pingT = setInterval(() => this.send({ t: 'ping', c: performance.now() }, true), 2000);
+  },
+  connect() {
+    let ws;
+    try { ws = new WebSocket(serverUrl()); } catch (e) { mpSay('连不上服务器'); return; }
+    this.ws = ws;
+    ws.onopen = () => {
+      this.connected = true; this.retry = 0;
+      if (this.session) ws.send(JSON.stringify({ t: 'rejoin', code: this.session.code, token: this.session.token }));
+      for (const m of this.queue) ws.send(m);
+      this.queue = [];
+      renderLobby();
+    };
+    ws.onmessage = e => { let m; try { m = JSON.parse(e.data); } catch (err) { return; } this.onMessage(m); };
+    ws.onclose = () => {
+      this.connected = false; this.ws = null;
+      if (this.closed) return;
+      renderLobby(); mpSay('与服务器的连接断开，正在重连…');
+      setTimeout(() => { if (!this.closed) this.connect(); }, Math.min(5000, 500 * 2 ** this.retry++));
+    };
+  },
+  send(m, volatile) {
+    const s = JSON.stringify(m);
+    if (this.connected && this.ws && this.ws.readyState === 1) this.ws.send(s);
+    else if (!volatile && m.t !== 'in' && m.t !== 'fire') this.queue.push(s);
+  },
+  save(s) { this.session = s; store.set('duel', s ? Object.assign({ at: Date.now() }, s) : null); },
+  // leave the room for good (the battle, if any, is forfeit)
+  leave() { this.send({ t: 'leave' }); this.save(null); this.side = null; this.lobby = null; },
+  onMessage(m) {
+    switch (m.t) {
+      case 'pong': { const r = performance.now() - m.c; this.rtt = this.rtt ? this.rtt * 0.7 + r * 0.3 : r; renderNet(); break; }
+      case 'room': this.save({ code: m.code, token: m.token }); this.side = m.side; mpSay(''); break;
+      case 'lobby':
+        this.lobby = m; renderLobby();
+        if (!G.net && G.mode === 'menu' && $('#lobby').hidden) showScreen('lobby');
+        break;
+      case 'start': startDuel(m); break;
+      case 'snap': if (G.net) G.net.snap(m); break;
+      case 'over': if (G.net) G.net.over(m); break;
+      case 'err':
+        if (m.gone) { this.save(null); this.lobby = null; if (G.net) { G.net = null; toMenu(); } if (!$('#lobby').hidden) showScreen('mp'); }
+        mpSay(m.msg);
+        break;
+    }
+  },
+};
+function mpSay(msg) { const el = $('#mpMsg'); if (el) el.textContent = msg; const st = $('#lbStatus'); if (st && msg) st.textContent = msg; }
+function renderNet() { const el = $('#lbNet'); if (el) el.textContent = Net.connected ? '延迟 ' + Math.round(Net.rtt) + ' ms' : '连接中…'; }
+function duelCard(side, key, name, no, sel, off) {
+  const s = SPECS[key], tune = S.DUEL.tune[key] || {}, g = Object.assign({}, GUNS[s.gun], tune.gun), nb = s.tur.filter(t => !t.sec).reduce((a, t) => a + TS[t.kind].n, 0);
+  const tp = s.torp ? (s.torpMounts * (s.torpSalvo || TORPS[s.torp].salvo)) + ' × ' + (s.torp === 't93' ? 610 : 533) + ' mm' : '无';
+  return `<button type="button" class="card${sel ? ' sel' : ''}" data-k="${key}" data-side="${side}" aria-pressed="${sel}"${off ? ' disabled' : ''}>
+    <canvas aria-hidden="true"></canvas>
+    <div><div class="card-h"><b>${name}</b><span>${no}</span></div><div class="ty">${s.type}</div></div>
+    <dl><dt>航速</dt><dd>${s.kn} kn</dd><dt>主炮</dt><dd>${nb} × ${g.cal} mm</dd><dt>鱼雷</dt><dd>${tp}</dd><dt>射程</dt><dd>${(g.range / 1000).toFixed(1)} km</dd><dt>耐久</dt><dd>${fmt(tune.hp || s.hp)}</dd></dl></button>`;
+}
+function renderLobby() {
+  renderNet();
+  const L = Net.lobby; if (!L) return;
+  const me = Net.side, mine = L.seats[me], other = L.seats[OTHER[me]], host = !!(mine && mine.host), lobby = L.phase === 'lobby';
+  $('#lbCode').textContent = L.code;
+  $('#lbCls').innerHTML = Object.entries(S.DUEL.classes).map(([k, n]) => `<button type="button" role="radio" data-v="${k}" aria-checked="${k === L.cls}"${host && lobby ? '' : ' disabled'}>${n}</button>`).join('');
+  $('#lbEsc').querySelectorAll('button').forEach(b => { b.setAttribute('aria-checked', +b.dataset.v === L.escorts); b.disabled = !host || !lobby; });
+  $('#lbHostNote').textContent = host ? '你是房主，由你选舰种' : '舰种由房主选择';
+  document.querySelectorAll('.lb-side').forEach(sec => {
+    const side = sec.dataset.side, s = L.seats[side], isMe = side === me;
+    sec.classList.toggle('mine', isMe);
+    sec.querySelector('.lb-who').innerHTML = s ? `<b>${isMe ? '你' : '对手'}</b>${s.host ? ' · 房主' : ''} · ${s.ready ? '<span class="ok">已准备</span>' : '未准备'}${s.online ? '' : ' · 掉线'}` : '等待对手加入…';
+    const roster = S.duelRoster(side, L.cls), list = isMe ? roster : s ? roster.filter(p => p[0] === s.key) : roster;
+    const box = sec.querySelector('.lb-ships');
+    box.innerHTML = list.map(([k, n, no]) => duelCard(side, k, n, no, !!s && s.key === k, !isMe || !lobby || (s && s.ready))).join('');
+    box.querySelectorAll('.card').forEach(el => drawSil(el.querySelector('canvas'), el.dataset.k, el.classList.contains('sel') ? '#f0b54a' : side === 'US' ? '#8fd3e6' : '#ef5a40'));
+  });
+  const st = !Net.connected ? '连接服务器…' : L.phase === 'countdown' ? `${L.cd} 秒后开战` : L.phase === 'playing' ? '对局进行中…'
+    : !other ? `把房间号 ${L.code} 或邀请链接发给对手` : !mine.ready ? '选好座舰后点“准备”' : !other.ready ? '等待对手准备' : '';
+  $('#lbStatus').textContent = st;
+  const rb = $('#lbReady'); rb.textContent = mine && mine.ready ? '取消准备' : '准备'; rb.disabled = L.phase === 'playing';
+  $('#lbSwap').disabled = !!other || !lobby;
+  if (mine && G.mode === 'menu' && !G.net && (!G.preview || G.preview.key !== mine.key)) {
+    const p = S.duelRoster(me, L.cls).find(q => q[0] === mine.key);
+    if (p) setupPreview(p[0], me, p[1]);
+  }
+}
+(() => {
+  const lb = $('#lobby');
+  lb.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    Sfx.init();
+    if (b.classList.contains('card')) { if (b.dataset.side === Net.side) { Net.send({ t: 'pick', key: b.dataset.k }); Sfx.pick(b.dataset.k); } return; }
+    if (b.parentElement.id === 'lbCls') { Net.send({ t: 'cls', v: b.dataset.v }); return; }
+    if (b.parentElement.id === 'lbEsc') { Net.send({ t: 'esc', v: +b.dataset.v }); return; }
+    switch (b.id) {
+      case 'lbReady': { const s = Net.lobby && Net.lobby.seats[Net.side]; Net.send({ t: 'ready', v: !(s && s.ready) }); break; }
+      case 'lbSwap': Net.send({ t: 'side' }); break;
+      case 'lbLeave': Net.leave(); showScreen('mp'); setupPreview(); break;
+      case 'lbCopy': {
+        const link = location.origin + location.pathname + '?room=' + (Net.lobby ? Net.lobby.code : '');
+        const done = () => { b.textContent = '已复制'; setTimeout(() => { b.textContent = '复制邀请链接'; }, 1600); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, () => prompt('邀请链接', link)); else prompt('邀请链接', link);
+        break;
+      }
+    }
+  });
+  const join = () => { const c = $('#mpCode').value.replace(/\D/g, ''); if (c.length !== 4) { mpSay('房间号是 4 位数字'); return; } Net.open(); mpSay('正在加入…'); Net.send({ t: 'join', code: c }); };
+  $('#mpBtn').addEventListener('click', () => { Sfx.init(); showScreen('mp'); mpSay(''); });
+  $('#mpCreate').addEventListener('click', () => { Net.open(); mpSay('正在创建房间…'); Net.send({ t: 'create' }); });
+  $('#mpJoin').addEventListener('click', join);
+  $('#mpCode').addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
+  $('#mpBack').addEventListener('click', () => { showScreen('menu'); measureStage(); });
+})();
+
+// One battle as this captain sees it. The world here is a mirror: setupDuel builds the same ships (same ids) as the server's,
+// then every frame takes positions, damage and turret bearings from the snapshots.
+class DuelGame {
+  constructor(m) {
+    this.side = m.side; this.picks = m.picks; this.snaps = []; this.evq = []; this.rt = null; this.inT = 0; this.fireT = 0; this.result = null; this.away = -1; this.lastSnap = performance.now();
+    clearWorld({ mode: 'duel' });
+    const caps = S.setupDuel(world, m.picks);
+    this.me = caps[this.side]; this.foe = caps[OTHER[this.side]];
+    world.time = G.time = m.time;
+  }
+  snap(m) {
+    m.map = new Map(); for (const a of m.s) m.map.set(a[0], a);
+    this.snaps.push(m); if (this.snaps.length > 90) this.snaps.splice(0, this.snaps.length - 90);
+    for (const e of m.ev) this.evq.push(e);
+    this.away = m.away; this.lastSnap = performance.now();
+    const me = this.me, d = m.me;
+    d.tr.forEach((v, i) => { me.torpReady[i] = v; });
+    me.turrets.forEach((t, i) => { t.reload = d.rl[i]; t.onTarget = !!(d.ot[i] & 1); t.inArc = !!(d.ot[i] & 2); });
+    me.dc.charges = d.dc[0]; me.dc.cd = d.dc[1]; me.dc.active = d.dc[2];
+    [me.stats.shots, me.stats.hits, me.stats.torps, me.stats.torpHits, me.stats.dealt, me.stats.taken] = d.st;
+  }
+  frame(dt) {
+    // after the battle the server stops sending: let the ships steam on by themselves behind the results
+    if (!this.snaps.length) return;
+    if (this.result && performance.now() - this.lastSnap > 600) { world.torps = []; world.step(dt, false); return; }
+    const latest = this.snaps[this.snaps.length - 1].time;
+    if (this.rt == null) this.rt = latest - INTERP;
+    this.rt += dt;
+    const err = latest - INTERP - this.rt;
+    if (Math.abs(err) > 1) {
+      // far behind (a hidden tab) or ahead: jump, dropping what we missed rather than playing it all at once
+      this.rt = latest - INTERP;
+      this.evq = this.evq.filter(e => e.t > this.rt - 0.3 || e.k === 'sunk');
+    } else this.rt += err * Math.min(1, dt * 1.5);
+    const rt = this.rt;
+    while (this.snaps.length > 2 && this.snaps[1].time <= rt) this.snaps.shift();
+    const a = this.snaps[0], b = this.snaps[1] || a, k = b.time > a.time ? clamp((rt - a.time) / (b.time - a.time), 0, 1.6) : 0;
+    for (const s of world.ships) {
+      const sa = a.map.get(s.id); if (!sa) { s.removed = true; s.alive = false; continue; }
+      this.place(s, sa, b.map.get(s.id) || sa, k);
+    }
+    // torpedoes run straight: take the older snapshot's and run them on to now
+    const seen = new Map(world.torps.map(t => [t.id, t])), dtA = rt - a.time;
+    world.torps = a.tp.map(([id, x, z, h, trav, team, speed, range]) => {
+      const t = seen.get(id) || { id, seen: { US: 3, JP: 3 }, emitT: 0 }, d = speed * dtA;
+      return Object.assign(t, { x: x + Math.sin(h) * d, z: z + Math.cos(h) * d, h, dx: Math.sin(h), dz: Math.cos(h), trav: trav + d, team: team ? 'JP' : 'US', speed, range, alive: true });
+    });
+    world.time = rt;
+    while (this.evq.length && this.evq[0].t <= rt) present(this.evq.shift());
+    // between snapshots our own gauges keep counting down
+    const me = this.me;
+    for (const t of me.turrets) t.reload -= dt;
+    for (let i = 0; i < me.torpReady.length; i++) me.torpReady[i] -= dt;
+    if (me.dc.cd > 0) me.dc.cd -= dt; if (me.dc.active > 0) me.dc.active -= dt;
+    if (G.mode === 'play' || G.mode === 'paused') G.clock = rt;
+    // our ship is gone: watch the rest of the battle from a ship still afloat, ours first
+    if (!me.alive && (!G.watch || !G.watch.alive)) this.watchNext();
+  }
+  place(s, sa, sb, k) {
+    const q = k < 0.5 ? sa : sb;
+    s.x = lerp(sa[1], sb[1], k); s.z = lerp(sa[2], sb[2], k); s.heading = wrapA(sa[3] + angDiff(sa[3], sb[3]) * k);
+    s.speed = lerp(sa[4], sb[4], k); s.rudder = lerp(sa[5], sb[5], k);
+    s.vx = Math.sin(s.heading) * s.speed; s.vz = Math.cos(s.heading) * s.speed;
+    if (s !== this.me) s.throttle = q[6];
+    s.hp = q[7]; s.alive = !!(q[8] & 1); s.removed = !!(q[8] & 2);
+    if (s !== this.me) s.dc.active = q[8] & 4 ? 1 : 0;
+    s.sinkT = sa[9] >= 0 ? lerp(sa[9], sb[9] >= 0 ? sb[9] : sa[9], k) : -1;
+    const f = q[10]; s.fires.length = 0; for (let i = 0; i < f.length; i += 2) s.fires.push({ lx: f[i], lz: f[i + 1] });
+    const ta = sa[11], tb = sb[11];
+    s.turrets.forEach((t, i) => { t.rel = wrapA(ta[i * 2] + angDiff(ta[i * 2], tb[i * 2]) * k); t.elev = lerp(ta[i * 2 + 1], tb[i * 2 + 1], k); });
+  }
+  watchNext() {
+    const alive = world.ships.filter(s => s.alive), mine = alive.filter(s => s.team === this.side), list = mine.length ? mine.concat(alive.filter(s => s.team !== this.side)) : alive;
+    if (!list.length) { G.watch = null; return; }
+    const i = list.indexOf(G.watch);
+    G.watch = list[(i + 1) % list.length];
+    hint('观战：' + G.watch.name + (G.watch.team === this.side ? '（友舰）' : '（敌舰）') + (coarse ? '' : ' · T 切换'));
+  }
+  control(P, dt) {
+    this.inT -= dt;
+    if (this.inT > 0) return;
+    this.inT = 1 / 15;
+    Net.send({ t: 'in', th: P.throttle, rc: Math.round(P.rudderCmd * 100) / 100, ax: Math.round(P.aimX), az: Math.round(P.aimZ) });
+  }
+  fire(w, ax, az) {
+    const now = performance.now(); if (now - this.fireT < 120) return; this.fireT = now;
+    Net.send({ t: 'in', th: this.me.throttle, rc: this.me.rudderCmd, ax: Math.round(ax), az: Math.round(az) });
+    Net.send({ t: 'fire', w, ax: Math.round(ax), az: Math.round(az) });
+  }
+  send(m) { Net.send(m); }
+  sunk(s, killer) {
+    const me = this.me, foe = s.team !== this.side;
+    if (killer === me && foe) { ribbon('击沉', 0); haptic('success'); G.stats.tons += s.spec.tons; }
+    feed(`${killer && killer.team !== s.team ? '<b>' + killer.name + '</b> ' : ''}击沉 <b>${s.name}</b>（${s.typeLabel}）`, foe ? 'foe' : 'friend');
+    if (s === me) { hint('弃舰！'); banner('座舰沉没', me.name + '沉入铁底湾', '你可以继续观战，直到战斗结束。'); }
+  }
+  over(m) { this.result = m; G.endT = 4; }
+  cycleWatch() { if (!this.me.alive) this.watchNext(); }
+}
+function startDuel(m) {
+  Sfx.init(); Sfx.music(false);
+  const g = G.net = new DuelGame(m), P = g.me;
+  G.player = P; G.watch = null;
+  battleStations(P);
+  G.stats = { kills: [], tons: 0, lost: [], ship: P.stats };
+  banner('联机对战 · ' + S.DUEL.classes[m.picks.cls], P.name + ' 对阵 ' + g.foe.name, `你指挥${SIDE_CN[g.side]}，击沉对方全部舰船获胜。`);
+}
+function showDuelEnd() {
+  const g = G.net, r = g.result, st = r.stats[g.side], kills = r.kills[g.side] || [], draw = r.winner === 'draw', win = r.winner === g.side;
+  G.mode = 'end'; exitLock();
+  const why = r.why === 'surrender' ? (win ? '对手认输' : '认输') : r.why === 'disconnect' ? (win ? '对手掉线' : '掉线判负') : '战斗时间 ' + clockStr(r.time);
+  $('#endEyebrow').textContent = '联机对战 · ' + S.DUEL.classes[g.picks.cls] + ' · ' + why;
+  $('#endTitle').textContent = draw ? '平局' : win ? '胜利' : '战败';
+  const fs = r.stats[OTHER[g.side]];
+  $('#endLine').textContent = draw ? `双方打到最后，谁也没能把对方赶出海峡。` : win ? `${st.name}击败了${fs.name}，铁底湾归${SIDE_CN[g.side]}所有。` : `${fs.name}占了上风，${SIDE_CN[g.side]}退出了海峡。`;
+  const acc = st.shots ? st.hits / st.shots * 100 : 0, tons = kills.reduce((a, k) => a + k.tons, 0);
+  const cells = [['击沉吨位', fmt(tons), '吨'], ['击沉', kills.length, '艘'], ['主炮命中率', acc.toFixed(1), '%'], ['鱼雷命中', st.torpHits + ' / ' + st.torps, ''], ['造成伤害', fmt(st.dealt), ''], ['承受伤害', fmt(st.taken), ''], ['座舰耐久', Math.round(st.hp / st.maxHp * 100), '%'], ['战果评分', Math.round(st.score * 100) + ' : ' + Math.round(fs.score * 100), '']];
+  $('#endStats').innerHTML = cells.map(([a, b, c]) => `<div><dt>${a}</dt><dd>${b}<small>${c}</small></dd></div>`).join('');
+  $('#endKills').innerHTML = kills.length ? kills.map(k => `<li><b>${k.name}</b><span>${k.type} · ${fmt(k.tons)} 吨</span>${FATE[k.name] ? `<em>${FATE[k.name]}</em>` : ''}</li>`).join('') : '<li class="none">本舰没有取得击沉。</li>';
+  $('#againBtn').textContent = '回到房间'; $('#portBtn').textContent = '离开房间';
+  showScreen('end');
+}
+// from the results: back to the room's lobby for another round, or out of the room altogether
+function duelAgain() { G.net = null; G.mode = 'menu'; G.watch = null; setupPreview(); showScreen('lobby'); renderLobby(); Sfx.music(true); }
+function duelQuit() { if (G.net && !G.net.result) Net.send({ t: 'surrender' }); Net.leave(); G.net = null; G.watch = null; toMenu(); }
 
 // ---------------------------------------------------------------- boot
 function start(data) {
@@ -3114,14 +2933,22 @@ function start(data) {
   if (data && data.diff) G.diff = data.diff;
   resize(); buildLand(); buildMenu();
   showScreen('menu'); setupPreview(); measureStage();
+  // a duel invite (?room=1234), or a duel this page was in a moment ago (a reload, a dropped connection)
+  const room = (new URLSearchParams(location.search).get('room') || '').replace(/\D/g, ''), ses = store.get('duel', null);
+  if (ses && Date.now() - ses.at < 5 * 60 * 1000 && (!room || room === ses.code)) { Net.session = ses; Net.open(); }
+  else if (room.length === 4) { store.set('duel', null); showScreen('mp'); $('#mpCode').value = room; mpSay('正在加入房间 ' + room + '…'); Net.open(); Net.send({ t: 'join', code: room }); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (G.mode === 'menu') { drawMenuArt(); measureStage(); } });
   requestAnimationFrame(t => { lastT = t; frame(t); });
 }
 window.claude?.hot?.snapshot?.(() => ({ ship: G.shipKey, diff: G.diff }));
-if (window.__IBS_DEBUG) window.__ibs = { PERF, renderer, G, advance(sec, fn) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) { if (fn) fn(); if (G.mode !== 'paused') step(1 / 30, true); updateCamera(1 / 30); } }, leadPoint, intercept, angDiff, terrainH, get ships() { return ships; }, get torps() { return torps; }, aim, startGame, SPECS, camera, scene, Ship, clearWorld, showScreen, Sfx,
+if (window.__IBS_DEBUG) window.__ibs = { PERF, renderer, G, advance(sec, fn) { const n = Math.round(sec * 30); for (let i = 0; i < n; i++) { if (fn) fn(); if (G.mode !== 'paused') step(1 / 30, true); updateCamera(1 / 30); } }, leadPoint, intercept, angDiff, terrainH, get ships() { return world.ships; }, get torps() { return world.torps; }, aim, startGame, SPECS, camera, scene, clearWorld, showScreen, Sfx,
+  get world() { return world; }, torpVisible: t => torpSeen(t),
+  // the dev tools' old calling convention: the current world is implied
+  Ship: function (key, team, name, o) { return new S.Ship(world, key, team, name, o); },
+  fireTurret: (s, t, x, z, err) => S.fireTurret(world, s, t, x, z, err), launchFan: (s, h) => S.launchFan(world, s, h), AI: S.AI,
   // used by dev/record.js
-  step, updateCamera, renderView, drawOverlay, setupPreview, selectShip, spawnWave, fireTurret, fireShell, launchFan, AI, FX, TS, GUNS, menuCam, glCanvas, ov, SUN_AZ, keys, drawMini, setWeapon, intercept,
-  get shells() { return shells; },
+  step, updateCamera, renderView, drawOverlay, setupPreview, selectShip, spawnWave, FX, TS, GUNS, menuCam, glCanvas, ov, SUN_AZ, keys, drawMini, setWeapon,
+  get shells() { return world.shells; },
   forceSize(w, h) { VW = w; VH = h; ODPR = 1; renderer.setPixelRatio(1); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); ov.width = w; ov.height = h; } };
 if (window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data ?? {});
 })();

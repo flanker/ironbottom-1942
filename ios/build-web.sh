@@ -7,6 +7,7 @@ OUT="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/web"
 rm -rf "$OUT"
 mkdir -p "$OUT/sfx" "$OUT/vendor/fonts"
 cp "$REPO"/sfx/*.mp3 "$OUT/sfx/"
+cp "$REPO/sim.js" "$OUT/"
 cp "$SRCROOT/vendor/three.min.js" "$OUT/vendor/"
 cp "$SRCROOT"/vendor/fonts/* "$OUT/vendor/fonts/"
 sed -e 's#https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js#vendor/three.min.js#' \

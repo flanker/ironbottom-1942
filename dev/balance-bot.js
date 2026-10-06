@@ -23,7 +23,7 @@ window.__err = []; window.addEventListener('error', e => window.__err.push(e.mes
         cd -= 1 / 30; if (cd <= 0 && d < P.gun.range) { G.fireReq = true; cd = 0.5; }
       }
       for (const t of I.torps) {
-        if (t.team === P.team || t.seenT <= 0) continue;
+        if (t.team === P.team || !I.torpVisible(t)) continue;
         if (Math.hypot(P.x - t.x, P.z - t.z) < 1400) { desired = Math.abs(I.angDiff(P.heading, t.h)) < Math.PI / 2 ? t.h : t.h + Math.PI; break; }
       }
       if (Math.hypot(P.x, P.z) > 5500) desired = Math.atan2(-P.x, -P.z);
@@ -43,6 +43,6 @@ window.__err = []; window.addEventListener('error', e => window.__err.push(e.mes
       log.push([Math.round(G.time), G.wave, Math.round(G.player.hp / G.player.maxHp * 100), I.ships.filter(s => s.team === 'JP' && s.alive).length, I.ships.filter(s => s.team === 'US' && s.alive).length]);
       if (G.mode !== 'play' || G.endT > 0) break;
     }
-    return { key, diff, result: G.result, log: log.map(l => l.join('/')).join(' '), byKind: Object.fromEntries(Object.entries(byKind).map(([k, v]) => [k, Math.round(v)])), kills: G.stats.kills.map(k => k.name).join(','), hits: G.stats.hits + '/' + G.stats.shots, th: G.stats.torpHits + '/' + G.stats.torps, lost: G.stats.lost.join(',') };
+    return { key, diff, result: G.result, log: log.map(l => l.join('/')).join(' '), byKind: Object.fromEntries(Object.entries(byKind).map(([k, v]) => [k, Math.round(v)])), kills: G.stats.kills.map(k => k.name).join(','), hits: G.stats.ship.hits + '/' + G.stats.ship.shots, th: G.stats.ship.torpHits + '/' + G.stats.ship.torps, lost: G.stats.lost.join(',') };
   };
 })();
