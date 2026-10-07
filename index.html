@@ -208,13 +208,47 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
 .kills li.none{color:var(--paper-dim)}
 .btns{display:flex;flex-wrap:wrap;gap:12px}
 .pause-keys{font-size:12.5px}
+/* ---------- Home: first choose how to play, against the computer or against a friend ---------- */
+.home{background:
+  linear-gradient(0deg,rgba(6,9,12,.95) 0%,rgba(6,9,12,.72) 30%,rgba(6,9,12,0) 54%),
+  linear-gradient(90deg,rgba(6,9,12,.9) 0%,rgba(6,9,12,.55) 22%,rgba(6,9,12,0) 38%)}
+.home-grid{display:grid;grid-template-columns:minmax(260px,400px) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"brand stage" "modes modes";
+  gap:18px 28px;max-width:1640px;margin:0 auto;min-height:max(100%,640px);box-sizing:border-box;padding:clamp(18px,3.6vh,40px) clamp(16px,2.8vw,44px) clamp(16px,3vh,32px)}
+.home .brand .brief{max-width:26em}
+.modes{grid-area:modes;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.mode{all:unset;box-sizing:border-box;cursor:pointer;position:relative;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"tag tag" "title title" "art art" "desc desc" "go foot";gap:6px 16px;padding:18px 24px 20px 26px;
+  background:var(--steel);border:1px solid var(--rule);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:border-color .2s,background .2s}
+.mode::before{content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:4px;background:var(--lamp-dim);transition:background .2s}
+.mode:hover,.mode:focus-visible{border-color:var(--lamp);background:var(--steel-2)}
+.mode:hover::before,.mode:focus-visible::before{background:var(--lamp)}
+.mode:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
+.mode-tag{grid-area:tag;justify-self:start;font-size:12px;font-weight:700;letter-spacing:.24em;padding:3px 10px;border:1px solid var(--lamp);color:var(--lamp)}
+.mode-title{grid-area:title;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}
+.mode-title b{font-family:var(--f-display);font-weight:900;font-size:clamp(34px,3.3vw,50px);line-height:1.1;letter-spacing:.06em;color:var(--paper)}
+.mode-title span{font-size:14px;letter-spacing:.16em;color:var(--lamp)}
+.mode-art{grid-area:art;width:100%;height:60px;display:block;margin:2px 0 4px}
+.mode-desc{grid-area:desc;font-size:14px;line-height:1.7;color:var(--paper);text-wrap:pretty}
+.mode-go{grid-area:go;align-self:center;font-weight:700;font-size:15px;letter-spacing:.24em;color:var(--lamp);white-space:nowrap}
+.mode-go::after{content:"→";display:inline-block;margin-left:.5em;transition:transform .2s}
+.mode:hover .mode-go::after,.mode:focus-visible .mode-go::after{transform:translateX(5px)}
+.mode-foot{grid-area:foot;align-self:center;justify-self:end;font-family:var(--f-mono);font-size:11.5px;color:var(--paper-dim);text-align:right}
+.modes-title{grid-column:1 / -1;margin:0 0 -4px}
+.home .brand .sound-btn{margin-top:4px}
+.back{all:unset;cursor:pointer;display:inline-block;margin:0 0 14px;font-size:13px;letter-spacing:.14em;color:var(--paper-dim)}
+.back:hover{color:var(--lamp)}
+.back:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
+@media (max-width:980px){
+  .home{background:linear-gradient(180deg,rgba(6,9,12,.35),rgba(6,9,12,0) 30%)}
+  .home-grid{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"brand" "stage" "modes";min-height:0;gap:0;padding:0}
+  .modes{background:rgba(6,9,12,.86);padding:4px clamp(16px,4vw,32px) 24px;grid-template-columns:minmax(0,1fr);gap:12px}
+  .home .stage{min-height:max(36vh,240px)}
+}
+@media (max-width:560px){
+  .mode{padding:14px 16px 16px 20px;grid-template-areas:"tag tag" "title title" "art art" "desc desc" "go go" "foot foot"}
+  .mode-desc{font-size:13px}.mode-foot{justify-self:start;margin-top:2px}
+}
 /* ---------- Duel: entry, lobby ---------- */
-/* the duel stands beside the campaign as a second way in: same size as the launch button, drawn in the lamp's outline */
-.duel-btn{all:unset;cursor:pointer;box-sizing:border-box;width:100%;display:grid;gap:3px;justify-items:center;padding:9px 16px 10px;border:1px solid var(--lamp);background:rgba(240,181,74,.08);text-align:center;transition:background .2s}
-.duel-btn b{font-family:var(--f-body);font-weight:700;font-size:16px;letter-spacing:.3em;color:var(--lamp)}
-.duel-btn span{font-size:11.5px;letter-spacing:.06em;color:var(--paper-dim)}
-.duel-btn:hover{background:rgba(240,181,74,.2)}
-.duel-btn:focus-visible{outline:2px solid var(--paper);outline-offset:3px}
 .mp-note{margin:0;line-height:1.75;font-size:14px;color:var(--paper);text-wrap:pretty}
 .mp-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .mp-or{color:var(--paper-dim);font-size:13px}
@@ -376,7 +410,21 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
   .seg button{padding:7px 10px;font-size:12px}
   .diff-note,.best{display:none}
   .launch .primary{white-space:nowrap}
-  .duel-btn{width:auto;flex:1;padding:8px 12px}.duel-btn b{font-size:15px;letter-spacing:.2em;white-space:nowrap}.duel-btn span{display:none}
+  /* home: title and the two ways to play on the left, the ship on its stage on the right */
+  .home{background:linear-gradient(90deg,rgba(6,9,12,.94) 0,rgba(6,9,12,.8) 42%,rgba(6,9,12,0) 64%)}
+  .home-grid{grid-template-columns:minmax(330px,52%) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"brand stage" "modes stage";min-height:100%;height:100%;gap:8px 14px;
+    padding:10px calc(env(safe-area-inset-right,0px) + 10px) 10px calc(env(safe-area-inset-left,0px) + 14px)}
+  .home .brand .sound-btn{display:none}
+  .home .stage{min-height:0}
+  .modes-title{display:none}
+  .modes{grid-template-columns:minmax(0,1fr);gap:8px;align-content:start;background:none;padding:0}
+  .mode{padding:10px 14px 11px 16px;gap:3px 12px;grid-template-areas:"title tag" "desc desc" "go foot"}
+  .mode-title b{font-size:24px}.mode-title span{font-size:12px}
+  .mode-tag{justify-self:end;align-self:center;font-size:11px;padding:2px 8px}
+  .mode-art{display:none}
+  .mode-desc{font-size:12px;line-height:1.5}
+  .mode-go{font-size:13px}.mode-foot{font-size:10.5px}
+  .back{margin:0 0 2px}
   /* duel screens on a landscape phone: one tight sheet, silhouettes beside the names */
   .sheet{padding:12px 16px;gap:10px;margin-block:8px}
   .sheet h2{font-size:28px}
@@ -460,10 +508,45 @@ html.app,html.app body{touch-action:manipulation}
     <div id="tRudder" class="t-rudder" aria-label="舵：左右拖动"><div class="t-rud-knob"></div><div class="t-rud-act"></div></div>
   </div>
 
-  <div id="menu" class="screen menu">
-    <div class="menu-grid">
+  <div id="home" class="screen menu home">
+    <div class="home-grid">
       <header class="brand">
         <p class="eyebrow">所罗门群岛 · 瓜达尔卡纳尔 · 1942 年 11 月</p>
+        <h1 class="title">铁底湾<span class="yr">1942</span></h1>
+        <p class="en">IRONBOTTOM SOUND</p>
+        <p class="brief">萨沃岛与瓜岛之间这片海峡沉船太多，水兵管它叫“铁底湾”。1942 年 11 月的夜里，美日两国舰队在这里用大炮和鱼雷近距离厮杀。</p>
+        <button class="sound-btn" type="button" aria-pressed="true">声音：开</button>
+      </header>
+      <div class="stage" id="homeStage">
+        <p class="stage-hint" aria-hidden="true">拖动旋转 · 滚轮缩放</p>
+      </div>
+      <nav class="modes" aria-labelledby="modesTitle">
+        <h2 id="modesTitle" class="sec-title modes-title">选择玩法 <span>CHOOSE YOUR BATTLE</span></h2>
+        <button type="button" class="mode" id="modeSolo">
+          <span class="mode-tag">对战电脑</span>
+          <span class="mode-title"><b>单人战役</b><span>守住铁底湾</span></span>
+          <canvas class="mode-art" aria-hidden="true"></canvas>
+          <span class="mode-desc">驾驶一艘美军战舰、带两艘驱逐舰，击退日军分三波发起的夜袭。三艘座舰，三档难度。</span>
+          <span class="mode-go">选择座舰</span>
+          <span class="mode-foot" id="homeBest"></span>
+        </button>
+        <button type="button" class="mode duel" id="modeDuel">
+          <span class="mode-tag">对战真人</span>
+          <span class="mode-title"><b>联机对决</b><span>1v1 · 美军对日军</span></span>
+          <canvas class="mode-art" aria-hidden="true"></canvas>
+          <span class="mode-desc">和朋友一对一，各开一艘同级战舰对轰，可以各带两艘僚舰。创建房间，把链接发给对方就能开战。</span>
+          <span class="mode-go">创建或加入房间</span>
+          <span class="mode-foot">驱逐舰 · 轻巡 · 重巡 · 战列舰</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <div id="menu" class="screen menu" hidden>
+    <div class="menu-grid">
+      <header class="brand">
+        <button class="back" id="menuBack" type="button">← 返回首页</button>
+        <p class="eyebrow">单人战役 · 对战电脑 · 1942 年 11 月</p>
         <h1 class="title">铁底湾<span class="yr">1942</span></h1>
         <p class="en">IRONBOTTOM SOUND</p>
         <p class="brief">萨沃岛与瓜岛之间这片海峡沉船太多，水兵管它叫“铁底湾”。今夜日军舰队分三波从萨沃岛西侧突入，要炮击亨德森机场。你的座舰带两艘驱逐舰守在海峡里，击退全部三波。</p>
@@ -504,7 +587,6 @@ html.app,html.app body{touch-action:manipulation}
             </div>
             <span class="diff-note" id="diffNote"></span>
             <button id="startBtn" class="primary" type="button">起锚出击</button>
-            <button id="mpBtn" class="duel-btn" type="button"><b>联机对战</b><span>1v1 · 美军对日军 · 建房或加入</span></button>
             <button id="soundBtn" class="sound-btn" type="button" aria-pressed="true">声音：开</button>
             <p id="best" class="best"></p>
           </div>
@@ -533,7 +615,7 @@ html.app,html.app body{touch-action:manipulation}
 
   <div id="mp" class="screen dim" hidden>
     <div class="sheet">
-      <p class="eyebrow">联机对战 · 1v1</p>
+      <p class="eyebrow">联机对决 · 对战真人</p>
       <h2>同级舰对决</h2>
       <p class="mp-note">两名舰长各指挥一艘同级战舰，一方美军、一方日军，各带两艘驱逐舰僚舰。两国同级舰的耐久和火力已经拉平，航速、射程和鱼雷保留各自特点。击沉对方全部舰船获胜；你的座舰沉没后可以继续观战。</p>
       <div class="mp-row">
@@ -543,7 +625,7 @@ html.app,html.app body{touch-action:manipulation}
         <button class="ghost" id="mpJoin" type="button">加入</button>
       </div>
       <p class="mp-msg" id="mpMsg" role="status"></p>
-      <div class="btns"><button class="ghost" id="mpBack" type="button">返回港口</button></div>
+      <div class="btns"><button class="ghost" id="mpBack" type="button">← 返回首页</button></div>
     </div>
   </div>
 
@@ -2144,6 +2226,7 @@ window.addEventListener('keydown', e => {
   const k = e.code;
   if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(k) && G.mode === 'play') e.preventDefault();
   if (k === 'KeyM') { Sfx.setMuted(!Sfx.muted); hint(Sfx.muted ? '已静音' : '声音开启'); }
+  if (k === 'Escape' && G.mode === 'menu' && (!$('#menu').hidden || !$('#mp').hidden)) { showScreen('home'); measureStage(); return; }
   if (G.mode === 'paused' && (k === 'Escape' || k === 'KeyP') && !e.repeat && performance.now() - G.pausedAt > 400) { resume(); return; }
   if (G.mode !== 'play') return;
   if (k === 'ShiftLeft' || k === 'ShiftRight') G.shiftHeld = true;
@@ -2177,7 +2260,7 @@ function resume() { if (G.mode !== 'paused') return; G.mode = 'play'; showScreen
 // ---------------------------------------------------------------- HUD
 const hud = $('#hud'), vign = $('#vignette');
 function showScreen(name) {
-  $('#menu').hidden = name !== 'menu'; $('#pause').hidden = name !== 'pause'; $('#end').hidden = name !== 'end';
+  $('#home').hidden = name !== 'home'; $('#menu').hidden = name !== 'menu'; $('#pause').hidden = name !== 'pause'; $('#end').hidden = name !== 'end';
   $('#mp').hidden = name !== 'mp'; $('#lobby').hidden = name !== 'lobby';
   hud.hidden = !(G.mode === 'play' || G.mode === 'paused');
   $('#touch').hidden = !(coarse && G.mode === 'play');
@@ -2456,11 +2539,22 @@ function drawMini() {
 }
 
 // ---------------------------------------------------------------- menu
-function drawSil(cv, key, fill) {
-  const spec = SPECS[key], dpr = Math.min(2, window.devicePixelRatio || 1);
-  const W = cv.clientWidth || 260, H = cv.clientHeight || 46; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+// a canvas sized to its box at the screen's pixel ratio, cleared, drawing in CSS pixels
+function canvas2d(cv, w0, h0) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth || w0, H = cv.clientHeight || h0;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
-  const sc = Math.min((W - 8) / 236, (H - 6) / 48), cx = W / 2, base = H - 4, X = z => cx + z * sc, Y = y => base - y * sc;
+  return { c, W, H };
+}
+// one scale for every ship (236 m to the width), so destroyer, cruiser and battleship compare at a glance
+function drawSil(cv, key, fill) {
+  const { c, W, H } = canvas2d(cv, 260, 46);
+  silhouette(c, key, fill, W / 2, H - 4, Math.min((W - 8) / 236, (H - 6) / 48));
+}
+// a ship in profile, bow to the right (flip: to the left), centred on cx with its waterline at base
+function silhouette(c, key, fill, cx, base, sc, flip) {
+  const spec = SPECS[key], X = z => z * sc, Y = y => base - y * sc;
+  c.save(); c.translate(cx, 0); if (flip) c.scale(-1, 1);
   c.fillStyle = fill; c.strokeStyle = fill;
   c.beginPath(); c.moveTo(X(-spec.L / 2), Y(0));
   for (let i = 0; i <= 40; i++) { const s = i / 40, z = (s - .5) * spec.L; c.lineTo(X(z + bowRake(spec, s, 1)), Y(deckY(spec, z))); }
@@ -2495,6 +2589,7 @@ function drawSil(cv, key, fill) {
     c.fillRect(X(t.z - ts.len / 2), Y(dy + ts.h), ts.len * sc, (ts.h + Math.max(0, t.y)) * sc);
     if (Math.abs(dir) > 0.5) { c.lineWidth = Math.max(1, ts.br * 2.4 * sc); c.beginPath(); c.moveTo(X(t.z + dir * ts.len * 0.2), Y(dy + ts.h * 0.5)); c.lineTo(X(t.z + dir * (ts.len * 0.2 + ts.bl)), Y(dy + ts.h * 0.5 + ts.bl * 0.05)); c.stroke(); }
   }
+  c.restore();
 }
 function buildMenu() {
   const cards = $('#cards');
@@ -2510,12 +2605,15 @@ function buildMenu() {
   $('#oni').innerHTML = ONI.map(([k, n, c]) => `<figure><canvas aria-hidden="true"></canvas><figcaption>${n}<span>${c} · ${SPECS[k].L} m</span></figcaption></figure>`).join('');
   $('#diff').querySelectorAll('button').forEach(b => b.addEventListener('click', () => selectDiff(b.dataset.d)));
   $('#startBtn').addEventListener('click', () => startGame());
-  $('#soundBtn').addEventListener('click', () => { Sfx.init(); Sfx.setMuted(!Sfx.muted); if (!Sfx.muted && G.mode === 'menu') Sfx.music(true); });
+  document.querySelectorAll('.sound-btn').forEach(b => b.addEventListener('click', () => { Sfx.init(); Sfx.setMuted(!Sfx.muted); if (!Sfx.muted && G.mode === 'menu') Sfx.music(true); }));
+  $('#modeSolo').addEventListener('click', () => { Sfx.init(); showScreen('menu'); drawMenuArt(); measureStage(); });
+  $('#modeDuel').addEventListener('click', () => { Sfx.init(); showScreen('mp'); mpSay(''); });
+  $('#menuBack').addEventListener('click', () => toHome());
   syncSoundBtn();
   $('#resumeBtn').addEventListener('click', () => resume());
-  $('#quitBtn').addEventListener('click', () => G.net ? duelQuit() : toMenu());
+  $('#quitBtn').addEventListener('click', () => G.net ? duelQuit() : toHome());
   $('#againBtn').addEventListener('click', () => G.net ? duelAgain() : startGame());
-  $('#portBtn').addEventListener('click', () => G.net ? duelQuit() : toMenu());
+  $('#portBtn').addEventListener('click', () => G.net ? duelQuit() : toHome());
   selectShip(G.shipKey, true); selectDiff(G.diff);
   drawMenuArt();
 }
@@ -2524,6 +2622,26 @@ function drawMenuArt() {
   document.querySelectorAll('#oni figure').forEach((f, i) => drawSil(f.querySelector('canvas'), ONI[i][0], '#a39d8a'));
   const best = store.get('best', null);
   $('#best').textContent = best ? `最佳战绩：${best.ship} · ${best.diff} · 击沉 ${fmt(best.tons)} 吨${best.win ? ' · 守住海峡' : ''}` : '';
+  $('#homeBest').textContent = best ? `最佳：击沉 ${fmt(best.tons)} 吨${best.win ? ' · 守住海峡' : ''}` : '';
+  drawModeArt();
+}
+// the two ways to play, in silhouette: your ship against a Japanese column, or two captains bow to bow
+function drawModeArt() {
+  const solo = $('#modeSolo .mode-art'), duel = $('#modeDuel .mode-art');
+  if (solo.clientWidth) {
+    const { c, W, H } = canvas2d(solo, 400, 60), sc = Math.min(W * 0.34 / 236, (H - 6) / 48), base = H - 4;
+    silhouette(c, G.shipKey, '#8fd3e6', W * 0.2, base, sc);
+    // the Japanese column further off, so smaller, and fading into the dusk astern
+    [['fubuki', 0.5], ['aoba', 0.68], ['kongo', 0.87]].forEach(([k, x], i) => { c.globalAlpha = 0.95 - i * 0.2; silhouette(c, k, '#ef5a40', W * x, base, sc * 0.6, true); });
+    c.globalAlpha = 1;
+  }
+  if (duel.clientWidth) {
+    const { c, W, H } = canvas2d(duel, 400, 60), sc = Math.min(W * 0.36 / 236, (H - 6) / 48), base = H - 4;
+    silhouette(c, 'neworleans', '#8fd3e6', W * 0.25, base, sc);
+    silhouette(c, 'takao', '#ef5a40', W * 0.75, base, sc, true);
+    c.fillStyle = '#f0b54a'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+    c.font = `900 ${Math.round(H * 0.5)}px "Big Shoulders Stencil Display","Arial Narrow",sans-serif`; c.fillText('VS', W / 2, base - 2);
+  }
 }
 function selectShip(k, silent) {
   if (!SPECS[k] || !playableMeta(k)) k = 'fletcher';
@@ -2551,24 +2669,27 @@ function setupPreview(key, team, name) {
   const e = team === 'JP' ? world.add(new S.Ship(world, 'fletcher', 'US', '奥班农号', { no: 'DD-450', x: -1500, z: 400, heading: 1.9, speedFrac: 0.6 })) : world.add(new S.Ship(world, 'fubuki', 'JP', '白雪', { x: -1500, z: 400, heading: 1.9, speedFrac: 0.6 }));
   e.throttle = 5; e.rudderCmd = -0.1;
 }
-function toMenu() { G.mode = 'menu'; G.net = null; G.watch = null; exitLock(); showScreen('menu'); setupPreview(); drawMenuArt(); measureStage(); Sfx.music(true); }
-function syncSoundBtn() { const b = $('#soundBtn'); if (b) { b.textContent = Sfx.muted ? '声音：关' : '声音：开'; b.setAttribute('aria-pressed', !Sfx.muted); } }
+// back to the menus: the home screen (how to play) or the campaign's ship selection
+function toMenu(name = 'menu') { G.mode = 'menu'; G.net = null; G.watch = null; exitLock(); showScreen(name); setupPreview(); drawMenuArt(); measureStage(); Sfx.music(true); }
+function toHome() { toMenu('home'); }
+function syncSoundBtn() { document.querySelectorAll('.sound-btn').forEach(b => { b.textContent = Sfx.muted ? '声音：关' : '声音：开'; b.setAttribute('aria-pressed', !Sfx.muted); }); }
 // browsers only allow audio after a gesture: the first click or key on the menu starts the sea and the music
 ['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, () => { if (G.mode === 'menu') { Sfx.init(); Sfx.music(true); } }, { passive: true }));
 const menuCam = { t: 0, stage: { fx: 0.5, fy: 0.42, w: 600 }, yaw: 0, el: 0.12, zoom: 1, idle: 99 };
 // where the stage sits on screen; the menu camera frames the ship inside it (and follows it when the menu scrolls)
 function measureStage() {
-  const el = $('#stage'); if (!el || $('#menu').hidden) return;
-  const r = el.getBoundingClientRect(), capH = $('.stage-cap').offsetHeight;
+  const el = [...document.querySelectorAll('.stage')].find(e => !e.closest('.screen').hidden); if (!el) return;
+  const cap = el.querySelector('.stage-cap'), r = el.getBoundingClientRect(), capH = cap ? cap.offsetHeight : 0;
   menuCam.stage = { fx: (r.left + r.width / 2) / VW, fy: (r.top + (r.height - capH) * 0.5) / VH, w: r.width, h: Math.max(120, r.height - capH) };
 }
 $('#menu').addEventListener('scroll', measureStage, { passive: true });
+$('#home').addEventListener('scroll', measureStage, { passive: true });
 // drag the stage to walk round the ship (vertical drag changes height), wheel to look closer; the slow drift resumes
 // from wherever you leave it. On touch, vertical swipes still scroll the page (touch-action: pan-y).
-(() => {
-  const st = $('#stage'); let drag = null;
-  if (coarse) $('#stageHint').textContent = '左右滑动旋转';
-  const seen = () => { menuCam.idle = 0; $('#stageHint').classList.add('off'); };
+document.querySelectorAll('.stage').forEach(st => {
+  let drag = null;
+  if (coarse) document.querySelectorAll('.stage-hint').forEach(h => { h.textContent = '左右滑动旋转'; });
+  const seen = () => { menuCam.idle = 0; document.querySelectorAll('.stage-hint').forEach(h => h.classList.add('off')); };
   st.addEventListener('pointerdown', e => { if (e.button > 0) return; drag = { x: e.clientX, y: e.clientY, id: e.pointerId }; st.setPointerCapture(e.pointerId); st.classList.add('drag'); seen(); });
   st.addEventListener('pointermove', e => {
     if (!drag || e.pointerId !== drag.id) return;
@@ -2579,7 +2700,7 @@ $('#menu').addEventListener('scroll', measureStage, { passive: true });
   const end = () => { drag = null; st.classList.remove('drag'); };
   st.addEventListener('pointerup', end); st.addEventListener('pointercancel', end); st.addEventListener('lostpointercapture', end);
   st.addEventListener('wheel', e => { e.preventDefault(); menuCam.zoom = clamp(menuCam.zoom * Math.exp(e.deltaY * 0.0012), 0.35, 1.5); seen(); }, { passive: false });
-})();
+});
 
 // ---------------------------------------------------------------- camera
 function updateCamera(dt) {
@@ -2736,7 +2857,7 @@ const Net = {
       case 'snap': if (G.net) G.net.snap(m); break;
       case 'over': if (G.net) G.net.over(m); break;
       case 'err':
-        if (m.gone) { this.save(null); this.lobby = null; if (G.net) { G.net = null; toMenu(); } if (!$('#lobby').hidden) showScreen('mp'); }
+        if (m.gone) { this.save(null); this.lobby = null; if (G.net) { G.net = null; toHome(); } if (!$('#lobby').hidden) showScreen('mp'); }
         mpSay(m.msg);
         break;
     }
@@ -2800,11 +2921,10 @@ function renderLobby() {
     }
   });
   const join = () => { const c = $('#mpCode').value.replace(/\D/g, ''); if (c.length !== 4) { mpSay('房间号是 4 位数字'); return; } Net.open(); mpSay('正在加入…'); Net.send({ t: 'join', code: c }); };
-  $('#mpBtn').addEventListener('click', () => { Sfx.init(); showScreen('mp'); mpSay(''); });
   $('#mpCreate').addEventListener('click', () => { Net.open(); mpSay('正在创建房间…'); Net.send({ t: 'create' }); });
   $('#mpJoin').addEventListener('click', join);
   $('#mpCode').addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
-  $('#mpBack').addEventListener('click', () => { showScreen('menu'); measureStage(); });
+  $('#mpBack').addEventListener('click', () => { showScreen('home'); measureStage(); });
 })();
 
 // One battle as this captain sees it. The world here is a mirror: setupDuel builds the same ships (same ids) as the server's,
@@ -2931,14 +3051,14 @@ function showDuelEnd() {
 }
 // from the results: back to the room's lobby for another round, or out of the room altogether
 function duelAgain() { G.net = null; G.mode = 'menu'; G.watch = null; setupPreview(); showScreen('lobby'); renderLobby(); Sfx.music(true); }
-function duelQuit() { if (G.net && !G.net.result) Net.send({ t: 'surrender' }); Net.leave(); G.net = null; G.watch = null; toMenu(); }
+function duelQuit() { if (G.net && !G.net.result) Net.send({ t: 'surrender' }); Net.leave(); G.net = null; G.watch = null; toHome(); }
 
 // ---------------------------------------------------------------- boot
 function start(data) {
   if (data && data.ship) G.shipKey = data.ship;
   if (data && data.diff) G.diff = data.diff;
   resize(); buildLand(); buildMenu();
-  showScreen('menu'); setupPreview(); measureStage();
+  showScreen('home'); setupPreview(); measureStage();
   // a duel invite (?room=1234), or a duel this page was in a moment ago (a reload, a dropped connection)
   const room = (new URLSearchParams(location.search).get('room') || '').replace(/\D/g, ''), ses = store.get('duel', null);
   if (ses && Date.now() - ses.at < 5 * 60 * 1000 && (!room || room === ses.code)) { Net.session = ses; Net.open(); }
