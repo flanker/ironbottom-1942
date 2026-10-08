@@ -2773,8 +2773,11 @@ function frame(now) {
   vignT = Math.max(0, vignT - (dt || 0.016) * 1.2); vign.style.opacity = Math.min(0.9, vignT).toFixed(2);
 }
 function step(dt, active) {
-  if (G.net) G.net.frame(dt);
-  else {
+  if (G.net) {
+    // the server runs the battle: place the ships from its snapshots, then send it this captain's helm, aim and fire orders
+    G.net.frame(dt);
+    if (G.mode === 'play') updatePlayer(dt);
+  } else {
     if (G.mode === 'play') { G.clock += dt; updatePlayer(dt); waveLogic(dt); }
     if (G.mode === 'menu' && G.preview) {
       const e = world.ships[1]; if (e && Math.hypot(e.x, e.z) > 3500) e.rudderCmd = 0.4;
