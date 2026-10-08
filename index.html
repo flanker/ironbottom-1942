@@ -439,11 +439,10 @@ button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
   .btns{gap:8px}.btns .primary,.btns .ghost{padding:8px 16px;font-size:14px}
 }
 /* Touch, in the browser as in the app: long presses are for the guns and the helm, so no text selection, loupe or callout,
-   no double-tap zoom, and no enlarged text when a phone turns sideways. The room-code box still takes text. */
+   no double-tap zoom, and no enlarged text when a phone turns sideways. */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{touch-action:manipulation}
 html,html *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-html #app input{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 @media (prefers-reduced-motion:reduce){
   .banner.show,.torp-warn{animation:none}
 }
@@ -2122,8 +2121,7 @@ if (APP) {
 }
 // touch screens, in the browser as in the app: a long press or a pinch belongs to the game, not to text selection or zoom
 if (APP || coarse) {
-  const field = e => e.target && e.target.closest && e.target.closest('input, textarea');
-  ['selectstart', 'contextmenu'].forEach(ev => document.addEventListener(ev, e => { if (!field(e)) e.preventDefault(); }));
+  ['selectstart', 'contextmenu'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
   ['gesturestart', 'gesturechange'].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), { passive: false }));
 }
 const touchState = { left: false, right: false, rud: 0 };
