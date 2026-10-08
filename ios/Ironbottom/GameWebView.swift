@@ -20,8 +20,9 @@ final class GameController: NSObject, WKScriptMessageHandler {
         config.setURLSchemeHandler(BundleSchemeHandler(root: root), forURLScheme: "ironbottom")
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
-        // No text selection, loupe or callouts: long presses are for the guns.
-        config.preferences.isTextInteractionEnabled = false
+        // Text interaction stays on so the room-code box takes typing; the page itself turns off selection, the loupe
+        // and callouts everywhere else, since long presses are for the guns.
+        config.preferences.isTextInteractionEnabled = true
         let scripts = config.userContentController
         scripts.add(WeakMessageHandler(self), name: "haptic")
         // Tells the page it is inside the app: touch layout, haptics, background pause.
