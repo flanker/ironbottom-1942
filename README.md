@@ -122,6 +122,20 @@ railway up         # 部署到已关联的 Railway 项目
 open ios/Ironbottom.xcodeproj   # 选模拟器或真机运行；上传 TestFlight 前在 Signing 里选开发者团队
 ```
 
+## 小红书小工具 / B站 Toy
+
+两个平台都是把网页打成 zip 上传，在 App 的 WebView 里运行。`dev/package/build.mjs` 从网站生成只含单人战役的版本：去掉联机对决，脚本移到 `app.js`，音效以 base64 放进 `sfx.js`，three.js 和拉丁字体取自 `ios/vendor/`，CSS 给 Chrome 61 补上回退写法。`index.html` 改动后如果某处补丁对不上，构建会直接报错。
+
+- 小红书小工具：容器不联网，禁止内联脚本、`fetch` 和 `.mp3` 文件，规范见 `.claude/skills/minitool-zip-builder/`。客户端 9.46 及以上时，存档存进容器的 Storage 接口。
+- B站 Toy：加载 B站的 Toy SDK（`window.toy`）。在 B站 App 9.9.0 及以上，进入后切到横屏沉浸模式，并按容器给出的安全区（包括顶部胶囊）留边；登录用户的存档走云存档，可多端同步。
+
+```sh
+node dev/package/build.mjs minitool   # → dist/ironbottom-1942-minitool.zip，上传到创服平台
+node dev/package/build.mjs toy        # → dist/ironbottom-1942-toy.zip，上传到 B站 Toy 发布平台
+```
+
+上传前各跑一次平台 skill 自带的检查：`python3 .claude/skills/minitool-zip-builder/scripts/audit_artifact.py <zip>`（小红书）、`python3 .claude/skills/toy/scripts/toy_doctor.py <zip> --slug ironbottom-1942`（Toy）。
+
 ## 平衡测试
 
 `dev/` 下分三块：`debug/` 是调数值和看舰模的工具，`record/` 录宣传片画面（`record/legacy/` 是老的单人战役录制器），`promo/` 剪辑、混音和出片。打开 `dev/debug/index.html` 会开启调试句柄 `window.__ibs`，并加载一个「机器人舰长」。它会算提前量瞄准、躲鱼雷、绕开岛屿、自动损管。在控制台执行：

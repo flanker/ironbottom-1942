@@ -54,9 +54,9 @@ const TS = {
 // Bx block (rf/rr rounded front/rear, fs front slope, ta top inset, win window band), Cy funnel, Ms mast (tri tripod legs),
 // Pl platform, Tt torpedo mount, Aa light gun (o Oerlikon, b2/b4 Bofors, j2/j3 25 mm, ha/ha2 HA mounts), Sl searchlight,
 // Rf rangefinder, Dr director, Bt boat, Cp catapult (+ floatplane), Cr crane, Gm fixed gun mount, Dc depth-charge rack.
-const Bx = (z, y, len, h, w, x = 0, m = 's', o = {}) => ({ k: 'b', z, y, len, h, w, x, m, ...o });
-const Cy = (z, y, r, h, rake = 0, x = 0, o = {}) => ({ k: 'c', z, y, r, h, rake: rake * DEG, x, ...o });
-const Ms = (z, y, h, r, o = {}) => ({ k: 'm', z, y, h, r, x: 0, ...o, rake: (o.rake || 0) * DEG });
+const Bx = (z, y, len, h, w, x = 0, m = 's', o = {}) => Object.assign({ k: 'b', z, y, len, h, w, x, m }, o);
+const Cy = (z, y, r, h, rake = 0, x = 0, o = {}) => Object.assign({ k: 'c', z, y, r, h, rake: rake * DEG, x }, o);
+const Ms = (z, y, h, r, o = {}) => Object.assign({ k: 'm', z, y, h, r, x: 0 }, o, { rake: (o.rake || 0) * DEG });
 const Pl = (z, y, len, w, x = 0) => ({ k: 'pl', z, y, len, w, x });
 const Tt = (z, y, n, x = 0, len = 7.5, sh = 0) => ({ k: 'tt', z, y, n, x, len, sh });
 const Aa = (z, y, x, kind) => ({ k: 'aa', z, y, x, kind });
