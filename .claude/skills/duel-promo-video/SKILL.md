@@ -61,3 +61,4 @@ export PROMO_PROD=dev/promo/productions/<日期-主题>             # 这部片�
 - `dev/promo/`：通用流程。`jobs.py` 是录制任务的辅助函数，`runall.py` 并行录制，`tts.py` 生成 AI 试读，`compose.py` 逐段合成，`mix.py` 混音并导出 mp4，`export.py` 生成 SRT、旁白稿和交付文件，`cards/` 是字卡和封面渲染，`sheet.py` 和 `tsheet.py` 出缩略图。
 - `dev/promo/productions/2026-10-duel/`：上一版联机宣传片（BB 种子 12、DD 种子 26、CA 种子 17），做新片子时复制这个文件夹当模板。里面有 `prod.py`（录制任务和 BB 的房间流程）、`edit.py`（剪辑表、音乐、按钮声、画面说明）、`lines.json`（台词）和 `cover.html`（封面）。
 - 老的单人战役录制器在 `dev/record/legacy/`：`record.html` 加载 `record.js`、`record-hud.js`、`record-cards.js`，用 `recserver.py` 直接收帧，录单人战役画面可以用它。
+- 单人战役宣传片（B站 Toy 版）在 `dev/promo/productions/2026-10-toy/`：`make.py` 自带剪辑表和混音，不走 `compose.py`。录素材时用 Playwright 打开 `record.html`，`__rec.setup(w, h)` 后逐个 `__rec.run(镜头)` 或 `__rec.game('nc'|'dd')`，**每个镜头录完都要 `await __rec.flush()`**，否则最后一段音轨会被截断。竖版设 `__rec.fovK = 1.75` 再 `setup(1080, 1920)`。Chromium 加 `--use-angle=metal` 用真 GPU，一个镜头几秒钟就能录完。带真实 HUD 的段落，字卡要放在画面上方，否则会压住武器栏。

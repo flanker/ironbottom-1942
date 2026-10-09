@@ -114,7 +114,8 @@
   const KN = 0.5144 * 2.6;
   function scene() { I.clearWorld(); G.mode = 'viewer'; G.player = null; G.stats = null; cam.clearViewOffset(); }
   function ship(key, team, name, x, z, hd, frac = 0.7, thr = 5) { const s = new I.Ship(key, team, name, { x, z, heading: hd, speedFrac: frac }); s.throttle = thr; I.ships.push(s); return s; }
-  function look(p, t, fov = 45) { cam.position.copy(p); cam.lookAt(t); if (Math.abs(cam.fov - fov) > 0.01) { cam.fov = fov; cam.updateProjectionMatrix(); } }
+  // R.fovK widens every shot's lens, for portrait renders (1.75 keeps a 16:9 framing's ships in a 9:16 frame)
+  function look(p, t, fov = 45) { cam.position.copy(p); cam.lookAt(t); fov *= R.fovK || 1; if (Math.abs(cam.fov - fov) > 0.01) { cam.fov = fov; cam.updateProjectionMatrix(); } }
   function aimAt(s, x, z) { s.aimX = x; s.aimZ = z; }
   function salvo(s, x, z, err = 10, sec = false) { for (const t of s.turrets) if (!!t.sec === sec && t.inArc) I.fireTurret(s, t, x, z, err); }
   function lead(from, tgt) { return I.leadPoint(from.x, from.z, tgt, from.gun); }
@@ -349,7 +350,7 @@
             const d = dirXZ(hT), lat = dirXZ(comb + Math.PI / 2), run = sc.owner.torp.speed * TP;
             for (const off of [-52, -20, 22, 54]) {
               const x = P.x - d.x * run + lat.x * off, z = P.z - d.z * run + lat.z * off;
-              I.torps.push({ x, z, h: hT, dx: d.x, dz: d.z, speed: sc.owner.torp.speed, range: 3000, trav: 200, owner: sc.owner, team: 'JP', spec: sc.owner.torp, alive: true, seenT: 3, emitT: 0, evaded: new Set() });
+              I.torps.push({ x, z, h: hT, dx: d.x, dz: d.z, speed: sc.owner.torp.speed, range: 3000, trav: 200, owner: sc.owner, team: 'JP', spec: sc.owner.torp, alive: true, seen: { US: 3, JP: 3 }, evaded: new Set() });
             }
           }
         },
