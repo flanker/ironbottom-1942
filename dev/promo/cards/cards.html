@@ -1,0 +1,63 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@700;900&display=swap">
+<style>
+:root{--ink:#06090c;--paper:#ebe3cd;--dim:#a39d8a;--amber:#f0b54a;--us:#8fd3e6;--jp:#ef5a40;
+  --serif:"Noto Serif SC",serif;--sans:"Noto Sans SC",sans-serif;--sten:"Big Shoulders Stencil Display",sans-serif;--mono:"IBM Plex Mono",monospace}
+html,body{margin:0;background:transparent}
+#c{position:relative;overflow:hidden;color:var(--paper);font-family:var(--sans)}
+.sh{text-shadow:0 2px 3px rgba(0,0,0,.9),0 0 26px rgba(0,0,0,.85),0 0 60px rgba(0,0,0,.5)}
+.abs{position:absolute}
+.chip{position:absolute;display:flex;align-items:center;gap:14px;padding:12px 26px 12px 20px;background:rgba(6,9,12,.72);border-left:6px solid var(--amber);font-weight:700}
+.chip small{font-family:var(--mono);font-weight:500;color:var(--amber);letter-spacing:.08em}
+.label{position:absolute;display:flex;align-items:baseline;gap:14px;font-weight:700}
+.label i{font-style:normal;font-family:var(--mono);font-weight:500;color:var(--dim);letter-spacing:.06em}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;transform:translateY(-2px)}
+.bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#16222c 0%,#0b1117 55%,#05080b 100%)}
+.bg:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(240,181,74,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(240,181,74,.05) 1px,transparent 1px);background-size:48px 48px}
+.frame{position:absolute;border:2px solid rgba(240,181,74,.55);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 18px 50px rgba(0,0,0,.6)}
+.logo{position:absolute;display:flex;align-items:baseline;gap:6px;font-family:var(--serif);font-weight:900}
+.logo b{font-family:var(--sten);font-weight:900;color:var(--amber)}
+</style>
+<div id="c"></div>
+<script>
+const A = 'var(--amber)';
+const logo = (x, y, px, extra = '') => `<div class="logo sh" style="left:${x}px;top:${y}px;font-size:${px}px">铁底湾<b style="font-size:${px * 0.66}px">1942</b>${extra}</div>`;
+const chip = (t, en, x = 64, y = 56, px = 34) => `<div class="chip sh" style="left:${x}px;top:${y}px;font-size:${px}px">${t}${en ? `<small style="font-size:${px * 0.55}px">${en}</small>` : ''}</div>`;
+const lab = (side, who, x, y, px) => `<div class="label sh" style="left:${x}px;top:${y}px;font-size:${px}px"><span class="dot" style="background:var(--${side.toLowerCase()})"></span><span style="color:var(--${side.toLowerCase()})">${who}</span><i style="font-size:${px * 0.6}px">${side === 'US' ? 'US NAVY' : 'IJN'}</i></div>`;
+const center = (html, top, px, color = 'var(--paper)', fam = 'var(--sans)', w = 900) => `<div class="abs sh" style="left:0;right:0;top:${top}px;text-align:center;font-family:${fam};font-weight:${w};font-size:${px}px;color:${color};line-height:1.25">${html}</div>`;
+// landscape split: two panes 944×531 at y 250
+const SPL = { w: 944, h: 531, y: 250, x0: 8, x1: 968 };
+window.CARDS = {
+  // ---- landscape
+  hook: [1920, 1080, () => center('真人联机 1v1', 760, 132, A, 'var(--serif)') + center('美军 vs 日军 · 铁底湾1942', 925, 46, 'var(--paper)', 'var(--sans)', 700)],
+  title: [1920, 1080, () => `<div class="abs sh" style="left:0;right:0;top:330px;text-align:center;font-family:var(--serif);font-weight:900;font-size:170px">铁底湾<span style="font-family:var(--sten);color:${A};font-size:112px;margin-left:10px">1942</span></div>`
+     + center('联机对决 · 上线', 570, 72, A) + center('真人 1v1 · 美军对日军 · 浏览器打开就能玩', 680, 40, 'var(--paper)', 'var(--sans)', 500)],
+  splitbg: [1920, 1080, () => `<div class="bg"></div><div class="frame" style="left:${SPL.x0 - 2}px;top:${SPL.y - 2}px;width:${SPL.w}px;height:${SPL.h}px"></div><div class="frame" style="left:${SPL.x1 - 2}px;top:${SPL.y - 2}px;width:${SPL.w}px;height:${SPL.h}px"></div>`
+     + lab('US', '玩家 A · 美军', 24, 186, 38) + lab('JP', '玩家 B · 日军', 984, 186, 38) + logo(1610, 984, 50)
+     + `<div class="abs" style="left:24px;top:996px;font-family:var(--mono);font-size:22px;color:var(--dim);letter-spacing:.1em">两台电脑 · 同一局 · 各自视角</div>`, true],
+  tech: [1920, 1080, () => `<div class="abs" style="right:90px;top:250px;width:640px;padding:40px 44px;background:rgba(6,9,12,.78);border-left:6px solid ${A}">`
+     + `<div style="font-family:var(--mono);color:${A};font-size:24px;letter-spacing:.14em;margin-bottom:18px">SERVER · 服务器权威</div>`
+     + ['对局在服务器上运行（30 Hz）', '每秒同步 15 次快照，平滑插值', '掉线 60 秒内重开页面，接着打'].map(t => `<div style="font-size:38px;font-weight:700;margin:14px 0">${t}</div>`).join('') + '</div>'],
+  outro: [1920, 1080, () => `<div class="abs" style="inset:0;background:radial-gradient(ellipse at 50% 55%,rgba(6,9,12,.2),rgba(6,9,12,.75))"></div>`
+     + `<div class="abs sh" style="left:0;right:0;top:320px;text-align:center;font-family:var(--serif);font-weight:900;font-size:150px">铁底湾<span style="font-family:var(--sten);color:${A};font-size:100px;margin-left:10px">1942</span></div>`
+     + center('联机对决 · 真人 1v1', 550, 64, A) + center('电脑、手机浏览器打开就能玩 · 叫上朋友来一局', 660, 40, 'var(--paper)', 'var(--sans)', 500)],
+  // ---- portrait (1080×1920): two 16:9 panes 1080×608 at y 330 and 978
+  pstackbg: [1080, 1920, () => `<div class="bg"></div><div class="frame" style="left:-2px;top:328px;width:1080px;height:608px"></div><div class="frame" style="left:-2px;top:976px;width:1080px;height:608px"></div>`
+     + logo(40, 40, 96) + `<div class="abs sh" style="left:44px;top:168px;font-size:44px;font-weight:700;color:${A}">联机对决 · 真人 1v1</div>`
+     + lab('US', '玩家 A · 美军', 30, 264, 40).replace('label', 'label').replace('top:264px', 'top:262px') + lab('JP', '玩家 B · 日军', 30, 1598, 40), true],
+  ptop: [1080, 1920, () => `<div class="abs" style="left:0;right:0;top:0;height:330px;background:linear-gradient(rgba(6,9,12,.85),rgba(6,9,12,0))"></div>` + logo(40, 84, 96) + `<div class="abs sh" style="left:44px;top:212px;font-size:44px;font-weight:700;color:${A}">联机对决 · 真人 1v1</div>`],
+  phook: [1080, 1920, () => center('对面是真人', 1270, 150, A, 'var(--serif)') + center('美军 vs 日军 · 网页 3D 海战', 1470, 50, 'var(--paper)', 'var(--sans)', 700)],
+  pend: [1080, 1920, () => `<div class="abs" style="inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(6,9,12,.35),rgba(6,9,12,.85))"></div>`
+     + `<div class="abs sh" style="left:0;right:0;top:640px;text-align:center;font-family:var(--serif);font-weight:900;font-size:150px">铁底湾<span style="font-family:var(--sten);color:${A};font-size:100px;margin-left:8px">1942</span></div>`
+     + center('联机对决 · 真人 1v1', 880, 64, A) + center('浏览器打开就能玩<br>叫上朋友来一局', 990, 50, 'var(--paper)', 'var(--sans)', 700)],
+};
+// chapter chips (landscape) and bottom captions (portrait)
+const TAGS = { t_create: ['创建房间', 'ROOM'], t_join: ['输入房间号加入', 'JOIN'], t_cls: ['选舰种 · 选座舰', 'CLASS'], t_balance: ['同级舰 · 数值拉平', 'BALANCE'], t_esc: ['AI 僚舰 · 可选', 'ESCORTS'], t_ready: ['准备 · 3 秒开战', 'READY'],
+  t_long: ['战列舰 · 九公里对轰', 'BB · 9 KM'], t_jp: ['日军视角', 'IJN VIEW'], t_shell: ['炮弹视角 · 406 mm', 'SHELL CAM'], t_close: ['抵近对射', 'CLOSE RANGE'], t_spec: ['沉了接着观战', 'SPECTATE'],
+  t_dd: ['驱逐舰 · 两公里内', 'DD · 2 KM'], t_t93: ['九三式氧气鱼雷', 'TYPE 93'], t_ca: ['重巡 · 三对三混战', 'CA · 3 v 3'], t_result: ['结算 · 回到房间', 'RESULT'], t_tech: ['', ''] };
+for (const [k, [t, en]] of Object.entries(TAGS)) if (t) CARDS[k] = [1920, 1080, () => chip(t, en)];
+const CAPS = { c_create: '创建房间 · 房间号 1942', c_join: '朋友输入房间号 · 加入', c_ready: '选好战舰 · 准备 · 3 秒开战', c_long: '九公里外 · 第一轮就命中', c_t93: '九三式鱼雷 · 几乎看不见', c_ca: '三对三混战 · 沉了接着观战', c_end: '浏览器打开就能玩' };
+for (const [k, t] of Object.entries(CAPS)) CARDS[k] = [1080, 1920, () => `<div class="abs sh" style="left:40px;right:40px;top:1660px;text-align:center;font-size:66px;font-weight:900;color:var(--paper);line-height:1.2">${t.replace(/ · /g, ' <span style="color:var(--amber)">·</span> ')}</div>`];
+for (const [k, t] of Object.entries(CAPS)) CARDS['f' + k] = [1080, 1920, () => `<div class="abs sh" style="left:40px;right:40px;top:1500px;text-align:center;font-size:72px;font-weight:900;color:var(--paper);line-height:1.2">${t.replace(/ · /g, ' <span style="color:var(--amber)">·</span> ')}</div>`];
+window.render = name => { const [w, h, f, opaque] = CARDS[name]; const c = document.getElementById('c'); c.style.width = w + 'px'; c.style.height = h + 'px'; c.innerHTML = f(); return [w, h, !!opaque]; };
+</script>
