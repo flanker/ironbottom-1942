@@ -1095,14 +1095,20 @@ const SFX_CLIPS = { gun_s: -21, gun_m: -20, gun_l: -19, gun_xl: -18.6, distant: 
   hit_a: -17.2, hit_b: -15.4, hit_c: -15.9, boom_a: -12.3, boom_b: -12.7, music_hymn: -20 };
 // which recording each calibre fires, and the playback rate that makes the reference calibre sound right
 const GUN_CLIP = [[135, 'gun_s', 127, 1.4], [180, 'gun_m', 152, 1], [300, 'gun_l', 203, 1], [1e9, 'gun_xl', 406, 1]];
+const MAX_VOICES = 48;
 // Every positional sound goes through a voice: air absorption (distant guns lose their crack), stereo pan relative to the
 // camera, and a send into a shared reverb that stands in for the echo off the water and the islands.
 const Sfx = {
   ctx: null, out: null, verb: null, noise: null, muted: store.get('muted', false), last: 0, count: 0, inFlight: 0, dir: new THREE.Vector3(),
+  bag: null, active: 0,
   init() {
     if (this.ctx) { this.ctx.resume && this.ctx.resume(); return; }
     try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
     const c = this.ctx, sr = c.sampleRate;
+    // sounds build their nodes through this, so each node joins the voice being built (see begin)
+    this.bag = null; this.active = 0;
+    const vc = this.vc = { get currentTime() { return c.currentTime; } };
+    for (const k of ['Gain', 'BiquadFilter', 'StereoPanner', 'WaveShaper', 'Oscillator', 'BufferSource']) if (c['create' + k]) vc['create' + k] = () => this.own(c['create' + k]());
     const comp = c.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.25;
     comp.connect(c.destination);
     // master low-pass: a big salvo of your own dulls everything for a moment
@@ -1175,10 +1181,33 @@ const Sfx = {
     const dx = x - camera.position.x, dz = z - camera.position.z, dl = Math.hypot(dx, dz);
     return dl < 1 ? 0 : clamp((dx * rx + dz * rz) / (rl * dl), -1, 1) * 0.85;
   },
+  // A voice is every node one sound builds. They are all disconnected once its last source has ended, rather than left
+  // hanging off the bus until garbage collection gets round to them.
+  begin() {
+    const b = this.bag = { nodes: [], n: 0 }; this.active++;
+    queueMicrotask(() => { if (!b.n) this.free(b); });
+  },
+  own(node) {
+    const b = this.bag; if (!b) return node;
+    b.nodes.push(node);
+    if (node.start) { b.n++; node.onended = () => { if (--b.n === 0) this.free(b); }; }
+    return node;
+  },
+  free(b) {
+    if (b.done) return; b.done = true; this.active--;
+    if (this.bag === b) this.bag = null;
+    for (const n of b.nodes) n.disconnect();
+  },
   voice(x, z, wet = 0.3, now = false) {
     if (!this.ok()) return null;
     // hear from the player's ship as much as from the camera hanging 300 m behind it, so near misses land close
-    const P = G.player, c = this.ctx, d = P && G.mode !== 'menu' ? Math.min(distToCam(x, z), Math.hypot(x - P.x, z - P.z) + 40) : distToCam(x, z), air = c.createBiquadFilter();
+    const P = G.player, d = P && G.mode !== 'menu' ? Math.min(distToCam(x, z), Math.hypot(x - P.x, z - P.z) + 40) : distToCam(x, z);
+    // Only so many voices at once, distant ones turned away first. If the audio thread ever falls behind, every sound
+    // lasts longer in real time, more of them overlap, and it never catches up again: the sound stutters for the rest
+    // of the battle while the picture stays smooth.
+    if (this.active >= MAX_VOICES || (this.active >= MAX_VOICES / 2 && d > 2500)) return null;
+    this.begin();
+    const c = this.vc, air = c.createBiquadFilter();
     air.type = 'lowpass'; air.frequency.value = clamp(19000 / (1 + d / 320), 500, 19000); air.Q.value = 0.4;
     let tail = air;
     if (c.createStereoPanner) { const p = c.createStereoPanner(); p.pan.value = this.panOf(x, z); air.connect(p); tail = p; }
@@ -1188,7 +1217,7 @@ const Sfx = {
   },
   // filtered noise with an attack/decay envelope
   hiss(dest, t0, dur, f0, f1, vol, type = 'lowpass', q = 0.7, atk = 0.006, rate = 1) {
-    const c = this.ctx, s = c.createBufferSource(); s.buffer = this.noise; s.playbackRate.value = rate * rand(0.9, 1.1);
+    const c = this.vc, s = c.createBufferSource(); s.buffer = this.noise; s.playbackRate.value = rate * rand(0.9, 1.1);
     const f = c.createBiquadFilter(); f.type = type; f.Q.value = q; f.frequency.setValueAtTime(f0, t0); if (f1) f.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
     const g = c.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), t0 + atk); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     s.connect(f); f.connect(g); g.connect(dest); s.start(t0, rand(0, 1.5)); s.stop(t0 + dur + 0.05);
@@ -1196,7 +1225,7 @@ const Sfx = {
   },
   // pitch-dropping sine, optionally driven into the saturator
   thump(dest, t0, dur, f0, f1, vol, drive = 0) {
-    const c = this.ctx, o = c.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    const c = this.vc, o = c.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
     const g = c.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), t0 + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     if (drive) { const ws = c.createWaveShaper(); ws.curve = this.curve; const pre = c.createGain(); pre.gain.value = 1 + drive * 3; o.connect(pre); pre.connect(ws); ws.connect(g); } else o.connect(g);
     g.connect(dest); o.start(t0); o.stop(t0 + dur + 0.05);
@@ -1204,7 +1233,7 @@ const Sfx = {
   // recorded clip, levelled to a common loudness; returns the source so callers can automate its rate
   clip(name, dest, t0, vol, rate = 1, offset = 0, stopAt = 0) {
     const b = this.buf[name]; if (!b) return null;
-    const c = this.ctx, s = c.createBufferSource(), g = c.createGain();
+    const c = this.vc, s = c.createBufferSource(), g = c.createGain();
     s.buffer = b; s.playbackRate.value = rate; g.gain.value = vol * Math.pow(10, (-18 - SFX_CLIPS[name]) / 20);
     s.connect(g); g.connect(dest); s.start(t0, Math.max(0, offset)); if (stopAt) s.stop(stopAt);
     return { s, g, b };
@@ -1225,7 +1254,7 @@ const Sfx = {
   // ears ring after a heavy salvo of your own, and you hear the shells tearing away toward the target
   gunOwn(k, n, t0, tx, tz, cal) {
     if (k > 0.3) this.dull(lerp(3500, 700, k), 0.25 + k * 0.5);
-    const c = this.ctx, g = c.createGain(); let dest = g;
+    const c = this.vc, g = c.createGain(); let dest = g;
     if (c.createStereoPanner) { const p = c.createStereoPanner(); p.pan.setValueAtTime(0, t0); p.pan.linearRampToValueAtTime(this.panOf(tx, tz), t0 + 1.6); g.connect(p); p.connect(this.out); } else g.connect(this.out);
     if (!this.clip('outgoing', dest, t0 + 0.08, (0.22 + 0.2 * k) * Math.min(3, n) / 2, Math.pow(203 / cal, 0.35) * rand(0.95, 1.05)))
       this.hiss(g, t0 + 0.05, 1.3 + k * 1.2, lerp(2600, 1300, k), lerp(700, 260, k), (0.07 + 0.08 * k) * Math.min(3, n) / 2, 'bandpass', 1.6, 0.05, 0.9);
@@ -1246,7 +1275,7 @@ const Sfx = {
   // shell coming down near the player: a ripping rush that climbs as it closes, with the flutter of a spinning shell
   incoming(cal, x, z, dur) {
     if (this.inFlight >= 3) return; const v = this.voice(x, z, 0.12, true); if (!v) return;
-    const c = this.ctx, { t0, dest } = v, t1 = t0 + dur, k = cal / 406;
+    const c = this.vc, { t0, dest } = v, t1 = t0 + dur, k = cal / 406;
     this.inFlight++; setTimeout(() => this.inFlight--, dur * 1000);
     // recorded: light shells get the high whistle, heavy ones a deeper whine; the clip's end is lined up with the impact
     const small = cal < 180, name = small ? 'whistle' : ['incoming_a', 'incoming_b', 'incoming_c'][(Math.random() * 3) | 0], b = this.buf[name];
@@ -1271,7 +1300,7 @@ const Sfx = {
   // shell passing close overhead to land beyond: rush up to the pass, doppler drop, sweep across
   flyby(cal, x0, z0, x1, z1, tPass) {
     const v = this.voice(x0, z0, 0.15, true); if (!v) return;
-    const c = this.ctx, { t0, dest } = v, tp = t0 + tPass, k = cal / 406, fc = lerp(2200, 1000, k);
+    const c = this.vc, { t0, dest } = v, tp = t0 + tPass, k = cal / 406, fc = lerp(2200, 1000, k);
     if (v.pan) { v.pan.setValueAtTime(this.panOf(x0, z0), t0); v.pan.linearRampToValueAtTime(this.panOf(x1, z1), tp + 0.5); }
     // recorded pass peaks 2.35 s into the clip; line that up with the moment the shell goes over, then bend the pitch down
     const PASS = 2.35, rate = Math.pow(160 / cal, 0.4) * rand(0.96, 1.04), ts = Math.max(t0, tp - PASS / rate);
@@ -1300,13 +1329,13 @@ const Sfx = {
     return b;
   },
   waterFx(dest, t0, vol, rate, type = 'lowpass', freq = 9000) {
-    const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    const c = this.vc, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
     s.buffer = this.water; s.playbackRate.value = rate; f.type = type; f.frequency.value = freq; f.Q.value = 0.5; g.gain.value = vol;
     s.connect(f); f.connect(g); g.connect(dest); s.start(t0);
   },
   // struck steel: inharmonic plate modes, each decaying on its own clock
   ring(dest, t0, f0, dur, vol, modes = [1, 2.76, 5.4, 8.93]) {
-    const c = this.ctx;
+    const c = this.vc;
     modes.forEach((m, i) => {
       const o = c.createOscillator(), g = c.createGain(), f = f0 * m * rand(0.985, 1.015), d = dur / (1 + i * 0.6);
       o.frequency.setValueAtTime(f, t0); o.frequency.exponentialRampToValueAtTime(f * 0.97, t0 + d);
@@ -1353,7 +1382,7 @@ const Sfx = {
     this.waterFx(dest, t0 + 1.4, 0.45 * a * g, 0.8, 'lowpass', 5000);
     if (own) { this.dull(500, 1.2); this.ring(dest, t0 + 0.1, rand(62, 78), 2.6, 0.16, [1, 1.47, 2.09, 2.76, 3.9]); this.debris(dest, t0 + 0.2, 14, 1.6, 0.2); }
   },
-  lowpassTo(dest, f) { const q = this.ctx.createBiquadFilter(); q.type = 'lowpass'; q.frequency.value = f; q.connect(dest); return q; },
+  lowpassTo(dest, f) { const q = this.vc.createBiquadFilter(); q.type = 'lowpass'; q.frequency.value = f; q.connect(dest); return q; },
   dull(f, tau) { const now = this.ctx.currentTime, e = this.ear.frequency; e.cancelScheduledValues(now); e.setValueAtTime(f, now); e.setTargetAtTime(20000, now + 0.05, tau); },
   // a ship blowing up: detonation, the deep boom rolling out, burning debris
   boom(s, x, z) {
@@ -1365,7 +1394,7 @@ const Sfx = {
     this.hiss(dest, t0 + 0.1, 2 + s, 300, 50, Math.min(1, 0.2 * s) * a, 'lowpass', 0.6, 0.3, 0.6);
     this.debris(dest, t0 + 0.3, 12, 2.5, 0.12 * a);
   },
-  alarm() { if (!this.ctx || this.muted) return; const c = this.ctx, t0 = c.currentTime; for (let i = 0; i < 3; i++) { const o = c.createOscillator(); o.type = 'square'; o.frequency.value = 880; const g = c.createGain(); g.gain.setValueAtTime(0.0001, t0 + i * 0.18); g.gain.exponentialRampToValueAtTime(0.05, t0 + i * 0.18 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.18 + 0.12); o.connect(g); g.connect(this.out); o.start(t0 + i * 0.18); o.stop(t0 + i * 0.18 + 0.14); } },
+  alarm() { if (!this.ctx || this.muted) return; this.begin(); const c = this.vc, t0 = c.currentTime; for (let i = 0; i < 3; i++) { const o = c.createOscillator(); o.type = 'square'; o.frequency.value = 880; const g = c.createGain(); g.gain.setValueAtTime(0.0001, t0 + i * 0.18); g.gain.exponentialRampToValueAtTime(0.05, t0 + i * 0.18 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.18 + 0.12); o.connect(g); g.connect(this.out); o.start(t0 + i * 0.18); o.stop(t0 + i * 0.18 + 0.14); } },
   launch(x, z) { const v = this.voice(x, z, 0.2); if (!v) return; const { t0, a, dest } = v; this.hiss(dest, t0, 0.5, 700, 200, 0.25 * a); this.thump(dest, t0 + 0.2, 0.4, 120, 60, 0.2 * a); },
   engine(frac) { if (this.engG) { this.engG.gain.setTargetAtTime(0.05 + 0.08 * Math.abs(frac), this.ctx.currentTime, 0.3); this.eng.frequency.setTargetAtTime(28 + 22 * Math.abs(frac), this.ctx.currentTime, 0.5); } },
 };

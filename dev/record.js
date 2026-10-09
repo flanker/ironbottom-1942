@@ -59,7 +59,7 @@
         for (const e of list) {
           cam.position.fromArray(e.cp); cam.quaternion.fromArray(e.cq); cam.updateMatrixWorld(true);
           G.mode = e.mode; if (G.player && e.P) { G.player.x = e.P[0]; G.player.z = e.P[1]; }
-          S.last = -1; S.inFlight = 0;
+          S.last = -1; S.inFlight = 0; S.active = 0;
           try { orig[e.k].apply(S, e.a); } catch (err) { console.warn('sfx', e.k, err); }
         }
         c.resume();
