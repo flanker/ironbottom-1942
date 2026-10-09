@@ -1,8 +1,8 @@
 // Duel balance in Node: both flagships are handed to the AI and every pairing of a class is fought out headless.
-//   node dev/duel-balance.js [runs per pairing] [class] [escorts]
-//   node dev/duel-balance.js 40 CA 2
+//   node dev/debug/duel-balance.js [runs per pairing] [class] [escorts]
+//   node dev/debug/duel-balance.js 40 CA 2
 // Prints the US win rate per pairing, with draws, average length and how much of each flagship was left.
-const S = require('../sim.js');
+const S = require('../../sim.js');
 const runs = +(process.argv[2] || 30), only = process.argv[3], escorts = process.argv[4] != null ? +process.argv[4] : 2;
 
 function duel(cls, us, jp) {

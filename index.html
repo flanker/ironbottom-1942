@@ -3114,7 +3114,7 @@ if (window.__IBS_DEBUG) window.__ibs = { PERF, renderer, G, advance(sec, fn) { c
   // the dev tools' old calling convention: the current world is implied
   Ship: function (key, team, name, o) { return new S.Ship(world, key, team, name, o); },
   fireTurret: (s, t, x, z, err) => S.fireTurret(world, s, t, x, z, err), launchFan: (s, h) => S.launchFan(world, s, h), AI: S.AI,
-  // used by dev/record.js
+  // used by dev/record/legacy/record.js
   step, updateCamera, renderView, drawOverlay, setupPreview, selectShip, spawnWave, FX, TS, GUNS, menuCam, glCanvas, ov, SUN_AZ, keys, drawMini, setWeapon,
   get shells() { return world.shells; },
   forceSize(w, h) { VW = w; VH = h; ODPR = 1; renderer.setPixelRatio(1); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); ov.width = w; ov.height = h; } };

@@ -60,7 +60,7 @@ railway up         # 部署到已关联的 Railway 项目
 
 `railway.json` 指定新加坡区域、单副本（房间在内存里，不能多副本）、不休眠，健康检查走 `/healthz`。由服务器直接提供的页面连同源的 `/ws`；静态站点（ironbottom1942.com）和 iOS app 连 `index.html` 里 `SERVER_ORIGIN` 指向的服务器。
 
-`node dev/duel-balance.js 40` 让双方座舰都交给 AI，把每个舰种的每种对阵打 40 局，输出美军胜率。调 `sim.js` 里 `DUEL.tune` 的数值时用它对比。
+`node dev/debug/duel-balance.js 40` 让双方座舰都交给 AI，把每个舰种的每种对阵打 40 局，输出美军胜率。调 `sim.js` 里 `DUEL.tune` 的数值时用它对比。
 
 ## 操作
 
@@ -124,7 +124,7 @@ open ios/Ironbottom.xcodeproj   # 选模拟器或真机运行；上传 TestFligh
 
 ## 平衡测试
 
-`dev/` 目录里是调数值用的工具。打开 `dev/index.html` 会开启调试句柄 `window.__ibs`，并加载一个「机器人舰长」。它会算提前量瞄准、躲鱼雷、绕开岛屿、自动损管。在控制台执行：
+`dev/` 下分三块：`debug/` 是调数值和看舰模的工具，`record/` 录宣传片画面（`record/legacy/` 是老的单人战役录制器），`promo/` 剪辑、混音和出片。打开 `dev/debug/index.html` 会开启调试句柄 `window.__ibs`，并加载一个「机器人舰长」。它会算提前量瞄准、躲鱼雷、绕开岛屿、自动损管。在控制台执行：
 
 ```js
 __run('fletcher', 'captain')   // 座舰：fletcher / brooklyn / nc；难度：cadet / captain / admiral
@@ -132,4 +132,4 @@ __run('fletcher', 'captain')   // 座舰：fletcher / brooklyn / nc；难度：c
 
 模拟会同步跑完一整局，返回胜负、每 20 秒的战况，以及按炮弹、鱼雷、火灾、搁浅拆分的伤害来源。
 
-`dev/viewer.html` 是舰模查看器，可以近距离环绕检查各舰模型：`?ship=takao&a=-110&e=14&d=0.6`（方位角、仰角、距离按舰长倍数），加 `lz=0.9` 可把视点移到舰艏（-1 为舰艉）。方向键环绕，+/- 远近，[ ] 切换舰型。
+`dev/debug/viewer.html` 是舰模查看器，可以近距离环绕检查各舰模型：`?ship=takao&a=-110&e=14&d=0.6`（方位角、仰角、距离按舰长倍数），加 `lz=0.9` 可把视点移到舰艏（-1 为舰艉）。方向键环绕，+/- 远近，[ ] 切换舰型。

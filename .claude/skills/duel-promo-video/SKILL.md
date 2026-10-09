@@ -9,12 +9,12 @@ description: 给铁底湾1942做宣传视频（B站横版 3–5 分钟 + 小红�
 
 ## 原理（先读懂再动手）
 
-1. **对局在 Node 里跑**：`node dev/duel-stream.js <BB|DD|CA> <seed> out.json` 用真实的 `server/room.js` 和 `sim.js` 把一整个房间跑完，包括建房、加入、选舰、准备、倒计时和对局。双方舰长交给游戏 AI，`Math.random` 用种子固定。每一方收到的每条服务器消息都按时间记下来，`xme` 里另存舰长的锁定目标、车钟、舵和鱼雷发射，页面要用这些来模拟玩家的手。
-   - 扫种子：`node dev/duel-stream.js BB scan 30`。看谁赢、命中、击沉、鱼雷，挑剧情好的那局。
+1. **对局在 Node 里跑**：`node dev/record/duel-stream.js <BB|DD|CA> <seed> out.json` 用真实的 `server/room.js` 和 `sim.js` 把一整个房间跑完，包括建房、加入、选舰、准备、倒计时和对局。双方舰长交给游戏 AI，`Math.random` 用种子固定。每一方收到的每条服务器消息都按时间记下来，`xme` 里另存舰长的锁定目标、车钟、舵和鱼雷发射，页面要用这些来模拟玩家的手。
+   - 扫种子：`node dev/record/duel-stream.js BB scan 30`。看谁赢、命中、击沉、鱼雷，挑剧情好的那局。
    - 房间流程的时间点写在 `SCENARIOS.<场景>.lobby` 里（`create`、`join`、`cls`、`esc`、`pickJP`、`readyUS`、`readyJP`），**单位是会话秒**。录制时页面要在同一时刻点同一个按钮，所以改其中一个，另一个也要跟着改（BB 场景对应 `prod.py` 的 `lobby()`）。改房间流程的时间不影响对局结果，同一种子打出来的仗完全一样。
-2. **页面逐帧回放**：`python3 dev/record-duel.py job.json` 打开真游戏（先在仓库根目录跑 `npm start`，端口 8080），注入两个脚本：
-   - `dev/record-duel-boot.js`：虚拟时钟（performance.now、Date.now、定时器和 rAF 只跟着 `__vc.advance` 走，CSS 动画逐帧步进），再加一个假 WebSocket，按时间把那一方的消息喂给页面。游戏代码一行不改，大厅、HUD、插值、结算全是真的。
-   - `dev/record-duel.js`：导演。plan 里的动作有 `cursor`、`move`、`click`、`type`、`zoom`（望远镜）、`cine`（隐藏 HUD 和界面）、`cam`。机位有 `orbit`、`chase`、`target`（站在被打的那艘船旁边）、`shell`（跟拍炮弹）、`wide`、`deck`；镜头里的舰船用 `me`、`foe`、`US`、`JP` 或舰名来指。声音先记录，take 结束后用 OfflineAudioContext 重放，输出对齐画面的 `audio.wav`。
+2. **页面逐帧回放**：`python3 dev/record/record-duel.py job.json` 打开真游戏（先在仓库根目录跑 `npm start`，端口 8080），注入两个脚本：
+   - `dev/record/record-duel-boot.js`：虚拟时钟（performance.now、Date.now、定时器和 rAF 只跟着 `__vc.advance` 走，CSS 动画逐帧步进），再加一个假 WebSocket，按时间把那一方的消息喂给页面。游戏代码一行不改，大厅、HUD、插值、结算全是真的。
+   - `dev/record/record-duel.js`：导演。plan 里的动作有 `cursor`、`move`、`click`、`type`、`zoom`（望远镜）、`cine`（隐藏 HUD 和界面）、`cam`。机位有 `orbit`、`chase`、`target`（站在被打的那艘船旁边）、`shell`（跟拍炮弹）、`wide`、`deck`；镜头里的舰船用 `me`、`foe`、`US`、`JP` 或舰名来指。声音先记录，take 结束后用 OfflineAudioContext 重放，输出对齐画面的 `audio.wav`。
    - job 里的 `takes` 只截取需要的时间段，其余时间快进（每秒 100 帧以上）。`every: 60` 用来出预览缩略图。
 3. **剪辑和混音**在 `dev/promo/` 里，见下文。每一部片子单独一个文件夹 `dev/promo/productions/<日期-主题>/`，放这部片子会变的东西：录制任务、剪辑表、台词、封面选帧。
 
@@ -28,7 +28,7 @@ export PROMO_PROD=dev/promo/productions/<日期-主题>             # 这部片�
 ```
 
 1. **先写台词再排镜头**。把台词写进 `$PROMO_PROD/lines.json`（`b` 是 B站，`x` 是小红书，一句一个 key），然后跑 `python3 dev/promo/tts.py` 生成 AI 试读，拿到每句时长。真人通常读得比 edge-tts 慢一点，镜头按「试读时长加 0.3–0.8 秒」留空。
-2. **出对局流**：`node dev/duel-stream.js BB 12 $PROMO_WORK/BB.json`，DD、CA 同理。
+2. **出对局流**：`node dev/record/duel-stream.js BB 12 $PROMO_WORK/BB.json`，DD、CA 同理。
 3. **预览选镜头**：每一方先跑一遍 `every: 60` 的预览，再用 `dev/promo/sheet.py` 或 `tsheet.py` 拼成缩略图，把命中、起火、中雷、击沉落在会话的哪一秒找出来。事件时间也可以直接查 stream JSON 的 `events`（`bt` 是对局时间）。**对局时间换算会话时间**：会话时间 = `start` + 0.04 + 0.15 + bt（`jobs.BASE`）。
 4. **写录制任务**：在 `$PROMO_PROD/prod.py` 里用 `dev/promo/jobs.py` 的 `job()`、`take()`、`cine()` 写，竖版用视口 864×1536（×1.25 得到 1080×1920），镜头视场乘 1.75。跑 `python3 $PROMO_PROD/prod.py > $PROMO_WORK/runs/list.txt`，再跑 `python3 dev/promo/runall.py $PROMO_WORK/runs/list.txt 4` 并行录制（别用 xargs，路径太长会报错）。
 5. **字卡**：`dev/promo/cards/cards.html` 用游戏自己的字体画片头、分屏底板、章节标签、技术说明卡、片尾、竖版顶栏和底部字幕，`python3 dev/promo/cards/render.py` 输出透明 PNG 到 `$PROMO_WORK/cards/`。
@@ -57,7 +57,7 @@ export PROMO_PROD=dev/promo/productions/<日期-主题>             # 这部片�
 
 ## 文件
 
-- `dev/duel-stream.js`、`dev/record-duel-boot.js`、`dev/record-duel.js`、`dev/record-duel.py`：出对局流和逐帧录制。
+- `dev/record/duel-stream.js`、`dev/record/record-duel-boot.js`、`dev/record/record-duel.js`、`dev/record/record-duel.py`：出对局流和逐帧录制。
 - `dev/promo/`：通用流程。`jobs.py` 是录制任务的辅助函数，`runall.py` 并行录制，`tts.py` 生成 AI 试读，`compose.py` 逐段合成，`mix.py` 混音并导出 mp4，`export.py` 生成 SRT、旁白稿和交付文件，`cards/` 是字卡和封面渲染，`sheet.py` 和 `tsheet.py` 出缩略图。
 - `dev/promo/productions/2026-10-duel/`：上一版联机宣传片（BB 种子 12、DD 种子 26、CA 种子 17），做新片子时复制这个文件夹当模板。里面有 `prod.py`（录制任务和 BB 的房间流程）、`edit.py`（剪辑表、音乐、按钮声、画面说明）、`lines.json`（台词）和 `cover.html`（封面）。
-- 老的单人战役录制器在 `dev/record.js`、`record-hud.js`、`record-cards.js`，用 `recserver.py` 直接收帧，录单人战役画面可以用它。
+- 老的单人战役录制器在 `dev/record/legacy/`：`record.html` 加载 `record.js`、`record-hud.js`、`record-cards.js`，用 `recserver.py` 直接收帧，录单人战役画面可以用它。

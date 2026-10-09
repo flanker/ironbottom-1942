@@ -1,4 +1,4 @@
-"""Helpers for recorder jobs (dev/record-duel.py): job(), take(), cine(), bt(). A production's prod.py builds its jobs with them."""
+"""Helpers for recorder jobs (dev/record/record-duel.py): job(), take(), cine(), bt(). A production's prod.py builds its jobs with them."""
 import json, os, sys
 SP = os.environ.get('PROMO_WORK') or os.path.abspath('promo-work')   # work dir: streams, runs/, takes/, tts/, cards/, out/
 def start(sc): return json.load(open(f'{SP}/{sc}.json'))['start'] + 0.04 + 0.15   # what the page shows lags the server

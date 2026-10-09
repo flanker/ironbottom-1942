@@ -1,7 +1,7 @@
 // Promo footage of the online duel, step 2a (runs before the page's own scripts): a virtual clock and a fake WebSocket.
 // performance.now, Date.now, timers and requestAnimationFrame only move when __vc.advance(ms) is called, so every frame
 // is rendered at exactly 1/fps of game time however slow the capture is. The WebSocket hands the page the messages a
-// real server sent its side in dev/duel-stream.js, each at its time; what the page sends is noted and answered only
+// real server sent its side in dev/record/duel-stream.js, each at its time; what the page sends is noted and answered only
 // with pongs (the lobby and the battle are already scripted).
 (function () {
   const realSetTimeout = window.setTimeout.bind(window), T0 = Date.now();

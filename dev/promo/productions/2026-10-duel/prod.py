@@ -1,6 +1,6 @@
 """Recorder jobs for the 2026-10 duel promo (BB seed 12, DD seed 26, CA seed 17).
    python3 dev/promo/productions/2026-10-duel/prod.py > $PROMO_WORK/runs/list.txt
-lobby() is the BB room scene; its click times match SCENARIOS.BB.lobby in dev/duel-stream.js."""
+lobby() is the BB room scene; its click times match SCENARIOS.BB.lobby in dev/record/duel-stream.js."""
 import os, sys; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '../..')); from jobs import *
 CLS = lambda v: f'#lbCls button[data-v="{v}"]'
 ESC = lambda v: f'#lbEsc button[data-v="{v}"]'

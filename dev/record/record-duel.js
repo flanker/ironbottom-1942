@@ -1,5 +1,5 @@
-// Promo footage of the online duel, step 2b (runs after the page's own scripts): the director. dev/record-duel.py loads
-// one captain's message stream (dev/duel-stream.js), hands over a plan of timed actions (cursor moves, clicks, typing,
+// Promo footage of the online duel, step 2b (runs after the page's own scripts): the director. dev/record/record-duel.py loads
+// one captain's message stream (dev/record/duel-stream.js), hands over a plan of timed actions (cursor moves, clicks, typing,
 // binoculars, cameras) and then calls __vc.advance once per frame and screenshots the page. The battle itself is the
 // real duel client replaying the server's snapshots; this only plays the captain's hands and the film crew.
 (function () {
@@ -120,7 +120,7 @@
   };
   D.CAMS = CAMS;
 
-  // ---- sound: log what is raised during a take, then replay it through an OfflineAudioContext (as dev/record.js does)
+  // ---- sound: log what is raised during a take, then replay it through an OfflineAudioContext (as dev/record/legacy/record.js does)
   const SFX = ['gun', 'hit', 'splash', 'incoming', 'flyby', 'torpHit', 'boom', 'launch', 'alarm', 'pick'], orig = {}, Sfx = I.Sfx;
   for (const k of SFX) orig[k] = Sfx[k];
   for (const k of SFX) Sfx[k] = (...a) => { if (D.log) D.log.push({ t: VC.t / 1000, k, a, cp: cam.position.toArray(), cq: cam.quaternion.toArray(), P: G.player ? [G.player.x, G.player.z] : null, mode: G.mode }); };

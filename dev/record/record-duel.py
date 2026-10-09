@@ -1,23 +1,23 @@
 """Promo footage of the online duel, step 3: drive one captain's page frame by frame and screenshot it.
 
-    python3 dev/record-duel.py job.json
+    python3 dev/record/record-duel.py job.json
 
 job: { "stream": "BB.json", "side": "US", "out": "shots/x", "w": 1536, "h": 864, "dpr": 1.25, "fps": 30,
        "plan": [[t, action, ...args], ...], "takes": [{"name": "lobby", "t0": 0, "t1": 12}, ...] }
-The page is the real game served by `npm start` (port 8080), with dev/record-duel-boot.js injected before its scripts and
-dev/record-duel.js after. Session time runs from 0; frames outside every take are stepped but not captured. Each take
+The page is the real game served by `npm start` (port 8080), with dev/record/record-duel-boot.js injected before its scripts and
+dev/record/record-duel.js after. Session time runs from 0; frames outside every take are stepped but not captured. Each take
 gets frames <out>/<name>/f00000.jpg… and <out>/<name>/audio.wav (the game's sounds for exactly those frames).
 """
 import asyncio, base64, json, os, sys, time
 from playwright.async_api import async_playwright
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 URL = os.environ.get('IBS_URL', 'http://localhost:8080/')
 
 
 def page_html(orig):
-    boot = open(os.path.join(ROOT, 'dev/record-duel-boot.js')).read()
-    rec = open(os.path.join(ROOT, 'dev/record-duel.js')).read()
+    boot = open(os.path.join(ROOT, 'dev/record/record-duel-boot.js')).read()
+    rec = open(os.path.join(ROOT, 'dev/record/record-duel.js')).read()
     html = orig.replace('<head>', '<head><script>window.__IBS_DEBUG = true;</script><script>' + boot + '</script>', 1)
     # a hook between the game camera and the render, for the film crew's cameras
     a = '  updateCamera(dt);\n  renderView();'
