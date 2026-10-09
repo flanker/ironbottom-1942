@@ -1,11 +1,11 @@
 // Promo footage of the online duel, step 1: play a whole room through the real server code (server/room.js) in Node and
-// keep every message each captain's page is sent, with its time. dev/record-duel.js later replays a side's messages into
+// keep every message each captain's page is sent, with its time. dev/record/record-duel.js later replays a side's messages into
 // the unmodified page through a fake WebSocket, frame by frame.
-//   node dev/duel-stream.js <scenario> <seed> [out.json]     one run, written out
-//   node dev/duel-stream.js <scenario> scan <n>               n seeds, one summary line each, to pick a good battle
+//   node dev/record/duel-stream.js <scenario> <seed> [out.json]     one run, written out
+//   node dev/record/duel-stream.js <scenario> scan <n>               n seeds, one summary line each, to pick a good battle
 // Both captains are flown by the game's own AI; a scenario may nudge them (closer ranges for a knife fight).
-const S = require('../sim.js');
-const { Room } = require('../server/room.js');
+const S = require('../../sim.js');
+const { Room } = require('../../server/room.js');
 const fs = require('node:fs');
 
 const TICK = 1 / 30, LAT = 0.04;   // the server's step; one-way latency the pages see

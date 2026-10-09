@@ -1,5 +1,5 @@
 // Promo-footage recorder. Takes over the game loop (G.hold), steps the simulation at a fixed rate, and posts each
-// rendered frame as a JPEG to the receiver (dev/recserver.py on :8766). Sounds raised during a shot are logged with
+// rendered frame as a JPEG to the receiver (dev/record/legacy/recserver.py on :8766). Sounds raised during a shot are logged with
 // their sim time and camera, then replayed through an OfflineAudioContext so the mix lines up with the picture.
 // Usage from the console: await __rec.setup(); await __rec.run('hook') … see SHOTS below.
 (function () {
@@ -85,7 +85,7 @@
       cx.drawImage(I.glCanvas, 0, 0, R.w, R.h);
       if (f.overlay) { I.drawOverlay(); cx.drawImage(I.ov, 0, 0, R.w, R.h); }
       f.paint && f.paint(cx, t + dt);
-      if (f.hud) R.hudPaint(cx, dt);   // dev/record-hud.js: overlay canvas, minimap and the HTML HUD
+      if (f.hud) R.hudPaint(cx, dt);   // dev/record/legacy/record-hud.js: overlay canvas, minimap and the HTML HUD
       const blob = await new Promise(r => comp.toBlob(r, 'image/jpeg', R.q));
       await post(`shots/${name}/f${String(i).padStart(5, '0')}.jpg`, blob);
     }

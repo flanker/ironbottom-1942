@@ -4,8 +4,8 @@
 <script>
   // Close-up model viewer. ?ship=fletcher&a=40&e=12&d=1.3  (azimuth deg, elevation deg, distance × L, lz: look-at point along the hull, -1 stern … 1 bow)
   // Keys: ←/→ orbit, ↑/↓ elevation, +/- distance, [ / ] cycle ships.
-  fetch('../index.html').then(r => r.text()).then(html => {
-    html = html.replace('<head>', '<head><script>window.__IBS_DEBUG = true; window.__IBS_BASE = "../"<\/script>').replace('src="sim.js"', 'src="../sim.js"')
+  fetch('../../index.html').then(r => r.text()).then(html => {
+    html = html.replace('<head>', '<head><script>window.__IBS_DEBUG = true; window.__IBS_BASE = "../../"<\/script>').replace('src="sim.js"', 'src="../../sim.js"')
                .replace('</body>', '<script src="viewer.js"><\/script></body>');
     document.open(); document.write(html); document.close();
   });
