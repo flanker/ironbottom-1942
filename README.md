@@ -134,7 +134,7 @@ node dev/package/build.mjs minitool   # → dist/ironbottom-1942-minitool.zip，
 node dev/package/build.mjs toy        # → dist/ironbottom-1942-toy.zip，上传到 B站 Toy 发布平台
 ```
 
-上传前各跑一次平台 skill 自带的检查：`python3 .claude/skills/minitool-zip-builder/scripts/audit_artifact.py <zip>`（小红书）、`python3 .claude/skills/toy/scripts/toy_doctor.py <zip> --slug ironbottom-1942`（Toy）。
+上传前各跑一次平台 skill 自带的检查：`python3 .claude/skills/minitool-zip-builder/scripts/audit_artifact.py <zip>`（小红书）、`python3 .claude/skills/toy/scripts/toy_doctor.py <zip> --slug ironbottom1942`（Toy）。
 
 ## 平衡测试
 
