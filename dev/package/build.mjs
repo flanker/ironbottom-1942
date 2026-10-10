@@ -44,6 +44,8 @@ head = once(head, /<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com
 body = once(body, '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>\n<script src="sim.js"></script>\n',
   (TARGET === 'toy' ? `<script src="${TOY_SDK}"></script>\n` : '') + '<script src="./three.min.js"></script>\n<script src="./sim.js"></script>\n<script src="./sfx.js"></script>\n', 'scripts');
 body = once(body, '<button type="button" class="mode duel" id="modeDuel">', '<button type="button" class="mode duel" id="modeDuel" hidden>', 'hide duel');
+// with the duel gone the home screen offers a single choice, so the game opens on the ship pick and comes back to it
+body = once(body, '<button class="back" id="menuBack" type="button">', '<button class="back" id="menuBack" type="button" hidden>', 'hide home link');
 html = head + body + '<script src="./app.js"></script>\n' + tail;
 
 // ---------------------------------------------------------------- app.js
@@ -149,6 +151,11 @@ app = once(app, `  const w = window.innerWidth, h = window.innerHeight; VW = w; 
   renderer.setSize(`, `  const w = window.innerWidth, h = window.innerHeight; VW = w; VH = h;
   renderer.setPixelRatio(Math.min(renderer.getPixelRatio(), Math.sqrt(2e6 / Math.max(1, w * h))));
   renderer.setSize(`, 'pixel budget');
+
+// one way to play: open on the ship pick, and every "back to the home screen" lands there too
+app = once(app, "  showScreen('home'); setupPreview(); measureStage();\n", "  showScreen('menu'); setupPreview(); drawMenuArt(); measureStage();\n", 'open on ship pick');
+app = once(app, "function toHome() { toMenu('home'); }", 'function toHome() { toMenu(); }', 'home is the ship pick');
+app = once(app, "(!$('#menu').hidden || !$('#mp').hidden)", "!$('#mp').hidden", 'no Esc to home');
 
 // no iOS-app shell in the container
 app = once(app, 'const APP = window.__IBS_APP || null;', 'const APP = null;', 'app shell');
@@ -299,6 +306,12 @@ const printCss = nodes => nodes.map(n => n.kids ? `${n.at}{\n${printCss(n.kids)}
 let style = printCss(lowerRules(parseCss(css.replace(/\/\*[\s\S]*?\*\//g, ''))));
 // one way to play here: the solo card takes the row the duel card shared
 style += '#home .modes{grid-template-columns:minmax(0,1fr)}\n';
+// the XHS container lays its own bar (back button on the left, profile and share on the right, 44 px) over the page just
+// under the status bar, and env(safe-area-inset-top) covers only the status bar
+if (TARGET === 'minitool') style += ':root{--chrome-top:44px}\n';
+// the Toy container floats its ··· / ✕ capsule in the top-right corner (about 84 px in from the right edge, 47 px down),
+// and its safe area doesn't report it: the score and clock sit left of it, the chart below it
+if (TARGET === 'toy') style += '@media (pointer:coarse) and (orientation:landscape) and (max-height:540px){.hud-tr{right:96px}.hud-br{top:56px}}\n';
 
 // ---------------------------------------------------------------- files
 fs.rmSync(OUT, { recursive: true, force: true });
